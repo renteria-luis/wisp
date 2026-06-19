@@ -1,0 +1,33 @@
+{
+  "common": {
+    "appName": "Wisp",
+    "loading": "Cargando…",
+    "close": "Cerrar",
+    "notMedicalAdvice": "Información general, no es consejo médico."
+  },
+  "tabs": {
+    "home": "Inicio",
+    "plan": "Plan",
+    "progress": "Progreso",
+    "space": "Espacio"
+  },
+  "home": {
+    "greeting": "Hola, {{name}}",
+    "subtitle": "Soy {{companion}}. Iremos paso a paso, sin prisa.",
+    "placeholder": "Aquí empieza tu camino."
+  },
+  "onboarding": {
+    "welcomeTitle": "Bienvenida a Wisp",
+    "welcomeBody": "Una compañía amable para ayudarte a fumar menos, a tu propio ritmo.",
+    "getStarted": "Empezar"
+  },
+  "screens": {
+    "plan": "Aquí estará tu plan.",
+    "progress": "Aquí estará tu progreso.",
+    "space": "Aquí estará el espacio de tu compañía.",
+    "log": "Registra un cigarrillo o un antojo resistido.",
+    "craving": "Respira. Este antojo va a pasar.",
+    "about": "Hecho con cariño, en tu dispositivo.",
+    "settings": "Idioma, perfil, notificaciones y tus datos."
+  }
+}
