@@ -1,16 +1,23 @@
-import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { allowanceForDay } from '@/engine/planEngine';
 import { personal } from '@/personal/personal.config';
+import { usePlan } from '@/store/usePlan';
+import { useSettings } from '@/store/useSettings';
+import { daysBetween, todayISO } from '@/utils/date';
 
 /**
- * Placeholder Home. The real companion (layered SVG, vitality-driven) and
- * today's status arrive in later phases. For Phase 0 this proves the styling
- * (NativeWind + tokens), i18n, and personal config are all wired end to end.
+ * Home. The real companion (layered SVG, vitality-driven) arrives in Phase 4;
+ * for now it greets the user by name and reflects today's plan status.
  */
 export default function Home() {
   const { t } = useTranslation();
+  const userName = useSettings((s) => s.userName);
+  const companionName = useSettings((s) => s.companionName);
+  const plan = usePlan((s) => s.plan);
+  const name = userName || personal.dedicateeName;
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
@@ -20,11 +27,35 @@ export default function Home() {
         </View>
 
         <Text className="mt-10 text-3xl font-bold text-ink">
-          {t('home.greeting', { name: personal.dedicateeName })}
+          {t('home.greeting', { name })}
         </Text>
         <Text className="mt-3 text-center text-base leading-6 text-ink-soft">
-          {t('home.subtitle', { companion: personal.companionDefaultName })}
+          {t('home.subtitle', { companion: companionName })}
         </Text>
+
+        {plan ? (
+          <View className="mt-8 flex-row items-center gap-2 rounded-full bg-primary-100 px-5 py-2">
+            {plan.track === 'gradual_reduction' ? (
+              <>
+                <Text className="text-sm text-primary-700">
+                  {t('plan.todayTarget')}
+                </Text>
+                <Text className="text-sm font-bold text-primary-700">
+                  {t('plan.cigarettes', {
+                    count: allowanceForDay(
+                      plan,
+                      daysBetween(plan.startDate, todayISO()),
+                    ),
+                  })}
+                </Text>
+              </>
+            ) : (
+              <Text className="text-sm font-bold text-primary-700">
+                {t('plan.track.cold_turkey')}
+              </Text>
+            )}
+          </View>
+        ) : null}
       </View>
     </SafeAreaView>
   );

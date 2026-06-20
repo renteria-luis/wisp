@@ -1,10 +1,21 @@
 import { Redirect } from 'expo-router';
+import { View } from 'react-native';
+
+import { useStoreHydrated } from '@/hooks/useStoreHydrated';
+import { useSettings } from '@/store/useSettings';
 
 /**
- * Entry redirect. In Phase 2 this will read a persisted "onboarding completed"
- * flag and send first-time users through `(onboarding)`. For now (no store yet)
- * it lands straight on the tabs so the app boots to a placeholder Home.
+ * Entry gate: first-time users go through onboarding; returning users land on
+ * the tabs. We wait for the settings store to rehydrate from storage so we
+ * don't flash the wrong route.
  */
 export default function Index() {
-  return <Redirect href="/home" />;
+  const hydrated = useStoreHydrated(useSettings);
+  const onboardingCompleted = useSettings((s) => s.onboardingCompleted);
+
+  if (!hydrated) {
+    return <View className="flex-1 bg-cream" />;
+  }
+
+  return <Redirect href={onboardingCompleted ? '/home' : '/welcome'} />;
 }

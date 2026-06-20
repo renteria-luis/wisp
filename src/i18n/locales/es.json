@@ -3,6 +3,10 @@
     "appName": "Wisp",
     "loading": "Cargando…",
     "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "confirm": "Confirmar",
+    "optional": "Opcional",
     "notMedicalAdvice": "Información general, no es consejo médico."
   },
   "tabs": {
@@ -19,10 +23,93 @@
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",
     "welcomeBody": "Una compañía amable para ayudarte a fumar menos, a tu propio ritmo.",
-    "getStarted": "Empezar"
+    "getStarted": "Empezar",
+    "nameLabel": "¿Cómo te llamo?",
+    "namePlaceholder": "Tu nombre",
+    "consumption": {
+      "title": "Tu consumo, hoy",
+      "subtitle": "Sin juicios: los números honestos ayudan a crear el plan correcto.",
+      "perDay": "Cigarrillos por día",
+      "packPrice": "Precio por cajetilla",
+      "cigsPerPack": "Cigarrillos por cajetilla",
+      "currency": "Moneda"
+    },
+    "profile": {
+      "title": "Un poco sobre ti",
+      "subtitle": "Esto personaliza tu cronología de salud. Todo es opcional.",
+      "gender": "Género",
+      "age": "Edad",
+      "yearsSmoking": "Años fumando",
+      "years": "años"
+    },
+    "triggers": {
+      "title": "¿Cuándo llegan los antojos?",
+      "subtitle": "Elige los momentos que reconozcas. Planearemos en torno a ellos."
+    },
+    "readiness": {
+      "title": "¿Cómo te sientes?",
+      "subtitle": "No hay respuestas incorrectas.",
+      "confidence": "¿Qué tan segura estás de reducir?",
+      "confidenceLow": "Aún no",
+      "confidenceHigh": "Mucho",
+      "firstCig": "¿Cuándo es tu primer cigarrillo al despertar?",
+      "preference": "¿Qué te parece mejor?"
+    },
+    "preview": {
+      "title": "Aquí está nuestro plan",
+      "suggested": "Sugerido para ti",
+      "chooseTrack": "¿Prefieres otro enfoque?",
+      "confirm": "Empezar mi plan",
+      "greeting": "Hola {{name}} — lo haremos juntas."
+    }
+  },
+  "gender": {
+    "female": "Mujer",
+    "male": "Hombre",
+    "nonbinary": "No binario",
+    "prefer_not": "Prefiero no decir"
+  },
+  "triggers": {
+    "work_break": "Descansos del trabajo",
+    "commute": "Trayecto",
+    "alcohol_social": "Beber / social",
+    "after_meals": "Después de comer",
+    "stress": "Estrés",
+    "boredom": "Aburrimiento",
+    "coffee": "Café"
+  },
+  "firstCig": {
+    "lt5": "En 5 minutos",
+    "m5_30": "5–30 minutos",
+    "m31_60": "31–60 minutos",
+    "gt60": "Después de una hora"
+  },
+  "preference": {
+    "quit": "Dejar por completo",
+    "reduce": "Reducir poco a poco",
+    "unsure": "Aún no estoy segura"
+  },
+  "plan": {
+    "track": {
+      "cold_turkey": "Dejarlo de golpe",
+      "gradual_reduction": "Reducción gradual"
+    },
+    "rationale": {
+      "cold_turkey": "Estás lista y fumas poco — un corte limpio puede funcionarte mejor.",
+      "gradual_reduction": "Una reducción constante te queda mejor — bajaremos a un ritmo amable."
+    },
+    "cigarettes_one": "{{count}} cigarrillo",
+    "cigarettes_other": "{{count}} cigarrillos",
+    "todayTarget": "Límite de hoy",
+    "dayOf": "Día {{day}} de {{total}}",
+    "targetDate": "Meta sin fumar",
+    "smokeFreeSince": "Sin fumar desde {{date}}",
+    "quitDate": "Fecha para dejarlo",
+    "weekAhead": "La semana que viene",
+    "criticalWindow": "Tus primeros {{days}} días son los más importantes — aquí estoy.",
+    "noPlan": "Aún no hay plan — termina la introducción para empezar."
   },
   "screens": {
-    "plan": "Aquí estará tu plan.",
     "progress": "Aquí estará tu progreso.",
     "space": "Aquí estará el espacio de tu compañía.",
     "log": "Registra un cigarrillo o un antojo resistido.",

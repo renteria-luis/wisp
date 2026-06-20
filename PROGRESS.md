@@ -1,67 +1,66 @@
 # PROGRESS
 
-## Current phase: 0 — Scaffold & foundations (status: done)
+## Current phase: 2 — Onboarding & plan engine (status: done)
 
-Wisp boots to a placeholder Home; `lint`, `typecheck`, and `test` all pass; the
-iOS and web bundles export cleanly. The foundation for Phase 1 is in place.
+Completing onboarding now assigns a track and produces a persisted plan; the
+Plan tab and Home reflect it. `lint`, `typecheck`, and **28 tests** pass; iOS and
+web bundles export cleanly (all 27 routes prerender).
 
-## Done
+> **Phase order note:** the user asked to jump straight to Phase 2. Phase 2's plan
+> engine is pure and its onboarding only needs lightweight persisted state, so it
+> was built in full and the **store slice** it needs (Zustand + AsyncStorage) was
+> folded in. The **SQLite/time-series data layer from Phase 1 is still deferred**
+> and must be done before Phase 3 (logging/adherence needs it). See Next steps.
 
-- **Toolchain:** Node was not preinstalled — installed Node 22 LTS via `nvm` and
-  symlinked `node`/`npm`/`npx` into `~/.local/bin` (already on PATH).
-- **App scaffold:** Expo **SDK 56** (React 19.2, RN 0.85.3, expo-router 56) on a
-  feature branch, reshaped from the official template into PROJECT.md §15 layout
-  (top-level `app/` + full `src/` skeleton).
-- **TypeScript (strict):** `@/*` → `src/*` path alias, plus
-  `noUncheckedIndexedAccess` and `resolveJsonModule`. `tsc --noEmit` clean.
-- **Styling:** NativeWind v4 + Tailwind v3 wired (babel `jsxImportSource`, metro
-  `withNativeWind`, `src/global.css`). Design tokens in `src/theme/tokens.ts`
-  share a single `palette.json` with `tailwind.config.js` so they never drift.
-- **Routing/UI:** root `Stack` + `(tabs)` (Home/Plan/Progress/Space) + an
-  `(onboarding)` group + modal routes (log/craving/about/settings). Placeholder
-  Home renders the companion greeting through i18n + personal config; `index.tsx`
-  redirects to the tabs (onboarding gate arrives in Phase 2).
-- **i18n:** i18next + react-i18next + expo-localization, EN default / ES, with a
-  locale key-parity test. All visible strings come from locale JSON.
-- **Personal touches:** `src/personal/personal.config.ts` holds the dedication +
-  easter-egg text (English, config-driven per §11).
-- **Quality tooling:** ESLint (eslint-config-expo flat config) clean, Prettier
-  (+ tailwind class sorting) clean, Jest (jest-expo) — **5 tests passing**.
-- **CI:** `.github/workflows/ci.yml` runs install → lint → typecheck → test on
-  Node 22 for pushes to `main` and PRs.
-- **Docs:** portfolio-oriented `README.md`.
-- **DoD verified:** `expo export` succeeds for **iOS** (Hermes bundle, fonts +
-  assets) and **web** (all 17 routes prerendered).
+## Done (Phase 2)
+
+- **Plan engine (pure, tested) — the product wedge:**
+  - `src/engine/planEngine.ts` — `suggestTrack` (transparent, overridable scoring
+    over consumption, readiness, dependence, preference) + `buildPlan` +
+    `allowanceForDay`.
+  - `src/engine/reduction.ts` — duration derivation and a `linear`/`easeOut`
+    allowance curve (monotonic, integer, ends at 0). Tunable constants exported.
+  - **23 engine tests** cover curve invariants, edge cases, and routing (incl. the
+    Tiffani persona → gradual reduction).
+- **Domain types** in `src/types/domain.ts`; pure date helpers in `src/utils/date.ts`.
+- **State (Phase-1 slice):** `useSettings`, `usePlan`, `useOnboarding` Zustand
+  stores persisted via AsyncStorage, plus a `useStoreHydrated` gate hook.
+- **Onboarding flow** (`app/(onboarding)/`): welcome → consumption → profile →
+  triggers → readiness → plan-preview. The preview runs the engine, shows the
+  suggested track + rationale + schedule, allows a track override, and commits
+  the plan + settings on confirm.
+- **Gating:** `app/index.tsx` waits for hydration, then routes first-timers to
+  onboarding and returning users to the tabs.
+- **Plan tab** shows today's allowance, day-of-N, the week ahead (`AllowanceBars`),
+  and the smoke-free target; **Home** greets by name and shows today's status.
+- **UI primitives** in `src/components/ui/`: Button, Card, OptionChip, NumberField,
+  Scale, ProgressDots, OnboardingStep, AllowanceBars.
+- **i18n:** full EN/ES strings for onboarding + plan (locale parity test passes).
+- Deps added: `zustand`, `date-fns`, `@react-native-async-storage/async-storage`.
 
 ## Next steps
 
-- **Phase 1 — Data layer & models.** Concretely:
-  1. Install: `npx expo install expo-sqlite @react-native-async-storage/async-storage`
-     and `npm i zustand nanoid date-fns`.
-  2. `src/data/schema.ts` + `src/data/db.ts` — expo-sqlite init + migrations for
-     the §16 tables (`cigarette_log`, `craving_log`, `check_in`, `plan_state`,
-     `inventory`, `economy_ledger`).
-  3. Repositories in `src/data/repositories/`, shared types in `src/types/`.
-  4. Zustand stores in `src/store/` (`useSettings`, `usePlan`, `useCompanion`,
-     `useEconomy`) with AsyncStorage persistence.
-  5. A `__DEV__`-only dev-seed util; repository unit tests.
-  - DoD: can log/read cigarette, craving, check-in; tests pass.
+- **Phase 1 (deferred slice) — SQLite time-series layer**, needed before Phase 3:
+  1. `npx expo install expo-sqlite`; `npm i nanoid` (+ `react-native-get-random-values`).
+  2. `src/data/schema.ts` + `src/data/db.ts` (init + migrations) for the §16 tables
+     (`cigarette_log`, `craving_log`, `check_in`, `economy_ledger`; `plan_state`
+     already lives in `usePlan`).
+  3. Repositories in `src/data/repositories/` + a `__DEV__` dev-seed + tests.
+- **Phase 3 — Adherence, re-planning & savings** (`adherence.ts`, `savings.ts`):
+  7-day rolling average, win days, non-punitive re-plan, money saved. Build on the
+  SQLite logs above.
 
 ## Notes / deviations from PROJECT.md
 
-- **Stack versions:** PROJECT.md predates SDK 56. Actual install is Expo SDK 56 /
-  React 19.2 / RN 0.85.3 / expo-router 56 / NativeWind 4.2 (Tailwind 3.4). Every
-  chosen library remains **Expo Go-compatible**, as required by §14.
-- **App display name is inlined in `app.config.ts`** (`'Wisp'`) instead of being
-  imported from `personal.config.ts`: Expo's config loader transpiles only
-  `app.config.ts` and cannot resolve relative `.ts` imports at config-eval time.
-  `personal.appName` stays the runtime/UI source of truth — keep the two in sync
-  (noted in `app.config.ts`). The "rebrand from one file" intent is preserved for
-  in-app text.
-- **Export convention:** route files (`app/`) default-export (Expo Router
-  requirement); shared components and data modules use **named** exports (keeps
-  `import/no-named-as-default` happy and reads consistently).
-- **Trimmed three dev-build-only template deps** (`@expo/ui`,
-  `expo-glass-effect`, `expo-symbols`) to stay strictly Expo Go-compatible, and
-  dropped the template's `use-color-scheme.web.ts` (web SSR hydration helper,
-  unneeded for an iOS-first app; it also tripped a React Compiler lint rule).
+- **Phase 1 interleave** (above): SQLite/time-series layer deferred to before
+  Phase 3; the persisted-store slice Phase 2 needed was built now.
+- **Typed routes & cold typecheck:** `experiments.typedRoutes` is on for the dev
+  experience. The generated `.expo/types/router.d.ts` is git-ignored and only
+  refreshed by a running `expo start`; `expo export` reuses a cached route list.
+  So `tsc`/CI run with it **absent** (→ permissive `Href`, stable and consistent).
+  Route names are validated at runtime and by the bundler.
+- **Spanish uses feminine forms** for the dedicatee persona (e.g. "lista",
+  "juntas"). A public build localizes neutrally.
+- _(Carried from Phase 0)_ Stack is Expo SDK 56 (vs PROJECT.md's pre-56
+  assumptions); app display name inlined in `app.config.ts`; route files
+  default-export while shared modules use named exports.

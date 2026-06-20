@@ -3,6 +3,10 @@
     "appName": "Wisp",
     "loading": "Loading…",
     "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "optional": "Optional",
     "notMedicalAdvice": "General information, not medical advice."
   },
   "tabs": {
@@ -19,10 +23,93 @@
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",
     "welcomeBody": "A gentle companion to help you smoke less — at your own pace.",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "nameLabel": "What should I call you?",
+    "namePlaceholder": "Your name",
+    "consumption": {
+      "title": "Your smoking, today",
+      "subtitle": "No judgment — honest numbers help me build the right plan.",
+      "perDay": "Cigarettes per day",
+      "packPrice": "Price per pack",
+      "cigsPerPack": "Cigarettes per pack",
+      "currency": "Currency"
+    },
+    "profile": {
+      "title": "A little about you",
+      "subtitle": "This personalizes your health timeline. All optional.",
+      "gender": "Gender",
+      "age": "Age",
+      "yearsSmoking": "Years smoking",
+      "years": "years"
+    },
+    "triggers": {
+      "title": "When do cravings hit?",
+      "subtitle": "Pick the moments that ring true. We'll plan around them."
+    },
+    "readiness": {
+      "title": "Where are you at?",
+      "subtitle": "There are no wrong answers.",
+      "confidence": "How confident are you about cutting back?",
+      "confidenceLow": "Not yet",
+      "confidenceHigh": "Very",
+      "firstCig": "When's your first cigarette after waking?",
+      "preference": "What feels right to you?"
+    },
+    "preview": {
+      "title": "Here's our plan",
+      "suggested": "Suggested for you",
+      "chooseTrack": "Prefer a different approach?",
+      "confirm": "Start my plan",
+      "greeting": "Hi {{name}} — we'll do this together."
+    }
+  },
+  "gender": {
+    "female": "Female",
+    "male": "Male",
+    "nonbinary": "Non-binary",
+    "prefer_not": "Prefer not to say"
+  },
+  "triggers": {
+    "work_break": "Work breaks",
+    "commute": "Commute",
+    "alcohol_social": "Drinking / social",
+    "after_meals": "After meals",
+    "stress": "Stress",
+    "boredom": "Boredom",
+    "coffee": "Coffee"
+  },
+  "firstCig": {
+    "lt5": "Within 5 minutes",
+    "m5_30": "5–30 minutes",
+    "m31_60": "31–60 minutes",
+    "gt60": "After an hour"
+  },
+  "preference": {
+    "quit": "Stop completely",
+    "reduce": "Cut down gradually",
+    "unsure": "I'm not sure yet"
+  },
+  "plan": {
+    "track": {
+      "cold_turkey": "Cold Turkey",
+      "gradual_reduction": "Gradual Reduction"
+    },
+    "rationale": {
+      "cold_turkey": "You're ready and smoke lightly — a clean break can work best for you.",
+      "gradual_reduction": "A steady taper fits you better — we'll ease down at a kind pace."
+    },
+    "cigarettes_one": "{{count}} cigarette",
+    "cigarettes_other": "{{count}} cigarettes",
+    "todayTarget": "Today's allowance",
+    "dayOf": "Day {{day}} of {{total}}",
+    "targetDate": "Smoke-free target",
+    "smokeFreeSince": "Smoke-free since {{date}}",
+    "quitDate": "Quit date",
+    "weekAhead": "The week ahead",
+    "criticalWindow": "Your first {{days}} days matter most — I'm right here.",
+    "noPlan": "No plan yet — finish onboarding to get started."
   },
   "screens": {
-    "plan": "Your plan will live here.",
     "progress": "Your progress will live here.",
     "space": "Your companion's space will live here.",
     "log": "Log a cigarette or a resisted craving.",

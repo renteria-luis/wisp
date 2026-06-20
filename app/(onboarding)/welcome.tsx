@@ -1,38 +1,57 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-/**
- * Onboarding entry. The full adaptive flow (consumption → profile → triggers →
- * readiness → plan preview) is built in Phase 2; this welcome step exists now so
- * the route group is in place.
- */
+import { Button } from '@/components/ui/Button';
+import { useOnboarding } from '@/store/useOnboarding';
+import { colors } from '@/theme/tokens';
+
+/** Onboarding entry: name + framing, then into the adaptive flow. */
 export default function Welcome() {
   const router = useRouter();
   const { t } = useTranslation();
+  const name = useOnboarding((s) => s.name);
+  const patch = useOnboarding((s) => s.patch);
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
-      <View className="flex-1 items-center justify-center px-8">
+    <SafeAreaView className="flex-1 bg-cream" edges={['top', 'bottom']}>
+      <View className="flex-1 justify-center px-6">
+        <View className="mb-10 items-center">
+          <View className="h-28 w-28 items-center justify-center rounded-full bg-primary-100">
+            <View className="h-16 w-16 rounded-full bg-primary-400" />
+          </View>
+        </View>
+
         <Text className="text-center text-3xl font-bold text-ink">
           {t('onboarding.welcomeTitle')}
         </Text>
-        <Text className="mt-4 text-center text-base leading-6 text-ink-soft">
+        <Text className="mt-3 text-center text-base leading-6 text-ink-soft">
           {t('onboarding.welcomeBody')}
         </Text>
+
+        <View className="mt-8">
+          <Text className="mb-1 text-sm font-medium text-ink-soft">
+            {t('onboarding.nameLabel')}
+          </Text>
+          <TextInput
+            value={name}
+            onChangeText={(v) => patch({ name: v })}
+            placeholder={t('onboarding.namePlaceholder')}
+            placeholderTextColor={colors.ink.mute}
+            className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 py-3 text-base text-ink"
+            returnKeyType="next"
+            autoCapitalize="words"
+          />
+        </View>
       </View>
 
-      <View className="px-8 pb-10">
-        <Pressable
-          onPress={() => router.replace('/home')}
-          accessibilityRole="button"
-          className="items-center rounded-xl bg-primary-500 py-4 active:opacity-90"
-        >
-          <Text className="text-base font-semibold text-ink-invert">
-            {t('onboarding.getStarted')}
-          </Text>
-        </Pressable>
+      <View className="px-6 pb-4">
+        <Button
+          label={t('onboarding.getStarted')}
+          onPress={() => router.push('/consumption')}
+          disabled={name.trim() === ''}
+        />
       </View>
     </SafeAreaView>
   );
