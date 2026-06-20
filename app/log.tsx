@@ -1,8 +1,114 @@
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ModalScreen } from '@/components/ui/ModalScreen';
+import { Button } from '@/components/ui/Button';
+import { OptionChip } from '@/components/ui/OptionChip';
+import { Scale } from '@/components/ui/Scale';
+import { useLogs } from '@/store/useLogs';
+import type { TriggerCategory } from '@/types/domain';
+
+const CATEGORIES: TriggerCategory[] = [
+  'work_break',
+  'commute',
+  'alcohol_social',
+  'after_meals',
+  'stress',
+  'boredom',
+  'coffee',
+];
+
+type Mode = 'smoked' | 'resisted';
 
 export default function Log() {
+  const router = useRouter();
   const { t } = useTranslation();
-  return <ModalScreen title={t('tabs.home')} message={t('screens.log')} />;
+  const logCigarette = useLogs((s) => s.logCigarette);
+  const logResisted = useLogs((s) => s.logResistedCraving);
+
+  const [mode, setMode] = useState<Mode>('smoked');
+  const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
+  const [intensity, setIntensity] = useState(5);
+  const [saving, setSaving] = useState(false);
+
+  const onSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (mode === 'smoked') {
+        await logCigarette({ trigger: trigger ?? undefined });
+      } else {
+        await logResisted({ trigger: trigger ?? undefined, intensity });
+      }
+      router.back();
+    } catch {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-cream">
+      <View className="flex-row justify-end px-4 pt-2">
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+          hitSlop={8}
+          className="px-2 py-1"
+        >
+          <Text className="text-base font-medium text-primary-600">
+            {t('common.close')}
+          </Text>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerClassName="gap-6 px-6 pb-6 pt-2">
+        <Text className="text-2xl font-bold text-ink">{t('log.title')}</Text>
+
+        <View className="flex-row gap-2">
+          <OptionChip
+            label={t('log.smoked')}
+            selected={mode === 'smoked'}
+            onPress={() => setMode('smoked')}
+          />
+          <OptionChip
+            label={t('log.resisted')}
+            selected={mode === 'resisted'}
+            onPress={() => setMode('resisted')}
+          />
+        </View>
+
+        <View>
+          <Text className="mb-2 text-sm font-medium text-ink-soft">
+            {t('log.triggerLabel')}
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {CATEGORIES.map((c) => (
+              <OptionChip
+                key={c}
+                label={t(`triggers.${c}`)}
+                selected={trigger === c}
+                onPress={() => setTrigger(trigger === c ? null : c)}
+              />
+            ))}
+          </View>
+        </View>
+
+        {mode === 'resisted' ? (
+          <View>
+            <Text className="mb-3 text-sm font-medium text-ink-soft">
+              {t('log.intensityLabel')}
+            </Text>
+            <Scale value={intensity} onChange={setIntensity} />
+          </View>
+        ) : null}
+      </ScrollView>
+
+      <View className="px-6 pb-4">
+        <Button label={t('log.save')} onPress={onSave} disabled={saving} />
+      </View>
+    </SafeAreaView>
+  );
 }

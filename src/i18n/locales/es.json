@@ -18,7 +18,11 @@
   "home": {
     "greeting": "Hola, {{name}}",
     "subtitle": "Soy {{companion}}. Iremos paso a paso, sin prisa.",
-    "placeholder": "Aquí empieza tu camino."
+    "placeholder": "Aquí empieza tu camino.",
+    "todayOf": "{{count}} de {{allowance}} hoy",
+    "smokeFreeToday": "Sin fumar hoy 🌿",
+    "loggedToday": "{{count}} registrados hoy",
+    "logAction": "Registrar"
   },
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",
@@ -109,10 +113,17 @@
     "criticalWindow": "Tus primeros {{days}} días son los más importantes — aquí estoy.",
     "noPlan": "Aún no hay plan — termina la introducción para empezar."
   },
+  "log": {
+    "title": "Registrar",
+    "smoked": "Fumé",
+    "resisted": "Lo resistí",
+    "triggerLabel": "¿Qué lo provocó? (opcional)",
+    "intensityLabel": "¿Qué tan fuerte fue?",
+    "save": "Guardar"
+  },
   "screens": {
     "progress": "Aquí estará tu progreso.",
     "space": "Aquí estará el espacio de tu compañía.",
-    "log": "Registra un cigarrillo o un antojo resistido.",
     "craving": "Respira. Este antojo va a pasar.",
     "about": "Hecho con cariño, en tu dispositivo.",
     "settings": "Idioma, perfil, notificaciones y tus datos."

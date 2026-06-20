@@ -3,4 +3,7 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
+// expo-sqlite's web build loads a WebAssembly module — let Metro bundle .wasm.
+config.resolver.assetExts.push('wasm');
+
 module.exports = withNativeWind(config, { input: './src/global.css' });

@@ -18,7 +18,11 @@
   "home": {
     "greeting": "Hi, {{name}}",
     "subtitle": "I'm {{companion}}. We'll take this one breath at a time.",
-    "placeholder": "Your journey starts here."
+    "placeholder": "Your journey starts here.",
+    "todayOf": "{{count}} of {{allowance}} today",
+    "smokeFreeToday": "Smoke-free today 🌿",
+    "loggedToday": "{{count}} logged today",
+    "logAction": "Log"
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",
@@ -109,10 +113,17 @@
     "criticalWindow": "Your first {{days}} days matter most — I'm right here.",
     "noPlan": "No plan yet — finish onboarding to get started."
   },
+  "log": {
+    "title": "Log",
+    "smoked": "I smoked",
+    "resisted": "I resisted",
+    "triggerLabel": "What triggered it? (optional)",
+    "intensityLabel": "How strong was it?",
+    "save": "Save"
+  },
   "screens": {
     "progress": "Your progress will live here.",
     "space": "Your companion's space will live here.",
-    "log": "Log a cigarette or a resisted craving.",
     "craving": "Take a breath. This craving will pass.",
     "about": "Made with care, on your device.",
     "settings": "Language, profile, notifications, and your data."
