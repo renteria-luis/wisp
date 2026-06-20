@@ -121,8 +121,23 @@
     "intensityLabel": "How strong was it?",
     "save": "Save"
   },
+  "progress": {
+    "trend": "7-day trend",
+    "perDayAvg": "cigarettes/day",
+    "streak": "Win streak",
+    "winDays": "Win days",
+    "smokeFreeDays": "Smoke-free days",
+    "saved": "Money saved",
+    "cigsAvoided_one": "{{count}} cigarette avoided",
+    "cigsAvoided_other": "{{count}} cigarettes avoided",
+    "easeTitle": "Let's ease the pace",
+    "easeBody": "The last few days ran a little high — and that's okay. We can stretch the plan to a gentler pace.",
+    "accelTitle": "You're ahead 🌿",
+    "accelBody": "You've been comfortably under target. Want to finish a little sooner?",
+    "easeCta": "Adjust my plan",
+    "accelCta": "Speed up"
+  },
   "screens": {
-    "progress": "Your progress will live here.",
     "space": "Your companion's space will live here.",
     "craving": "Take a breath. This craving will pass.",
     "about": "Made with care, on your device.",

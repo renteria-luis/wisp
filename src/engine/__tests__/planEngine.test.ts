@@ -3,9 +3,12 @@ import { describe, expect, it } from '@jest/globals';
 import type { ReadinessInputs } from '@/types/domain';
 
 import {
+  ACCELERATE_FACTOR,
   allowanceForDay,
   buildPlan,
   COLD_TURKEY_WINDOW_DAYS,
+  EASE_FACTOR,
+  rebuildReductionPlan,
   suggestTrack,
 } from '../planEngine';
 
@@ -110,5 +113,27 @@ describe('allowanceForDay', () => {
     expect(allowanceForDay(plan, -5)).toBe(plan.allowances[0]);
     expect(allowanceForDay(plan, 9999)).toBe(0); // last day is always 0
     expect(allowanceForDay(plan, 0)).toBe(10);
+  });
+});
+
+describe('rebuildReductionPlan (non-punitive re-plan)', () => {
+  it('eases into a longer plan and accelerates into a shorter one', () => {
+    const recentAverage = 8;
+    const eased = rebuildReductionPlan({
+      recentAverage,
+      startDate: '2026-06-20',
+      durationFactor: EASE_FACTOR,
+    });
+    const faster = rebuildReductionPlan({
+      recentAverage,
+      startDate: '2026-06-20',
+      durationFactor: ACCELERATE_FACTOR,
+    });
+
+    expect(eased.nDays).toBeGreaterThan(faster.nDays);
+    expect(eased.baseline).toBe(8); // re-anchored at the realistic recent level
+    expect(eased.allowances[0]).toBe(8);
+    expect(eased.allowances[eased.nDays - 1]).toBe(0);
+    expect(faster.allowances[faster.nDays - 1]).toBe(0);
   });
 });

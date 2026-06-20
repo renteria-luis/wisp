@@ -13,7 +13,13 @@ import type {
 } from '@/types/domain';
 import { addDaysISO } from '@/utils/date';
 
-import { reductionCurve, reductionDurationDays } from './reduction';
+import {
+  clamp,
+  MAX_DAYS,
+  MIN_DAYS,
+  reductionCurve,
+  reductionDurationDays,
+} from './reduction';
 
 /** At/below this many cigarettes/day leans toward cold turkey. */
 export const LIGHT_CONSUMPTION_MAX = 10;
@@ -112,4 +118,40 @@ function clampIndex(i: number, length: number): number {
   if (i < 0) return 0;
   if (i >= length) return length - 1;
   return i;
+}
+
+/** Duration multipliers when re-planning from the current trend (§6.3). */
+export const EASE_FACTOR = 1.5;
+export const ACCELERATE_FACTOR = 0.6;
+
+/**
+ * Rebuild a reduction plan anchored at `startDate` from the user's recent
+ * average. `durationFactor` > 1 eases (flatten/extend); < 1 accelerates. Always
+ * non-punitive: it re-anchors at a realistic level and tapers to 0 — logs and
+ * history are untouched.
+ */
+export function rebuildReductionPlan({
+  recentAverage,
+  startDate,
+  curveType = 'linear',
+  durationFactor = 1,
+}: {
+  recentAverage: number;
+  startDate: string;
+  curveType?: CurveType;
+  durationFactor?: number;
+}): Plan {
+  const baseline = Math.max(1, Math.round(recentAverage));
+  const base = reductionDurationDays(baseline);
+  const nDays = clamp(Math.round(base * durationFactor), MIN_DAYS, MAX_DAYS);
+  const allowances = reductionCurve(baseline, nDays, curveType);
+  return {
+    track: 'gradual_reduction',
+    baseline,
+    curveType,
+    nDays,
+    startDate,
+    targetDate: addDaysISO(startDate, nDays - 1),
+    allowances,
+  };
 }

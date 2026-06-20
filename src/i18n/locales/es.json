@@ -121,8 +121,23 @@
     "intensityLabel": "¿Qué tan fuerte fue?",
     "save": "Guardar"
   },
+  "progress": {
+    "trend": "Tendencia de 7 días",
+    "perDayAvg": "cigarrillos/día",
+    "streak": "Racha de logros",
+    "winDays": "Días logrados",
+    "smokeFreeDays": "Días sin fumar",
+    "saved": "Dinero ahorrado",
+    "cigsAvoided_one": "{{count}} cigarrillo evitado",
+    "cigsAvoided_other": "{{count}} cigarrillos evitados",
+    "easeTitle": "Bajemos el ritmo",
+    "easeBody": "Los últimos días fueron un poco altos, y está bien. Podemos extender el plan a un ritmo más amable.",
+    "accelTitle": "Vas adelantada 🌿",
+    "accelBody": "Has estado cómodamente por debajo de la meta. ¿Quieres terminar un poco antes?",
+    "easeCta": "Ajustar mi plan",
+    "accelCta": "Acelerar"
+  },
   "screens": {
-    "progress": "Aquí estará tu progreso.",
     "space": "Aquí estará el espacio de tu compañía.",
     "craving": "Respira. Este antojo va a pasar.",
     "about": "Hecho con cariño, en tu dispositivo.",
