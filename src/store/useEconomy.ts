@@ -1,0 +1,107 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { getLastCigaretteTimestamp } from '@/data/repositories/cigaretteLog';
+import {
+  addLedgerEntry,
+  type LedgerReason,
+} from '@/data/repositories/economyLedger';
+import { accrueCoins } from '@/engine/economy';
+
+const HOUR_MS = 3_600_000;
+
+interface EconomyState {
+  balance: number;
+  /** ISO of the last time smoke-free coins were accrued. */
+  lastAccrualAt: string | null;
+  /** Grant a discrete bonus (check-in, resisted craving, win day, milestone). */
+  award: (delta: number, reason: LedgerReason) => Promise<void>;
+  /** Spend coins; returns false (no-op) if the balance is insufficient. */
+  spend: (amount: number, reason?: LedgerReason) => Promise<boolean>;
+  /** Accrue exponential smoke-free coins since the last accrual. */
+  accrueFromLogs: (planStartISO: string | null) => Promise<void>;
+  reset: () => void;
+}
+
+export const useEconomy = create<EconomyState>()(
+  persist(
+    (set, get) => ({
+      balance: 0,
+      lastAccrualAt: null,
+
+      award: async (delta, reason) => {
+        const balance = Math.max(0, Math.round(get().balance + delta));
+        set({ balance });
+        try {
+          await addLedgerEntry({
+            delta: Math.round(delta),
+            reason,
+            balanceAfter: balance,
+          });
+        } catch {
+          /* ledger is best-effort */
+        }
+      },
+
+      spend: async (amount, reason = 'purchase') => {
+        if (get().balance < amount) return false;
+        const balance = get().balance - amount;
+        set({ balance });
+        try {
+          await addLedgerEntry({
+            delta: -amount,
+            reason,
+            balanceAfter: balance,
+          });
+        } catch {
+          /* ledger is best-effort */
+        }
+        return true;
+      },
+
+      accrueFromLogs: async (planStartISO) => {
+        try {
+          const now = Date.now();
+          const lastCig = await getLastCigaretteTimestamp();
+          const streakStartISO =
+            lastCig ?? planStartISO ?? new Date(now).toISOString();
+          const streakStartMs = new Date(streakStartISO).getTime();
+          const last = get().lastAccrualAt;
+          const lastMs = last ? new Date(last).getTime() : streakStartMs;
+          const accrueFromMs = Math.max(lastMs, streakStartMs);
+
+          const elapsedHours = (now - accrueFromMs) / HOUR_MS;
+          if (elapsedHours <= 0) {
+            set({ lastAccrualAt: new Date(now).toISOString() });
+            return;
+          }
+          const streakStartHours = (accrueFromMs - streakStartMs) / HOUR_MS;
+          const coins = Math.round(accrueCoins(streakStartHours, elapsedHours));
+          const balance = Math.round(get().balance + Math.max(0, coins));
+          set({ balance, lastAccrualAt: new Date(now).toISOString() });
+          if (coins > 0) {
+            await addLedgerEntry({
+              delta: coins,
+              reason: 'accrual',
+              balanceAfter: balance,
+            });
+          }
+        } catch {
+          /* SQLite unavailable (e.g. web prerender) — skip accrual */
+        }
+      },
+
+      reset: () => set({ balance: 0, lastAccrualAt: null }),
+    }),
+    {
+      name: 'wisp-economy',
+      storage: createJSONStorage(() => AsyncStorage),
+      version: 1,
+      partialize: (s) => ({
+        balance: s.balance,
+        lastAccrualAt: s.lastAccrualAt,
+      }),
+    },
+  ),
+);
