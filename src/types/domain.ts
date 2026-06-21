@@ -72,3 +72,17 @@ export interface Pricing {
   /** ISO 4217 currency code, e.g. "USD". */
   currency: string;
 }
+
+/** Companion mood bands derived from the vitality score (§6.4). */
+export type VitalityState = 'exhausted' | 'tired' | 'okay' | 'radiant';
+
+export type CosmeticType = 'companion_color' | 'accessory' | 'room' | 'palette';
+
+/** A purchasable cosmetic (§7.4). `name`/`swatch` drive display. */
+export interface Cosmetic {
+  id: string;
+  type: CosmeticType;
+  price: number;
+  /** Hex color used as the item's swatch / applied tint where relevant. */
+  swatch: string;
+}
