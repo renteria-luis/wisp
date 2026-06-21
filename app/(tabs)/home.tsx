@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/Button';
 import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useVitality } from '@/hooks/useVitality';
-import { startSituationalSupport } from '@/notifications/scheduler';
+import {
+  requestNotificationPermission,
+  startSituationalSupport,
+} from '@/notifications/scheduler';
 import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
@@ -28,6 +31,8 @@ export default function Home() {
   const companionName = useSettings((s) => s.companionName);
   const situationalUntil = useSettings((s) => s.situationalUntil);
   const setSituationalUntil = useSettings((s) => s.setSituationalUntil);
+  const notificationsEnabled = useSettings((s) => s.notificationsEnabled);
+  const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const { score, band } = useVitality();
@@ -45,6 +50,9 @@ export default function Home() {
 
   const onSituational = async () => {
     if (situationalActive) return;
+    if (!notificationsEnabled) {
+      setNotificationsEnabled(await requestNotificationPermission());
+    }
     await startSituationalSupport();
     setSituationalUntil(new Date(Date.now() + SITUATIONAL_MS).toISOString());
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
