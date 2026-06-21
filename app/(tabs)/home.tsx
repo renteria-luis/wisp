@@ -1,6 +1,7 @@
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Companion } from '@/components/companion/Companion';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useVitality } from '@/hooks/useVitality';
+import { startSituationalSupport } from '@/notifications/scheduler';
 import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
@@ -16,12 +18,16 @@ import { useSettings } from '@/store/useSettings';
 import { colors } from '@/theme/tokens';
 import { daysBetween, todayISO } from '@/utils/date';
 
-/** Home: the vitality-driven companion, a greeting, today's status, and Log. */
+const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
+
+/** Home: the vitality-driven companion, today's status, and the panic button. */
 export default function Home() {
   const router = useRouter();
   const { t } = useTranslation();
   const userName = useSettings((s) => s.userName);
   const companionName = useSettings((s) => s.companionName);
+  const situationalUntil = useSettings((s) => s.situationalUntil);
+  const setSituationalUntil = useSettings((s) => s.setSituationalUntil);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const { score, band } = useVitality();
@@ -32,6 +38,17 @@ export default function Home() {
     cosmeticById(equipped.companion_color ?? '')?.swatch ??
     colors.primary['400'];
   const accessoryColor = cosmeticById(equipped.accessory ?? '')?.swatch;
+
+  const situationalActive =
+    situationalUntil != null &&
+    new Date(situationalUntil).getTime() > Date.now();
+
+  const onSituational = async () => {
+    if (situationalActive) return;
+    await startSituationalSupport();
+    setSituationalUntil(new Date(Date.now() + SITUATIONAL_MS).toISOString());
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
 
   let status: string | null = null;
   if (plan) {
@@ -73,11 +90,27 @@ export default function Home() {
         ) : null}
       </View>
 
-      <View className="px-6 pb-4">
+      <View className="gap-3 px-6 pb-4">
+        <Button
+          label={t('home.cravingAction')}
+          onPress={() => router.push('/craving')}
+        />
         <Button
           label={t('home.logAction')}
+          variant="secondary"
           onPress={() => router.push('/log')}
         />
+        <Pressable
+          onPress={onSituational}
+          accessibilityRole="button"
+          className="items-center py-1"
+        >
+          <Text className="text-sm font-medium text-ink-soft">
+            {situationalActive
+              ? t('home.situationalActive')
+              : t('home.situationalStart')}
+          </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

@@ -4,7 +4,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { SupportedLanguage } from '@/i18n';
 import { personal } from '@/personal/personal.config';
-import type { Pricing, Profile, TriggerCategory } from '@/types/domain';
+import type {
+  Pricing,
+  Profile,
+  QuietHours,
+  TriggerCategory,
+} from '@/types/domain';
 
 interface SettingsState {
   profile: Profile;
@@ -20,6 +25,12 @@ interface SettingsState {
   isPremium: boolean;
   onboardingCompleted: boolean;
   triggers: TriggerCategory[];
+  /** Notifications-suppressed window; null = always allow. */
+  quietHours: QuietHours | null;
+  /** Whether local trigger notifications are scheduled (permission granted). */
+  notificationsEnabled: boolean;
+  /** ISO until which situational "I'm out" support is active; null = off. */
+  situationalUntil: string | null;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -29,6 +40,9 @@ interface SettingsState {
   setLanguage: (language: SupportedLanguage | null) => void;
   setTriggers: (triggers: TriggerCategory[]) => void;
   setOnboardingCompleted: (completed: boolean) => void;
+  setQuietHours: (quietHours: QuietHours | null) => void;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  setSituationalUntil: (iso: string | null) => void;
   reset: () => void;
 }
 
@@ -42,6 +56,12 @@ const initialState = {
   isPremium: true,
   onboardingCompleted: false,
   triggers: [] as TriggerCategory[],
+  quietHours: {
+    start: { hour: 22, minute: 0 },
+    end: { hour: 7, minute: 0 },
+  } as QuietHours | null,
+  notificationsEnabled: false,
+  situationalUntil: null as string | null,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -59,6 +79,10 @@ export const useSettings = create<SettingsState>()(
       setTriggers: (triggers) => set({ triggers }),
       setOnboardingCompleted: (onboardingCompleted) =>
         set({ onboardingCompleted }),
+      setQuietHours: (quietHours) => set({ quietHours }),
+      setNotificationsEnabled: (notificationsEnabled) =>
+        set({ notificationsEnabled }),
+      setSituationalUntil: (situationalUntil) => set({ situationalUntil }),
       reset: () => set({ ...initialState }),
     }),
     {

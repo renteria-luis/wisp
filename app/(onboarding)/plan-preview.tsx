@@ -8,6 +8,10 @@ import { Card } from '@/components/ui/Card';
 import { OnboardingStep } from '@/components/ui/OnboardingStep';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { allowanceForDay, buildPlan, suggestTrack } from '@/engine/planEngine';
+import {
+  requestNotificationPermission,
+  rescheduleTriggerNotifications,
+} from '@/notifications/scheduler';
 import { useOnboarding } from '@/store/useOnboarding';
 import { useSettings } from '@/store/useSettings';
 import { usePlan } from '@/store/usePlan';
@@ -56,7 +60,7 @@ export default function PlanPreview() {
     [chosenTrack, baseline, startDate, onboarding.curveType],
   );
 
-  const onConfirm = () => {
+  const onConfirm = async () => {
     settings.setBaseline(baseline);
     settings.setUserName(onboarding.name.trim());
     settings.setProfile({
@@ -76,6 +80,16 @@ export default function PlanPreview() {
     settings.setTriggers(onboarding.triggers);
     setPlan(plan);
     settings.setOnboardingCompleted(true);
+    // Ask for notification permission in context, right after onboarding (§9).
+    const granted = await requestNotificationPermission();
+    settings.setNotificationsEnabled(granted);
+    if (granted) {
+      await rescheduleTriggerNotifications(
+        onboarding.triggers,
+        settings.quietHours,
+        true,
+      );
+    }
     onboarding.reset();
     router.replace('/home');
   };
