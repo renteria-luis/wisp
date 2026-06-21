@@ -5,7 +5,8 @@
 The companion now lives: a layered SVG creature whose expression/color/glow and
 idle bob reflect vitality, an exponential smoke-free coin economy, and a Space
 shop with daily-rotating cosmetics you can buy and equip. `lint`, `typecheck`,
-and **58 tests** pass; iOS and web bundles export cleanly.
+and **58 tests** pass; iOS and web bundles export cleanly, and it was verified
+**running on a real iPhone in Expo Go (SDK 54)**.
 
 > **Phases done:** 0 (scaffold), 2 (onboarding & plan engine), 1 (data layer),
 > 3 (adherence & savings), and now 4 (companion & economy). All merged to `main`,
@@ -51,7 +52,11 @@ and **58 tests** pass; iOS and web bundles export cleanly.
 - **Coin accrual is retroactive** on launch (rewards smoke-free time while the app
   was closed) and time-based off the last cigarette, which also covers the
   reduction-track "gaps between cigarettes" reward with one mechanism.
-- _(Carried)_ Expo SDK 56; `plan_state`/settings in Zustand; repos validated via
-  bundling + dev-seed (no SQLite Jest mock); typed routes on but `tsc`/CI run with
+- **Retargeted to Expo SDK 54** (down from the SDK 56 the scaffold pulled) so the
+  app runs in the released Expo Go: expo 54, react 19.1, RN 0.81, expo-router 6,
+  reanimated 4.1, TS 5.9. `ThemeProvider`/`DarkTheme`/`DefaultTheme` now import
+  from `@react-navigation/native` (expo-router 6 no longer re-exports them).
+- _(Carried)_ `plan_state`/settings in Zustand; repos validated via bundling +
+  dev-seed (no SQLite Jest mock); typed routes on but `tsc`/CI run with
   `.expo/types` absent; Spanish feminine for the dedicatee; route files
   default-export, shared modules named.
