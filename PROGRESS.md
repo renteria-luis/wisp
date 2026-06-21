@@ -1,55 +1,57 @@
 # PROGRESS
 
-## Current phase: 3 — Adherence, re-planning & savings (status: done)
+## Current phase: 4 — Companion, vitality & economy (status: done)
 
-Logging now drives a real Progress screen: 7-day trend, win-days/streak, money
-saved, and a non-punitive re-plan banner. `lint`, `typecheck`, and **45 tests**
-pass; iOS and web bundles export cleanly.
+The companion now lives: a layered SVG creature whose expression/color/glow and
+idle bob reflect vitality, an exponential smoke-free coin economy, and a Space
+shop with daily-rotating cosmetics you can buy and equip. `lint`, `typecheck`,
+and **58 tests** pass; iOS and web bundles export cleanly.
 
 > **Phases done:** 0 (scaffold), 2 (onboarding & plan engine), 1 (data layer),
-> and now 3 (adherence & savings). Phase order was shuffled at the user's request;
-> all phases are merged to `main`, each runnable + tested.
+> 3 (adherence & savings), and now 4 (companion & economy). All merged to `main`,
+> each runnable + tested. (Commits carry no the agent attribution, per request.)
 
-## Done (Phase 3)
+## Done (Phase 4)
 
-- **Adherence engine** (`src/engine/adherence.ts`, pure + 6 tests): 7-day rolling
-  average as the **primary** metric, `winDay`, streak/win-day counters, and
-  `recommendReplan` — eases when the trend stays over allowance for `OVER_DAYS`,
-  offers (not forces) acceleration when comfortably under, and **absorbs a single
-  slip** without punishing (tested explicitly).
-- **Re-plan builder** (`planEngine.rebuildReductionPlan`, +1 test): re-anchors a
-  reduction plan at the recent trend and flattens/extends (ease) or shortens
-  (accelerate) — logs/history untouched.
-- **Savings engine** (`src/engine/savings.ts`, pure + 5 tests): price-per-cig,
-  cigarettes avoided (never negative/day), money saved, and a cumulative series.
-- **Progress screen** (`app/(tabs)/progress.tsx`) via `useProgressData` (reads the
-  logs for the plan span, densifies, derives all metrics, refetches on new logs):
-  trend + last-14-days bars, streak/win-days (or smoke-free days for cold turkey),
-  money saved + cigarettes avoided, and a gentle ease/accelerate banner that
-  applies the re-plan to `usePlan`.
-- EN/ES progress strings (locale parity test passes).
-- **Permissions:** added a safe allowlist to `.the agent/settings.local.json` (npm,
-  npx, git non-destructive, tsc, jest, prettier, project edits) so routine ops
-  don't prompt; destructive/outward ops still ask.
+- **Vitality engine** (`src/engine/vitality.ts`, pure + 7 tests): 0–100 from
+  recent smoking, the smoke-free stretch, and under-/over-target, mapped to four
+  bands (exhausted/tired/okay/radiant).
+- **Coin economy** (`src/engine/economy.ts`, pure + 6 tests): exponential
+  smoke-free accrual `ratePerHour` (steps up ~15%/day, capped at 8×) integrated
+  over elapsed time, plus discrete bonus constants.
+- **Cosmetics** (`src/engine/cosmetics.ts`, pure + 4 tests): a 14-item catalog +
+  a deterministic, date-seeded daily rotation (offline, identical per day).
+- **Data:** migration **v2** adds `economy_ledger` (append-only) + its repo;
+  `cigaretteLog` gains last-timestamp / count-since queries.
+- **Stores:** `useEconomy` (balance + `accrueFromLogs`/`award`/`spend`,
+  write-through to the ledger) and `useCompanion` (owned + equipped cosmetics),
+  both AsyncStorage-persisted.
+- **Companion** (`src/components/companion/Companion.tsx`): layered
+  `react-native-svg` (glow, body, face, accessory, cheeks) with a Reanimated idle
+  bob whose speed tracks the band; honors reduce-motion. Driven by `useVitality`.
+- **Space tab:** the companion, coin balance, today's rotation + full shop;
+  tapping buys (spend → own → equip) or equips, with `expo-haptics` feedback.
+- **Wiring:** coins accrue on launch (`_layout`); a resisted craving awards a
+  bonus (Log modal). Home now shows the live, vitality-driven companion.
+- EN/ES strings for the shop (locale parity test passes).
 
 ## Next steps
 
-- **Phase 4 — Companion, vitality & economy.**
-  1. `src/engine/vitality.ts` — 0–100 vitality from recent behavior (penalty/bonus
-     over a short window) → companion bands (exhausted/tired/okay/radiant).
-  2. `src/engine/economy.ts` — exponential smoke-free coin accrual (capped) +
-     discrete bonuses; `src/engine/cosmetics.ts` incl. daily-rotating set (seeded
-     by date). Add `economy_ledger` + `inventory` SQLite tables (migration v2).
-  3. Companion SVG component (layered, vitality-driven) + Space tab + cosmetics
-     shop/inventory; haptics. Stores: `useCompanion`, `useEconomy`.
-  - DoD: companion reflects vitality; coins accrue; buy/equip cosmetics.
+- **Phase 5 — Craving toolkit & triggers/notifications.**
+  1. Craving modal: breathing guide, "this passes in N min" timer, distraction.
+  2. `src/engine/triggers.ts` → `src/notifications/scheduler.ts`: trigger windows
+     → local `expo-notifications`; situational "I'm out / drinking" mode; daily
+     rituals; quiet hours; re-schedule on launch/settings change.
+  - DoD: panic button works; scheduled notifications fire; situational mode raises support.
 
 ## Notes / deviations from PROJECT.md
 
-- **Re-plan UX:** for v1 the ease/accelerate suggestion surfaces as a banner the
-  user taps to apply (rather than silent auto-replanning) — clearer and keeps the
-  user in control. The trigger logic itself is the tested engine.
-- _(Carried)_ Expo SDK 56; `plan_state`/settings in Zustand, time-series in SQLite;
-  repositories validated via bundling + dev-seed (no SQLite Jest mock); typed
-  routes on but `tsc`/CI run with `.expo/types` absent; Spanish feminine for the
-  dedicatee; route files default-export, shared modules named.
+- **Inventory in Zustand** (`useCompanion`), not the SQLite `inventory` table from
+  §16 — it's a small bounded set; only the unbounded `economy_ledger` uses SQLite.
+- **Coin accrual is retroactive** on launch (rewards smoke-free time while the app
+  was closed) and time-based off the last cigarette, which also covers the
+  reduction-track "gaps between cigarettes" reward with one mechanism.
+- _(Carried)_ Expo SDK 56; `plan_state`/settings in Zustand; repos validated via
+  bundling + dev-seed (no SQLite Jest mock); typed routes on but `tsc`/CI run with
+  `.expo/types` absent; Spanish feminine for the dedicatee; route files
+  default-export, shared modules named.
