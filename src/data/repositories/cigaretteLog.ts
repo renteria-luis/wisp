@@ -50,3 +50,23 @@ export async function getDailyCigaretteCounts(
     toISO,
   );
 }
+
+/** ISO timestamp of the most recent cigarette, or null if none logged. */
+export async function getLastCigaretteTimestamp(): Promise<string | null> {
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ timestamp: string }>(
+    'SELECT timestamp FROM cigarette_log ORDER BY timestamp DESC LIMIT 1',
+  );
+  return row?.timestamp ?? null;
+}
+
+export async function countCigarettesSince(
+  timestampISO: string,
+): Promise<number> {
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ c: number }>(
+    'SELECT COUNT(*) AS c FROM cigarette_log WHERE timestamp >= ?',
+    timestampISO,
+  );
+  return row?.c ?? 0;
+}

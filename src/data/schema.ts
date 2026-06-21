@@ -35,4 +35,17 @@ export const MIGRATIONS: string[] = [
     note TEXT
   );
   `,
+
+  // v2 — coin economy ledger (§7.3). Inventory + balance live in the stores
+  // (small, bounded) — only the append-only ledger needs SQLite here.
+  `
+  CREATE TABLE IF NOT EXISTS economy_ledger (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    delta INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    balance_after INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_ledger_timestamp ON economy_ledger (timestamp);
+  `,
 ];
