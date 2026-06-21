@@ -22,7 +22,10 @@
     "todayOf": "{{count}} of {{allowance}} today",
     "smokeFreeToday": "Smoke-free today 🌿",
     "loggedToday": "{{count}} logged today",
-    "logAction": "Log"
+    "logAction": "Log",
+    "cravingAction": "I'm having a craving",
+    "situationalStart": "I'm out / drinking 🍸",
+    "situationalActive": "Extra support is on 💚"
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",
@@ -151,8 +154,44 @@
     "room": "Room",
     "palette": "Palette"
   },
+  "craving": {
+    "title": "Hang in there 🫧",
+    "subtitle": "This urge will pass. Let's ride it out together.",
+    "tools": {
+      "breathe": "Breathe",
+      "wait": "Wait it out",
+      "distract": "Distract me"
+    },
+    "breathing": {
+      "inhale": "Breathe in…",
+      "hold": "Hold…",
+      "exhale": "Breathe out…"
+    },
+    "timer": {
+      "message": "Cravings usually peak and fade within a few minutes. Stay with me.",
+      "done": "You did it. The wave passed. 🌊"
+    },
+    "distraction": {
+      "intro": "Pick one and do it right now:",
+      "more": "Show me others",
+      "items": {
+        "water": "Drink a glass of water, slowly.",
+        "walk": "Take a 2-minute walk.",
+        "text": "Text someone you love.",
+        "gum": "Chew gum or brush your teeth.",
+        "music": "Play one favorite song.",
+        "stretch": "Stand up and stretch."
+      }
+    },
+    "resisted": "I resisted 💪"
+  },
+  "notifications": {
+    "triggerTitle": "A gentle check-in 🫧",
+    "triggerBody": "This is a usual moment for a cigarette. Want to try 2 minutes with me instead?",
+    "situationalTitle": "I'm right here",
+    "situationalBody": "Tricky moment? Tap for a quick breath or a craving timer."
+  },
   "screens": {
-    "craving": "Take a breath. This craving will pass.",
     "about": "Made with care, on your device.",
     "settings": "Language, profile, notifications, and your data."
   }

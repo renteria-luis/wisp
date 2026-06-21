@@ -22,7 +22,10 @@
     "todayOf": "{{count}} de {{allowance}} hoy",
     "smokeFreeToday": "Sin fumar hoy 🌿",
     "loggedToday": "{{count}} registrados hoy",
-    "logAction": "Registrar"
+    "logAction": "Registrar",
+    "cravingAction": "Tengo un antojo",
+    "situationalStart": "Estoy fuera / bebiendo 🍸",
+    "situationalActive": "Apoyo extra activado 💚"
   },
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",
@@ -151,8 +154,44 @@
     "room": "Cuarto",
     "palette": "Paleta"
   },
+  "craving": {
+    "title": "Aguanta 🫧",
+    "subtitle": "Este antojo va a pasar. Lo superamos juntas.",
+    "tools": {
+      "breathe": "Respira",
+      "wait": "Espéralo",
+      "distract": "Distráeme"
+    },
+    "breathing": {
+      "inhale": "Inhala…",
+      "hold": "Sostén…",
+      "exhale": "Exhala…"
+    },
+    "timer": {
+      "message": "Los antojos suben y bajan en unos minutos. Quédate conmigo.",
+      "done": "Lo lograste. La ola pasó. 🌊"
+    },
+    "distraction": {
+      "intro": "Elige uno y hazlo ahora mismo:",
+      "more": "Muéstrame otros",
+      "items": {
+        "water": "Bebe un vaso de agua, despacio.",
+        "walk": "Da una caminata de 2 minutos.",
+        "text": "Escríbele a alguien que quieres.",
+        "gum": "Masca chicle o lávate los dientes.",
+        "music": "Pon tu canción favorita.",
+        "stretch": "Ponte de pie y estírate."
+      }
+    },
+    "resisted": "Lo resistí 💪"
+  },
+  "notifications": {
+    "triggerTitle": "Un saludito 🫧",
+    "triggerBody": "Suele ser un momento de cigarro. ¿Probamos 2 minutos juntas en su lugar?",
+    "situationalTitle": "Aquí estoy",
+    "situationalBody": "¿Momento difícil? Toca para respirar o un temporizador de antojo."
+  },
   "screens": {
-    "craving": "Respira. Este antojo va a pasar.",
     "about": "Hecho con cariño, en tu dispositivo.",
     "settings": "Idioma, perfil, notificaciones y tus datos."
   }
