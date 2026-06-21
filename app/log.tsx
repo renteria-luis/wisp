@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
+import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
+import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import type { TriggerCategory } from '@/types/domain';
 
@@ -41,6 +44,12 @@ export default function Log() {
         await logCigarette({ trigger: trigger ?? undefined });
       } else {
         await logResisted({ trigger: trigger ?? undefined, intensity });
+        await useEconomy
+          .getState()
+          .award(BONUS_RESISTED_CRAVING, 'resisted_craving');
+        void Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        );
       }
       router.back();
     } catch {

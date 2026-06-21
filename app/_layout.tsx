@@ -8,14 +8,21 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
+import { usePlan } from '@/store/usePlan';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    // Open the database and load today's counts once on launch.
-    void useLogs.getState().init();
+    // Open the database, load today's counts, and accrue smoke-free coins.
+    void (async () => {
+      await useLogs.getState().init();
+      await useEconomy
+        .getState()
+        .accrueFromLogs(usePlan.getState().plan?.startDate ?? null);
+    })();
   }, []);
 
   return (

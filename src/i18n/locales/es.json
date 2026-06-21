@@ -137,8 +137,21 @@
     "easeCta": "Ajustar mi plan",
     "accelCta": "Acelerar"
   },
+  "space": {
+    "coins_one": "{{count}} moneda",
+    "coins_other": "{{count}} monedas",
+    "dailyToday": "Selección de hoy",
+    "shop": "Tienda",
+    "owned": "En posesión",
+    "equipped": "Equipado"
+  },
+  "cosmeticType": {
+    "companion_color": "Color",
+    "accessory": "Accesorio",
+    "room": "Cuarto",
+    "palette": "Paleta"
+  },
   "screens": {
-    "space": "Aquí estará el espacio de tu compañía.",
     "craving": "Respira. Este antojo va a pasar.",
     "about": "Hecho con cariño, en tu dispositivo.",
     "settings": "Idioma, perfil, notificaciones y tus datos."

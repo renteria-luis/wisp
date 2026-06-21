@@ -3,18 +3,20 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Companion } from '@/components/companion/Companion';
 import { Button } from '@/components/ui/Button';
+import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
+import { useVitality } from '@/hooks/useVitality';
 import { personal } from '@/personal/personal.config';
+import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { colors } from '@/theme/tokens';
 import { daysBetween, todayISO } from '@/utils/date';
 
-/**
- * Home. The real companion (layered SVG, vitality-driven) arrives in Phase 4;
- * for now it greets the user by name and reflects today's logged status.
- */
+/** Home: the vitality-driven companion, a greeting, today's status, and Log. */
 export default function Home() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -22,7 +24,14 @@ export default function Home() {
   const companionName = useSettings((s) => s.companionName);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const { score, band } = useVitality();
+  const equipped = useCompanion((s) => s.equipped);
   const name = userName || personal.dedicateeName;
+
+  const companionColor =
+    cosmeticById(equipped.companion_color ?? '')?.swatch ??
+    colors.primary['400'];
+  const accessoryColor = cosmeticById(equipped.accessory ?? '')?.swatch;
 
   let status: string | null = null;
   if (plan) {
@@ -43,11 +52,14 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
       <View className="flex-1 items-center justify-center px-6">
-        <View className="h-44 w-44 items-center justify-center rounded-full bg-primary-100">
-          <View className="h-28 w-28 rounded-full bg-primary-400" />
-        </View>
+        <Companion
+          vitality={score}
+          band={band}
+          color={companionColor}
+          accessoryColor={accessoryColor}
+        />
 
-        <Text className="mt-10 text-3xl font-bold text-ink">
+        <Text className="mt-8 text-3xl font-bold text-ink">
           {t('home.greeting', { name })}
         </Text>
         <Text className="mt-3 text-center text-base leading-6 text-ink-soft">

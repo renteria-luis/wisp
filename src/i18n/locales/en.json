@@ -137,8 +137,21 @@
     "easeCta": "Adjust my plan",
     "accelCta": "Speed up"
   },
+  "space": {
+    "coins_one": "{{count}} coin",
+    "coins_other": "{{count}} coins",
+    "dailyToday": "Today's picks",
+    "shop": "Shop",
+    "owned": "Owned",
+    "equipped": "Equipped"
+  },
+  "cosmeticType": {
+    "companion_color": "Color",
+    "accessory": "Accessory",
+    "room": "Room",
+    "palette": "Palette"
+  },
   "screens": {
-    "space": "Your companion's space will live here.",
     "craving": "Take a breath. This craving will pass.",
     "about": "Made with care, on your device.",
     "settings": "Language, profile, notifications, and your data."
