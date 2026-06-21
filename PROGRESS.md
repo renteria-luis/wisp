@@ -1,61 +1,58 @@
 # PROGRESS
 
-## Current phase: 4 — Companion, vitality & economy (status: done)
+## Current phase: 5 — Craving toolkit & triggers/notifications (status: done)
 
-The companion now lives: a layered SVG creature whose expression/color/glow and
-idle bob reflect vitality, an exponential smoke-free coin economy, and a Space
-shop with daily-rotating cosmetics you can buy and equip. `lint`, `typecheck`,
-and **58 tests** pass; iOS and web bundles export cleanly, and it was verified
-**running on a real iPhone in Expo Go (SDK 54)**.
+The panic button is real: a craving modal with an animated breathing guide, a
+"this passes in ~3 min" timer, and rotating distractions; plus local trigger
+notifications, a situational "I'm out / drinking" support burst, and quiet hours.
+`lint`, `typecheck`, and **63 tests** pass; iOS and web bundles export cleanly
+(SDK 54 / Expo Go).
 
 > **Phases done:** 0 (scaffold), 2 (onboarding & plan engine), 1 (data layer),
-> 3 (adherence & savings), and now 4 (companion & economy). All merged to `main`,
-> each runnable + tested. (Commits carry no the agent attribution, per request.)
+> 3 (adherence & savings), 4 (companion & economy), and now 5 (craving &
+> notifications). All merged to `main`, each runnable + tested. (Commits carry no
+> the agent attribution, per request.)
 
-## Done (Phase 4)
+## Done (Phase 5)
 
-- **Vitality engine** (`src/engine/vitality.ts`, pure + 7 tests): 0–100 from
-  recent smoking, the smoke-free stretch, and under-/over-target, mapped to four
-  bands (exhausted/tired/okay/radiant).
-- **Coin economy** (`src/engine/economy.ts`, pure + 6 tests): exponential
-  smoke-free accrual `ratePerHour` (steps up ~15%/day, capped at 8×) integrated
-  over elapsed time, plus discrete bonus constants.
-- **Cosmetics** (`src/engine/cosmetics.ts`, pure + 4 tests): a 14-item catalog +
-  a deterministic, date-seeded daily rotation (offline, identical per day).
-- **Data:** migration **v2** adds `economy_ledger` (append-only) + its repo;
-  `cigaretteLog` gains last-timestamp / count-since queries.
-- **Stores:** `useEconomy` (balance + `accrueFromLogs`/`award`/`spend`,
-  write-through to the ledger) and `useCompanion` (owned + equipped cosmetics),
-  both AsyncStorage-persisted.
-- **Companion** (`src/components/companion/Companion.tsx`): layered
-  `react-native-svg` (glow, body, face, accessory, cheeks) with a Reanimated idle
-  bob whose speed tracks the band; honors reduce-motion. Driven by `useVitality`.
-- **Space tab:** the companion, coin balance, today's rotation + full shop;
-  tapping buys (spend → own → equip) or equips, with `expo-haptics` feedback.
-- **Wiring:** coins accrue on launch (`_layout`); a resisted craving awards a
-  bonus (Log modal). Home now shows the live, vitality-driven companion.
-- EN/ES strings for the shop (locale parity test passes).
+- **Craving toolkit** (`src/components/craving/`, `app/craving.tsx`): a tabbed
+  panic button — `BreathingGuide` (inhale/hold/exhale circle, haptic per phase),
+  `CravingTimer` (3-min SVG ring countdown), `Distraction` (rotating tips). An
+  "I resisted" action logs the craving + awards coins. Reached from a Home button.
+- **Triggers engine** (`src/engine/triggers.ts`, pure + 5 tests): default per-
+  category windows → daily notification specs, overnight-aware quiet-hours
+  filtering, and the situational support cadence.
+- **Scheduler** (`src/notifications/scheduler.ts`): local `expo-notifications`
+  (lazy-imported), permission request, daily trigger nudges, and the situational
+  burst — all deep-linking to `/craving`.
+- **Settings + wiring:** `useSettings` gains quiet hours, a notifications flag,
+  and `situationalUntil`. Permission is asked **after onboarding** (in context);
+  schedules refresh on launch; tapping a notification opens the craving toolkit;
+  a Home toggle starts situational support.
+- EN/ES strings for the toolkit + notifications (locale parity test passes).
 
 ## Next steps
 
-- **Phase 5 — Craving toolkit & triggers/notifications.**
-  1. Craving modal: breathing guide, "this passes in N min" timer, distraction.
-  2. `src/engine/triggers.ts` → `src/notifications/scheduler.ts`: trigger windows
-     → local `expo-notifications`; situational "I'm out / drinking" mode; daily
-     rituals; quiet hours; re-schedule on launch/settings change.
-  - DoD: panic button works; scheduled notifications fire; situational mode raises support.
+- **Phase 6 — Charts & health timeline.**
+  1. Custom animated SVG charts (`src/components/charts/`): cigarette trend,
+     savings over time, allowance vs actual — built on react-native-svg +
+     Reanimated.
+  2. `src/engine/health.ts`: the recovery-milestone dataset (§6.7), personalized
+     framing (gender/age/years), anchored from quit/zero date; brief "not medical
+     advice" note.
+  - DoD: Progress shows animated charts + the health timeline.
 
 ## Notes / deviations from PROJECT.md
 
+- **Notifications are local-only** (as designed, §9) and run in Expo Go on iOS.
+  Trigger **time windows use sensible defaults per category** (precise per-window
+  config — e.g. Tiffani's 15/15/30 breaks — is a Phase-7 settings screen);
+  quiet-hours defaults to 22:00–07:00.
 - **Inventory in Zustand** (`useCompanion`), not the SQLite `inventory` table from
-  §16 — it's a small bounded set; only the unbounded `economy_ledger` uses SQLite.
-- **Coin accrual is retroactive** on launch (rewards smoke-free time while the app
-  was closed) and time-based off the last cigarette, which also covers the
-  reduction-track "gaps between cigarettes" reward with one mechanism.
-- **Retargeted to Expo SDK 54** (down from the SDK 56 the scaffold pulled) so the
-  app runs in the released Expo Go: expo 54, react 19.1, RN 0.81, expo-router 6,
-  reanimated 4.1, TS 5.9. `ThemeProvider`/`DarkTheme`/`DefaultTheme` now import
-  from `@react-navigation/native` (expo-router 6 no longer re-exports them).
+  §16; only the unbounded `economy_ledger` uses SQLite.
+- **Retargeted to Expo SDK 54** so the app runs in the released Expo Go (expo 54,
+  react 19.1, RN 0.81, expo-router 6, reanimated 4.1); `ThemeProvider` from
+  `@react-navigation/native`.
 - _(Carried)_ `plan_state`/settings in Zustand; repos validated via bundling +
   dev-seed (no SQLite Jest mock); typed routes on but `tsc`/CI run with
   `.expo/types` absent; Spanish feminine for the dedicatee; route files
