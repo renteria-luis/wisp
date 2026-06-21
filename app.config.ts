@@ -53,6 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-localization',
     'expo-sqlite',
+    'expo-notifications',
   ],
   experiments: {
     typedRoutes: true,
