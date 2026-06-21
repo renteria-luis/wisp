@@ -86,3 +86,15 @@ export interface Cosmetic {
   /** Hex color used as the item's swatch / applied tint where relevant. */
   swatch: string;
 }
+
+/** Local 24-hour time of day. */
+export interface TimeOfDay {
+  hour: number;
+  minute: number;
+}
+
+/** Overnight-aware quiet-hours window (notifications suppressed inside). */
+export interface QuietHours {
+  start: TimeOfDay;
+  end: TimeOfDay;
+}
