@@ -125,6 +125,11 @@ export default function GodMode() {
               </View>
             </Row>
             <Button
+              label="+500 pending"
+              variant="ghost"
+              onPress={() => setPending(pending + 500)}
+            />
+            <Button
               label="Move pending → wallet"
               variant="ghost"
               onPress={() => {
