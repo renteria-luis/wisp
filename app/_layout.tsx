@@ -72,6 +72,7 @@ export default function RootLayout() {
             <Stack.Screen name="craving" options={{ presentation: 'modal' }} />
             <Stack.Screen name="about" options={{ presentation: 'modal' }} />
             <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

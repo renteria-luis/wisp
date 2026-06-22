@@ -70,3 +70,9 @@ export async function countCigarettesSince(
   );
   return row?.c ?? 0;
 }
+
+/** Dev/God-mode: wipe all cigarette logs. */
+export async function clearAllCigaretteLogs(): Promise<void> {
+  const db = await getDb();
+  await db.runAsync('DELETE FROM cigarette_log');
+}

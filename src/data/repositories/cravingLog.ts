@@ -38,3 +38,9 @@ export async function countResistedOnDate(dateISO: string): Promise<number> {
   );
   return row?.c ?? 0;
 }
+
+/** Dev/God-mode: wipe all craving logs. */
+export async function clearAllCravingLogs(): Promise<void> {
+  const db = await getDb();
+  await db.runAsync('DELETE FROM craving_log');
+}
