@@ -12,15 +12,24 @@ import { accrueCoins } from '@/engine/economy';
 const HOUR_MS = 3_600_000;
 
 interface EconomyState {
+  /** Coins in the wallet (spendable). */
   balance: number;
+  /** Coins earned passively but not yet claimed into the wallet. */
+  pending: number;
   /** ISO of the last time smoke-free coins were accrued. */
   lastAccrualAt: string | null;
-  /** Grant a discrete bonus (check-in, resisted craving, win day, milestone). */
+
+  /** Grant a discrete bonus straight to the wallet (action reward). */
   award: (delta: number, reason: LedgerReason) => Promise<void>;
   /** Spend coins; returns false (no-op) if the balance is insufficient. */
   spend: (amount: number, reason?: LedgerReason) => Promise<boolean>;
-  /** Accrue exponential smoke-free coins since the last accrual. */
+  /** Move pending coins into the wallet; returns the amount claimed. */
+  claim: () => Promise<number>;
+  /** Accrue exponential smoke-free coins into the pending pool. */
   accrueFromLogs: (planStartISO: string | null) => Promise<void>;
+  /** Dev / God-mode setters. */
+  setBalance: (balance: number) => void;
+  setPending: (pending: number) => void;
   reset: () => void;
 }
 
@@ -28,6 +37,7 @@ export const useEconomy = create<EconomyState>()(
   persist(
     (set, get) => ({
       balance: 0,
+      pending: 0,
       lastAccrualAt: null,
 
       award: async (delta, reason) => {
@@ -60,6 +70,26 @@ export const useEconomy = create<EconomyState>()(
         return true;
       },
 
+      claim: async () => {
+        const amount = Math.round(get().pending);
+        if (amount <= 0) {
+          set({ pending: 0 });
+          return 0;
+        }
+        const balance = Math.round(get().balance + amount);
+        set({ balance, pending: 0 });
+        try {
+          await addLedgerEntry({
+            delta: amount,
+            reason: 'claim',
+            balanceAfter: balance,
+          });
+        } catch {
+          /* ledger is best-effort */
+        }
+        return amount;
+      },
+
       accrueFromLogs: async (planStartISO) => {
         try {
           const now = Date.now();
@@ -78,21 +108,20 @@ export const useEconomy = create<EconomyState>()(
           }
           const streakStartHours = (accrueFromMs - streakStartMs) / HOUR_MS;
           const coins = Math.round(accrueCoins(streakStartHours, elapsedHours));
-          const balance = Math.round(get().balance + Math.max(0, coins));
-          set({ balance, lastAccrualAt: new Date(now).toISOString() });
-          if (coins > 0) {
-            await addLedgerEntry({
-              delta: coins,
-              reason: 'accrual',
-              balanceAfter: balance,
-            });
-          }
+          set({
+            pending: Math.round(get().pending + Math.max(0, coins)),
+            lastAccrualAt: new Date(now).toISOString(),
+          });
         } catch {
           /* SQLite unavailable (e.g. web prerender) — skip accrual */
         }
       },
 
-      reset: () => set({ balance: 0, lastAccrualAt: null }),
+      setBalance: (balance) =>
+        set({ balance: Math.max(0, Math.round(balance)) }),
+      setPending: (pending) =>
+        set({ pending: Math.max(0, Math.round(pending)) }),
+      reset: () => set({ balance: 0, pending: 0, lastAccrualAt: null }),
     }),
     {
       name: 'wisp-economy',
@@ -100,6 +129,7 @@ export const useEconomy = create<EconomyState>()(
       version: 1,
       partialize: (s) => ({
         balance: s.balance,
+        pending: s.pending,
         lastAccrualAt: s.lastAccrualAt,
       }),
     },

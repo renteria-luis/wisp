@@ -3,6 +3,7 @@ import { getDb } from '../db';
 
 export type LedgerReason =
   | 'accrual'
+  | 'claim'
   | 'check_in'
   | 'resisted_craving'
   | 'win_day'
