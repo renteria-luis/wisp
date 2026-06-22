@@ -143,6 +143,12 @@
   "space": {
     "coins_one": "{{count}} coin",
     "coins_other": "{{count}} coins",
+    "earned": "Earned smoke-free",
+    "pending": "{{count}} ready to claim",
+    "claim": "Claim",
+    "equip": "Equip",
+    "buyFor": "Buy for {{count}}",
+    "need": "Need {{count}}",
     "dailyToday": "Today's picks",
     "shop": "Shop",
     "owned": "Owned",

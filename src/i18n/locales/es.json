@@ -143,6 +143,12 @@
   "space": {
     "coins_one": "{{count}} moneda",
     "coins_other": "{{count}} monedas",
+    "earned": "Ganadas sin fumar",
+    "pending": "{{count}} listas para reclamar",
+    "claim": "Reclamar",
+    "equip": "Equipar",
+    "buyFor": "Comprar por {{count}}",
+    "need": "Faltan {{count}}",
     "dailyToday": "Selección de hoy",
     "shop": "Tienda",
     "owned": "En posesión",
