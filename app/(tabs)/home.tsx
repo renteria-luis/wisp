@@ -82,6 +82,7 @@ export default function Home() {
           band={band}
           color={companionColor}
           accessoryColor={accessoryColor}
+          character={equipped.character}
         />
 
         <Text className="mt-8 text-3xl font-bold text-ink">

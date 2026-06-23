@@ -164,7 +164,16 @@
     "companion_color": "Color",
     "accessory": "Accessory",
     "room": "Room",
-    "palette": "Palette"
+    "palette": "Palette",
+    "character": "Character"
+  },
+  "character": {
+    "char_wisp": "Wisp",
+    "char_cat": "Kitty",
+    "char_bunny": "Bunny",
+    "char_bird": "Birdie",
+    "char_fox": "Fox",
+    "char_axolotl": "Axolotl"
   },
   "craving": {
     "title": "Hang in there 🫧",

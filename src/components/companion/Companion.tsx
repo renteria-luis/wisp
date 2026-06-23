@@ -13,6 +13,8 @@ import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
 import { colors } from '@/theme/tokens';
 import type { VitalityState } from '@/types/domain';
 
+import { characterParts } from './characters';
+
 type Props = {
   vitality: number;
   band: VitalityState;
@@ -20,6 +22,8 @@ type Props = {
   color?: string;
   /** Optional accessory tint (equipped accessory). */
   accessoryColor?: string;
+  /** Equipped character id (silhouette). Defaults to the wisp. */
+  character?: string;
   size?: number;
 };
 
@@ -84,10 +88,12 @@ export function Companion({
   band,
   color = colors.primary['400'],
   accessoryColor,
+  character,
   size = 180,
 }: Props) {
   const reduced = useReducedMotion();
   const bob = useSharedValue(0);
+  const parts = characterParts(character);
 
   useEffect(() => {
     if (reduced) {
@@ -127,11 +133,10 @@ export function Companion({
           fill={color}
           opacity={glowOpacity}
         />
-        {/* body */}
-        <Path
-          d="M50 14 C64 26 80 40 78 60 C76 82 62 92 50 92 C38 92 24 82 22 60 C20 40 36 26 50 14 Z"
-          fill={color}
-        />
+        {/* character-specific behind parts (tails, gills, wings) */}
+        {parts.behind?.(color)}
+        {/* body silhouette (per equipped character) */}
+        {parts.body(color)}
         {/* soft belly highlight */}
         <Ellipse
           cx={50}

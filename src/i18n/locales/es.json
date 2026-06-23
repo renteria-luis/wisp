@@ -164,7 +164,16 @@
     "companion_color": "Color",
     "accessory": "Accesorio",
     "room": "Cuarto",
-    "palette": "Paleta"
+    "palette": "Paleta",
+    "character": "Personaje"
+  },
+  "character": {
+    "char_wisp": "Wisp",
+    "char_cat": "Gatito",
+    "char_bunny": "Conejito",
+    "char_bird": "Pajarito",
+    "char_fox": "Zorrito",
+    "char_axolotl": "Ajolote"
   },
   "craving": {
     "title": "Aguanta 🫧",

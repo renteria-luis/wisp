@@ -8,6 +8,15 @@
 import type { Cosmetic } from '@/types/domain';
 
 export const COSMETICS: Cosmetic[] = [
+  // Characters — the companion's silhouette. `char_wisp` is the free default
+  // (lets you switch back); the rest are premium unlockables. `swatch` is the
+  // creature's signature tint, shown on its shop glyph.
+  { id: 'char_wisp', type: 'character', price: 0, swatch: '#6f9d74' },
+  { id: 'char_cat', type: 'character', price: 200, swatch: '#9aa0ab' },
+  { id: 'char_bunny', type: 'character', price: 220, swatch: '#e9d8c5' },
+  { id: 'char_bird', type: 'character', price: 240, swatch: '#f0b94d' },
+  { id: 'char_fox', type: 'character', price: 300, swatch: '#e07a3c' },
+  { id: 'char_axolotl', type: 'character', price: 350, swatch: '#f1a2b8' },
   { id: 'color_sage', type: 'companion_color', price: 0, swatch: '#6f9d74' },
   { id: 'color_peach', type: 'companion_color', price: 80, swatch: '#f5934d' },
   { id: 'color_sky', type: 'companion_color', price: 80, swatch: '#5b8aa6' },

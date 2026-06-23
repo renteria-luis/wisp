@@ -76,7 +76,12 @@ export interface Pricing {
 /** Companion mood bands derived from the vitality score (§6.4). */
 export type VitalityState = 'exhausted' | 'tired' | 'okay' | 'radiant';
 
-export type CosmeticType = 'companion_color' | 'accessory' | 'room' | 'palette';
+export type CosmeticType =
+  | 'companion_color'
+  | 'accessory'
+  | 'room'
+  | 'palette'
+  | 'character';
 
 /** A purchasable cosmetic (§7.4). `name`/`swatch` drive display. */
 export interface Cosmetic {

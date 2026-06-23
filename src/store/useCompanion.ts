@@ -6,6 +6,8 @@ import type { Cosmetic, CosmeticType } from '@/types/domain';
 
 /** Default free companion color, owned from the start. */
 const DEFAULT_COLOR_ID = 'color_sage';
+/** Default free character (the wisp), owned + equipped from the start. */
+const DEFAULT_CHARACTER_ID = 'char_wisp';
 
 interface CompanionState {
   /** Owned cosmetic ids. */
@@ -19,10 +21,11 @@ interface CompanionState {
 }
 
 const initial = {
-  owned: [DEFAULT_COLOR_ID],
-  equipped: { companion_color: DEFAULT_COLOR_ID } as Partial<
-    Record<CosmeticType, string>
-  >,
+  owned: [DEFAULT_COLOR_ID, DEFAULT_CHARACTER_ID],
+  equipped: {
+    companion_color: DEFAULT_COLOR_ID,
+    character: DEFAULT_CHARACTER_ID,
+  } as Partial<Record<CosmeticType, string>>,
 };
 
 export const useCompanion = create<CompanionState>()(
@@ -41,7 +44,28 @@ export const useCompanion = create<CompanionState>()(
     {
       name: 'wisp-companion',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 1,
+      version: 2,
+      // v2 introduced the `character` slot — make sure the free wisp is owned
+      // and equipped for installs created before characters existed.
+      migrate: (state, version) => {
+        const s = state as {
+          owned?: string[];
+          equipped?: Record<string, string>;
+        };
+        if (version < 2) {
+          const owned = s.owned ?? [DEFAULT_COLOR_ID];
+          return {
+            owned: owned.includes(DEFAULT_CHARACTER_ID)
+              ? owned
+              : [...owned, DEFAULT_CHARACTER_ID],
+            equipped: {
+              character: DEFAULT_CHARACTER_ID,
+              ...(s.equipped ?? { companion_color: DEFAULT_COLOR_ID }),
+            },
+          } as CompanionState;
+        }
+        return s as CompanionState;
+      },
       partialize: (s) => ({ owned: s.owned, equipped: s.equipped }),
     },
   ),

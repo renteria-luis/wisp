@@ -6,6 +6,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Companion } from '@/components/companion/Companion';
+import { CharacterIcon } from '@/components/companion/characters';
 import { Button } from '@/components/ui/Button';
 import { COSMETICS, cosmeticById, dailyRotation } from '@/engine/cosmetics';
 import { useVitality } from '@/hooks/useVitality';
@@ -41,12 +42,18 @@ function CosmeticTile({
             : 'border-neutral-200'
       }`}
     >
-      <View
-        style={{ backgroundColor: cosmetic.swatch }}
-        className="h-12 w-12 rounded-full"
-      />
+      {cosmetic.type === 'character' ? (
+        <CharacterIcon id={cosmetic.id} color={cosmetic.swatch} size={48} />
+      ) : (
+        <View
+          style={{ backgroundColor: cosmetic.swatch }}
+          className="h-12 w-12 rounded-full"
+        />
+      )}
       <Text className="mt-2 text-[11px] text-ink-mute">
-        {t(`cosmeticType.${cosmetic.type}`)}
+        {cosmetic.type === 'character'
+          ? t(`character.${cosmetic.id}`)
+          : t(`cosmeticType.${cosmetic.type}`)}
       </Text>
       {equipped ? (
         <Text className="text-xs font-semibold text-primary-600">
@@ -101,6 +108,8 @@ export default function Space() {
     preview?.type === 'companion_color' ? preview.swatch : equippedColor;
   const shownAccessory =
     preview?.type === 'accessory' ? preview.swatch : equippedAccessory;
+  const shownCharacter =
+    preview?.type === 'character' ? preview.id : equipped.character;
 
   const rotation = useMemo(() => dailyRotation(todayISO()), []);
 
@@ -151,6 +160,7 @@ export default function Space() {
             band={band}
             color={shownColor}
             accessoryColor={shownAccessory}
+            character={shownCharacter}
           />
         </View>
 
@@ -181,12 +191,18 @@ export default function Space() {
         {preview ? (
           <View className="gap-2 rounded-2xl border border-accent-300 bg-neutral-0 p-3">
             <View className="flex-row items-center gap-3">
-              <View
-                style={{ backgroundColor: preview.swatch }}
-                className="h-8 w-8 rounded-full"
-              />
+              {preview.type === 'character' ? (
+                <CharacterIcon id={preview.id} color={preview.swatch} size={32} />
+              ) : (
+                <View
+                  style={{ backgroundColor: preview.swatch }}
+                  className="h-8 w-8 rounded-full"
+                />
+              )}
               <Text className="flex-1 text-sm font-medium text-ink">
-                {t(`cosmeticType.${preview.type}`)}
+                {preview.type === 'character'
+                  ? t(`character.${preview.id}`)
+                  : t(`cosmeticType.${preview.type}`)}
               </Text>
               <Pressable onPress={() => setPreview(null)} className="px-2 py-1">
                 <Text className="text-sm text-ink-mute">
