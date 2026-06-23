@@ -34,6 +34,9 @@ export default function Log() {
   const [mode, setMode] = useState<Mode>('smoked');
   const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
   const [intensity, setIntensity] = useState(5);
+  // Manner + source default to the full-impact case: own cigarette, whole.
+  const [shared, setShared] = useState(false);
+  const [gifted, setGifted] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const onSave = async () => {
@@ -41,7 +44,7 @@ export default function Log() {
     setSaving(true);
     try {
       if (mode === 'smoked') {
-        await logCigarette({ trigger: trigger ?? undefined });
+        await logCigarette({ trigger: trigger ?? undefined, shared, gifted });
       } else {
         await logResisted({ trigger: trigger ?? undefined, intensity });
         await useEconomy
@@ -104,6 +107,46 @@ export default function Log() {
             ))}
           </View>
         </View>
+
+        {mode === 'smoked' ? (
+          <>
+            <View>
+              <Text className="mb-2 text-sm font-medium text-ink-soft">
+                {t('log.mannerLabel')}
+              </Text>
+              <View className="flex-row gap-2">
+                <OptionChip
+                  label={t('log.whole')}
+                  selected={!shared}
+                  onPress={() => setShared(false)}
+                />
+                <OptionChip
+                  label={t('log.shared')}
+                  selected={shared}
+                  onPress={() => setShared(true)}
+                />
+              </View>
+            </View>
+
+            <View>
+              <Text className="mb-2 text-sm font-medium text-ink-soft">
+                {t('log.sourceLabel')}
+              </Text>
+              <View className="flex-row gap-2">
+                <OptionChip
+                  label={t('log.mine')}
+                  selected={!gifted}
+                  onPress={() => setGifted(false)}
+                />
+                <OptionChip
+                  label={t('log.gifted')}
+                  selected={gifted}
+                  onPress={() => setGifted(true)}
+                />
+              </View>
+            </View>
+          </>
+        ) : null}
 
         {mode === 'resisted' ? (
           <View>

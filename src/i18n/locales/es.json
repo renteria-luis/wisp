@@ -121,6 +121,12 @@
     "smoked": "Fumé",
     "resisted": "Lo resistí",
     "triggerLabel": "¿Qué lo provocó? (opcional)",
+    "mannerLabel": "¿Cuánto fumaste?",
+    "whole": "Entero",
+    "shared": "Solo un poco / compartido",
+    "sourceLabel": "¿De dónde salió?",
+    "mine": "Mío",
+    "gifted": "Me lo regalaron",
     "intensityLabel": "¿Qué tan fuerte fue?",
     "save": "Guardar"
   },

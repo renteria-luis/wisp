@@ -121,6 +121,12 @@
     "smoked": "I smoked",
     "resisted": "I resisted",
     "triggerLabel": "What triggered it? (optional)",
+    "mannerLabel": "How much did you smoke?",
+    "whole": "The whole thing",
+    "shared": "Just a bit / shared",
+    "sourceLabel": "Where was it from?",
+    "mine": "My own",
+    "gifted": "Someone gave it",
     "intensityLabel": "How strong was it?",
     "save": "Save"
   },
