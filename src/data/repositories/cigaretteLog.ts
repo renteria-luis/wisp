@@ -15,13 +15,19 @@ export async function addCigarette(input?: {
   timestamp?: string;
   trigger?: TriggerCategory;
   note?: string;
+  /** Smoked only partially (shared) → lighter health impact. */
+  shared?: boolean;
+  /** Someone gave it (gifted) → no money impact. */
+  gifted?: boolean;
 }): Promise<void> {
   const db = await getDb();
   await db.runAsync(
-    'INSERT INTO cigarette_log (timestamp, trigger_category, note) VALUES (?, ?, ?)',
+    'INSERT INTO cigarette_log (timestamp, trigger_category, note, shared, gifted) VALUES (?, ?, ?, ?, ?)',
     input?.timestamp ?? new Date().toISOString(),
     input?.trigger ?? null,
     input?.note ?? null,
+    input?.shared ? 1 : 0,
+    input?.gifted ? 1 : 0,
   );
 }
 
@@ -69,6 +75,36 @@ export async function countCigarettesSince(
     timestampISO,
   );
   return row?.c ?? 0;
+}
+
+/** Per-day counts of PAID cigarettes (gifted excluded) — drives savings. */
+export async function getDailyPaidCigaretteCounts(
+  fromISO: string,
+  toISO: string,
+): Promise<DailyCount[]> {
+  const db = await getDb();
+  return db.getAllAsync<DailyCount>(
+    `SELECT substr(timestamp, 1, 10) AS date, COUNT(*) AS count
+       FROM cigarette_log
+      WHERE gifted = 0 AND substr(timestamp, 1, 10) BETWEEN ? AND ?
+      GROUP BY date
+      ORDER BY date`,
+    fromISO,
+    toISO,
+  );
+}
+
+/** Health-weighted cigarette count since a timestamp (shared counts as 0.5). */
+export async function healthWeightedCountSince(
+  timestampISO: string,
+): Promise<number> {
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ w: number }>(
+    `SELECT COALESCE(SUM(CASE WHEN shared = 1 THEN 0.5 ELSE 1 END), 0) AS w
+       FROM cigarette_log WHERE timestamp >= ?`,
+    timestampISO,
+  );
+  return row?.w ?? 0;
 }
 
 /** Dev/God-mode: wipe all cigarette logs. */

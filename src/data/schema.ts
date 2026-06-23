@@ -48,4 +48,11 @@ export const MIGRATIONS: string[] = [
   );
   CREATE INDEX IF NOT EXISTS idx_ledger_timestamp ON economy_ledger (timestamp);
   `,
+
+  // v3 — cigarette source/manner. shared = smoked partially (less health
+  // impact); gifted = someone gave it (no money impact). Default: own + whole.
+  `
+  ALTER TABLE cigarette_log ADD COLUMN shared INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE cigarette_log ADD COLUMN gifted INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
