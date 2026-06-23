@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { getDailyCigaretteCounts } from '@/data/repositories/cigaretteLog';
+import {
+  getDailyCigaretteCounts,
+  getDailyPaidCigaretteCounts,
+} from '@/data/repositories/cigaretteLog';
 import {
   countWinDays,
   currentTrend,
@@ -37,23 +40,34 @@ export function useProgressData(): ProgressData {
   // Today's count changes whenever a log is added — use it as a refetch trigger.
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const [actual, setActual] = useState<number[]>([]);
+  // Paid-only daily counts (gifted excluded) — drive money saved / cigs avoided.
+  const [paidActual, setPaidActual] = useState<number[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    async function load(): Promise<number[]> {
-      if (!plan) return [];
+    async function load(): Promise<{ all: number[]; paid: number[] }> {
+      if (!plan) return { all: [], paid: [] };
       const today = todayISO();
-      const rows = await getDailyCigaretteCounts(plan.startDate, today);
-      return densifyDailyCounts(rows, plan.startDate, today).map(
-        (d) => d.count,
-      );
+      const [allRows, paidRows] = await Promise.all([
+        getDailyCigaretteCounts(plan.startDate, today),
+        getDailyPaidCigaretteCounts(plan.startDate, today),
+      ]);
+      const dense = (rows: typeof allRows): number[] =>
+        densifyDailyCounts(rows, plan.startDate, today).map((d) => d.count);
+      return { all: dense(allRows), paid: dense(paidRows) };
     }
     load()
-      .then((counts) => {
-        if (!cancelled) setActual(counts);
+      .then(({ all, paid }) => {
+        if (!cancelled) {
+          setActual(all);
+          setPaidActual(paid);
+        }
       })
       .catch(() => {
-        if (!cancelled) setActual([]);
+        if (!cancelled) {
+          setActual([]);
+          setPaidActual([]);
+        }
       });
     return () => {
       cancelled = true;
@@ -72,14 +86,14 @@ export function useProgressData(): ProgressData {
       streak: currentWinStreak(actual, allowances),
       smokeFreeDays: actual.filter((n) => n === 0).length,
       totalCigarettes: actual.reduce((s, n) => s + n, 0),
-      avoided: cigarettesAvoided(baseline, actual),
+      avoided: cigarettesAvoided(baseline, paidActual),
       saved: moneySaved({
         baseline,
-        actualDaily: actual,
+        actualDaily: paidActual,
         packPrice: pricing.packPrice,
         cigsPerPack: pricing.cigsPerPack,
       }),
       recommendation: recommendReplan({ actual, allowances }),
     };
-  }, [plan, actual, pricing.packPrice, pricing.cigsPerPack]);
+  }, [plan, actual, paidActual, pricing.packPrice, pricing.cigsPerPack]);
 }

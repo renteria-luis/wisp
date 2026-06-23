@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import {
-  countCigarettesSince,
   getLastCigaretteTimestamp,
+  healthWeightedCountSince,
 } from '@/data/repositories/cigaretteLog';
 import { allowanceForDay } from '@/engine/planEngine';
 import {
@@ -40,7 +40,7 @@ export function useVitality(): Vitality {
         now - VITALITY_WINDOW_HOURS * HOUR_MS,
       ).toISOString();
       const [recentCigarettes, lastCig] = await Promise.all([
-        countCigarettesSince(windowStartISO),
+        healthWeightedCountSince(windowStartISO),
         getLastCigaretteTimestamp(),
       ]);
       const hoursSinceLastCigarette = lastCig

@@ -15,6 +15,10 @@ interface LogInput {
   trigger?: TriggerCategory;
   intensity?: number;
   note?: string;
+  /** Smoked only partially (shared) → lighter health impact. */
+  shared?: boolean;
+  /** Someone gave it (gifted) → no money impact. */
+  gifted?: boolean;
 }
 
 interface LogsState {
@@ -56,7 +60,12 @@ export const useLogs = create<LogsState>((set, get) => ({
   },
 
   logCigarette: async (input) => {
-    await addCigarette({ trigger: input?.trigger, note: input?.note });
+    await addCigarette({
+      trigger: input?.trigger,
+      note: input?.note,
+      shared: input?.shared,
+      gifted: input?.gifted,
+    });
     await get().refreshToday();
   },
 
