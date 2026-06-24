@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   getDailyCigaretteCounts,
   getDailyPaidCigaretteCounts,
+  getLastCigaretteTimestamp,
 } from '@/data/repositories/cigaretteLog';
 import {
   countWinDays,
@@ -32,6 +33,11 @@ export interface ProgressData {
   saved: number;
   /** Cumulative money saved per day — powers the savings sparkline. */
   savedSeries: number[];
+  /** Hours since the last logged cigarette (or plan start if none). Drives the
+   *  recovery timeline: grows while smoke-free, resets to ~0 on a new log. */
+  smokeFreeHours: number;
+  /** True when the 7-day trend is above today's allowance (gentle setback). */
+  overQuota: boolean;
   recommendation: ReplanRecommendation;
 }
 
@@ -44,31 +50,40 @@ export function useProgressData(): ProgressData {
   const [actual, setActual] = useState<number[]>([]);
   // Paid-only daily counts (gifted excluded) — drive money saved / cigs avoided.
   const [paidActual, setPaidActual] = useState<number[]>([]);
+  // ISO of the most recent cigarette — anchors the recovery timeline.
+  const [lastCigaretteAt, setLastCigaretteAt] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    async function load(): Promise<{ all: number[]; paid: number[] }> {
-      if (!plan) return { all: [], paid: [] };
+    async function load(): Promise<{
+      all: number[];
+      paid: number[];
+      last: string | null;
+    }> {
+      if (!plan) return { all: [], paid: [], last: null };
       const today = todayISO();
-      const [allRows, paidRows] = await Promise.all([
+      const [allRows, paidRows, last] = await Promise.all([
         getDailyCigaretteCounts(plan.startDate, today),
         getDailyPaidCigaretteCounts(plan.startDate, today),
+        getLastCigaretteTimestamp(),
       ]);
       const dense = (rows: typeof allRows): number[] =>
         densifyDailyCounts(rows, plan.startDate, today).map((d) => d.count);
-      return { all: dense(allRows), paid: dense(paidRows) };
+      return { all: dense(allRows), paid: dense(paidRows), last };
     }
     load()
-      .then(({ all, paid }) => {
+      .then(({ all, paid, last }) => {
         if (!cancelled) {
           setActual(all);
           setPaidActual(paid);
+          setLastCigaretteAt(last);
         }
       })
       .catch(() => {
         if (!cancelled) {
           setActual([]);
           setPaidActual([]);
+          setLastCigaretteAt(null);
         }
       });
     return () => {
@@ -79,11 +94,21 @@ export function useProgressData(): ProgressData {
   return useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];
     const baseline = plan?.baseline ?? 0;
+    const anchorMs = lastCigaretteAt
+      ? new Date(lastCigaretteAt).getTime()
+      : plan
+        ? new Date(plan.startDate).getTime()
+        : Date.now();
+    const smokeFreeHours = Math.max(0, (Date.now() - anchorMs) / 3_600_000);
+    const trend = currentTrend(actual);
+    const todayAllowance = allowances.length
+      ? (allowances[allowances.length - 1] ?? 0)
+      : baseline;
     return {
       hasPlan: !!plan,
       actual,
       allowances,
-      trend: currentTrend(actual),
+      trend,
       winDayCount: countWinDays(actual, allowances),
       streak: currentWinStreak(actual, allowances),
       smokeFreeDays: actual.filter((n) => n === 0).length,
@@ -101,7 +126,16 @@ export function useProgressData(): ProgressData {
         packPrice: pricing.packPrice,
         cigsPerPack: pricing.cigsPerPack,
       }),
+      smokeFreeHours,
+      overQuota: trend > todayAllowance + 0.001,
       recommendation: recommendReplan({ actual, allowances }),
     };
-  }, [plan, actual, paidActual, pricing.packPrice, pricing.cigsPerPack]);
+  }, [
+    plan,
+    actual,
+    paidActual,
+    lastCigaretteAt,
+    pricing.packPrice,
+    pricing.cigsPerPack,
+  ]);
 }

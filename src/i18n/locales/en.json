@@ -32,6 +32,8 @@
     "quietEnd": "Until",
     "language": "Language",
     "lang": { "auto": "Automatic", "en": "English", "es": "Español" },
+    "appearance": "Appearance",
+    "theme": { "system": "Automatic", "light": "Light", "dark": "Dark" },
     "data": "Data",
     "dataNote": "Everything stays on your phone. Export a copy or erase it all.",
     "export": "Export my data",
@@ -150,6 +152,9 @@
     "quitDate": "Quit date",
     "weekAhead": "The week ahead",
     "criticalWindow": "Your first {{days}} days matter most — I'm right here.",
+    "journey": "Journey progress",
+    "savedSoFar": "Saved so far",
+    "nextMilestone": "Next health milestone",
     "noPlan": "No plan yet — finish onboarding to get started."
   },
   "log": {
@@ -178,6 +183,7 @@
     "legendActual": "Actual",
     "legendTarget": "Target",
     "nextGoal": "Toward {{goal}}",
+    "wishlistLink": "My wishlist ›",
     "easeTitle": "Let's ease the pace",
     "easeBody": "The last few days ran a little high — and that's okay. We can stretch the plan to a gentler pace.",
     "accelTitle": "You're ahead 🌿",
@@ -192,12 +198,32 @@
     "dinner": "dinner out",
     "getaway": "a weekend away"
   },
+  "wishlist": {
+    "title": "Wishlist",
+    "subtitle": "Add things you'd love to buy. Each one fills up as your smoke-free savings grow.",
+    "itemName": "What do you want?",
+    "itemPlaceholder": "e.g. an iPad, a jacket, a treat…",
+    "itemPrice": "How much does it cost?",
+    "add": "Add to wishlist",
+    "empty": "Nothing yet — add your first goal above.",
+    "reached": "Reached! 🎉"
+  },
   "health": {
     "title": "Your recovery",
     "count": "{{reached}} of {{total}}",
     "towards": "Towards {{title}}",
     "allReached": "Every milestone reached 🎉",
     "disclaimer": "General wellbeing information, not medical advice.",
+    "sinceLast": "Smoke-free: {{time}}",
+    "setback": "Smoking pauses your recovery — but every fresh start counts. You've got this 💚",
+    "dur": {
+      "min_one": "{{count}} min",
+      "min_other": "{{count}} min",
+      "hour_one": "{{count}} hour",
+      "hour_other": "{{count}} hours",
+      "day_one": "{{count}} day",
+      "day_other": "{{count}} days"
+    },
     "milestones": {
       "pulse": {
         "title": "Pulse & pressure",
@@ -328,6 +354,30 @@
     "version": "Version {{version}}",
     "privacy": "Your data never leaves your phone. No account, no cloud, no tracking.",
     "madeBy": "Made by {{name}}"
+  },
+  "godmode": {
+    "title": "God Mode 🔧",
+    "subtitle": "Dev only — edits live state. Derived stats (savings, trend) follow the logs you set here.",
+    "coins": "Coins",
+    "walletPending": "Wallet {{wallet}} · Pending {{pending}}",
+    "setWallet": "Set wallet",
+    "set": "Set",
+    "plus1000": "+1000",
+    "plus500pending": "+500 pending",
+    "movePending": "Move pending → wallet",
+    "planDay": "Plan day",
+    "dayOf": "Day {{day}} of {{total}}",
+    "noPlan": "No plan",
+    "dayMinus": "Day −1",
+    "dayPlus": "Day +1",
+    "cigaretteLogs": "Cigarette logs",
+    "today": "Today: {{count}}",
+    "plusToday": "+1 today",
+    "plusYesterday": "+1 yesterday",
+    "clearLogs": "Clear all logs",
+    "reset": "Reset",
+    "rerunOnboarding": "Re-run onboarding",
+    "wipe": "Wipe everything"
   },
   "screens": {
     "about": "Made with care, on your device.",

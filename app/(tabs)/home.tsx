@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Companion } from '@/components/companion/Companion';
 import { Button } from '@/components/ui/Button';
 import { HeartBurst } from '@/components/ui/HeartBurst';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useVitality } from '@/hooks/useVitality';
@@ -20,6 +21,7 @@ import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { applyTheme } from '@/theme/appearance';
 import { colors } from '@/theme/tokens';
 import { daysBetween, todayISO } from '@/utils/date';
 
@@ -39,6 +41,7 @@ export default function Home() {
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const { score, band } = useVitality();
   const equipped = useCompanion((s) => s.equipped);
+  const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
 
   // Easter egg: long-press the companion 5× within 3s for a heart burst (§11).
@@ -102,6 +105,26 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
+      <View className="flex-row items-center justify-end gap-1 px-5 pt-1">
+        <Pressable
+          onPress={() => applyTheme(scheme === 'dark' ? 'light' : 'dark')}
+          accessibilityRole="button"
+          accessibilityLabel="theme"
+          hitSlop={8}
+          className="px-2 py-1"
+        >
+          <Text className="text-xl">{scheme === 'dark' ? '☀️' : '🌙'}</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/settings')}
+          accessibilityRole="button"
+          accessibilityLabel={t('settings.title')}
+          hitSlop={8}
+          className="px-2 py-1"
+        >
+          <Text className="text-xl">⚙️</Text>
+        </Pressable>
+      </View>
       <View className="flex-1 items-center justify-center px-6">
         <Pressable
           onLongPress={onCompanionLongPress}

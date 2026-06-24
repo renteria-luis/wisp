@@ -23,6 +23,7 @@ import {
   requestNotificationPermission,
 } from '@/notifications/scheduler';
 import { useSettings } from '@/store/useSettings';
+import { applyTheme, type ThemePref } from '@/theme/appearance';
 import { colors } from '@/theme/tokens';
 import type { Gender } from '@/types/domain';
 import { exportAppData, wipeAppData } from '@/utils/appData';
@@ -34,6 +35,7 @@ const LANGS: { value: SupportedLanguage | null; key: string }[] = [
   { value: 'en', key: 'en' },
   { value: 'es', key: 'es' },
 ];
+const THEMES: ThemePref[] = ['system', 'light', 'dark'];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -294,6 +296,19 @@ export default function Settings() {
                 label={t(`settings.lang.${l.key}`)}
                 selected={s.language === l.value}
                 onPress={() => onLanguage(l.value)}
+              />
+            ))}
+          </View>
+        </Section>
+
+        <Section title={t('settings.appearance')}>
+          <View className="flex-row flex-wrap gap-2">
+            {THEMES.map((th) => (
+              <OptionChip
+                key={th}
+                label={t(`settings.theme.${th}`)}
+                selected={s.theme === th}
+                onPress={() => applyTheme(th)}
               />
             ))}
           </View>

@@ -168,8 +168,24 @@ function Row({
   );
 }
 
-/** The recovery hero: milestones that light up over time since the journey start. */
-export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
+function durationLabel(
+  t: ReturnType<typeof useTranslation>['t'],
+  hours: number,
+): string {
+  if (hours < 1) return t('health.dur.min', { count: Math.round(hours * 60) });
+  if (hours < 48) return t('health.dur.hour', { count: Math.round(hours) });
+  return t('health.dur.day', { count: Math.round(hours / 24) });
+}
+
+/** The recovery hero: milestones that light up with time SINCE THE LAST cigarette
+ *  — it grows while smoke-free and resets when a cigarette is logged. */
+export function HealthTimeline({
+  elapsedHours,
+  overQuota = false,
+}: {
+  elapsedHours: number;
+  overQuota?: boolean;
+}) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();
   const timeline = milestoneTimeline(elapsedHours);
@@ -202,6 +218,16 @@ export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
           </Text>
         </View>
       </View>
+
+      <Text className="mt-1 text-xs text-ink-mute dark:text-neutral-400">
+        {t('health.sinceLast', { time: durationLabel(t, elapsedHours) })}
+      </Text>
+
+      {overQuota ? (
+        <Text className="mt-3 rounded-xl bg-accent-50 p-3 text-xs leading-5 text-accent-700 dark:bg-accent-900 dark:text-accent-100">
+          {t('health.setback')}
+        </Text>
+      ) : null}
 
       {next ? (
         <View className="mt-3 rounded-xl bg-primary-50 p-3 dark:bg-primary-900">

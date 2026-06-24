@@ -13,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { applyLanguage } from '@/i18n';
+import { applySavedTheme } from '@/theme/appearance';
 import {
   configureNotificationHandler,
   rescheduleTriggerNotifications,
@@ -28,6 +29,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void (async () => {
+      applySavedTheme();
       applyLanguage(useSettings.getState().language);
       await useLogs.getState().init();
       await useEconomy
@@ -72,6 +74,7 @@ export default function RootLayout() {
             <Stack.Screen name="log" options={{ presentation: 'modal' }} />
             <Stack.Screen name="craving" options={{ presentation: 'modal' }} />
             <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="wishlist" options={{ presentation: 'modal' }} />
             <Stack.Screen name="about" options={{ presentation: 'modal' }} />
             <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
             <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />

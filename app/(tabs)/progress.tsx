@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +9,7 @@ import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 import {
   ACCELERATE_FACTOR,
   EASE_FACTOR,
@@ -17,6 +19,7 @@ import { useProgressData } from '@/hooks/useProgressData';
 import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { sortByPrice, useWishlist } from '@/store/useWishlist';
 import { todayISO } from '@/utils/date';
 
 /** "What you could buy instead" goals, cheapest → priciest (§6.8). */
@@ -42,9 +45,11 @@ export default function Progress() {
   const data = useProgressData();
   const plan = usePlan((s) => s.plan);
   const setPlan = usePlan((s) => s.setPlan);
+  const router = useRouter();
   const currency = useSettings((s) => s.pricing.currency);
   const seenEggs = useSettings((s) => s.seenEggs);
   const markEggSeen = useSettings((s) => s.markEggSeen);
+  const wishItems = useWishlist((s) => s.items);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -57,16 +62,24 @@ export default function Progress() {
 
   const isReduction = plan.track === 'gradual_reduction';
   const replan = data.recommendation;
-  const elapsedHours = Math.max(
-    0,
-    (Date.now() - new Date(plan.startDate).getTime()) / 3_600_000,
-  );
   // Easter egg: a one-time note once savings cross a meaningful amount (§11).
   const savingsEgg =
     data.saved >= (personal.specialNumber ?? 100) &&
     !seenEggs.includes('savings');
-  // Next "what you could buy instead" goal still ahead of current savings.
-  const nextGoal = SAVINGS_GOALS.find((g) => g.price > data.saved);
+  // Wishlist drives the savings goals; fall back to the suggested defaults when
+  // the user hasn't added anything yet. Sorted cheapest → priciest.
+  const goals = wishItems.length
+    ? sortByPrice(wishItems).map((i) => ({
+        key: i.id,
+        name: i.name,
+        price: i.price,
+      }))
+    : SAVINGS_GOALS.map((g) => ({
+        key: g.key,
+        name: t(`goals.${g.key}`),
+        price: g.price,
+      }));
+  const nextGoal = goals.find((g) => g.price > data.saved);
   const goalPct = nextGoal ? Math.min(1, data.saved / nextGoal.price) : 1;
 
   const applyReplan = () => {
@@ -89,7 +102,10 @@ export default function Progress() {
           {t('tabs.progress')}
         </Text>
 
-        <HealthTimeline elapsedHours={elapsedHours} />
+        <HealthTimeline
+          elapsedHours={data.smokeFreeHours}
+          overQuota={data.overQuota}
+        />
 
         <Card>
           <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
@@ -141,25 +157,32 @@ export default function Progress() {
               <Sparkline values={data.savedSeries} />
             </View>
           ) : null}
-          {nextGoal ? (
-            <View className="mt-4">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-xs text-ink-soft dark:text-neutral-300">
-                  {t('progress.nextGoal', { goal: t(`goals.${nextGoal.key}`) })}
-                </Text>
-                <Text className="text-xs text-ink-mute dark:text-neutral-400">
-                  {Math.round(goalPct * 100)}%
-                </Text>
-              </View>
-              <View className="mt-1 h-2 flex-row overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                <View
-                  style={{ flex: Math.max(0.0001, goalPct) }}
-                  className="rounded-full bg-primary-400"
-                />
-                <View style={{ flex: Math.max(0.0001, 1 - goalPct) }} />
-              </View>
-            </View>
-          ) : null}
+          <View className="mt-4">
+            {nextGoal ? (
+              <>
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-xs text-ink-soft dark:text-neutral-300">
+                    {t('progress.nextGoal', { goal: nextGoal.name })}
+                  </Text>
+                  <Text className="text-xs text-ink-mute dark:text-neutral-400">
+                    {Math.round(goalPct * 100)}%
+                  </Text>
+                </View>
+                <View className="mt-1">
+                  <ProgressBar progress={goalPct} />
+                </View>
+              </>
+            ) : null}
+            <Pressable
+              onPress={() => router.push('/wishlist')}
+              accessibilityRole="button"
+              className="mt-3 self-start"
+            >
+              <Text className="text-sm font-semibold text-primary-600">
+                {t('progress.wishlistLink')}
+              </Text>
+            </Pressable>
+          </View>
         </Card>
 
         {savingsEgg ? (

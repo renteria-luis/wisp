@@ -32,6 +32,8 @@
     "quietEnd": "Hasta",
     "language": "Idioma",
     "lang": { "auto": "Automático", "en": "English", "es": "Español" },
+    "appearance": "Apariencia",
+    "theme": { "system": "Automático", "light": "Claro", "dark": "Oscuro" },
     "data": "Datos",
     "dataNote": "Todo se queda en tu teléfono. Exporta una copia o bórralo todo.",
     "export": "Exportar mis datos",
@@ -150,6 +152,9 @@
     "quitDate": "Fecha para dejarlo",
     "weekAhead": "La semana que viene",
     "criticalWindow": "Tus primeros {{days}} días son los más importantes — aquí estoy.",
+    "journey": "Progreso del camino",
+    "savedSoFar": "Ahorrado hasta ahora",
+    "nextMilestone": "Próximo hito de salud",
     "noPlan": "Aún no hay plan — termina la introducción para empezar."
   },
   "log": {
@@ -178,6 +183,7 @@
     "legendActual": "Real",
     "legendTarget": "Meta",
     "nextGoal": "Hacia {{goal}}",
+    "wishlistLink": "Mi lista de deseos ›",
     "easeTitle": "Bajemos el ritmo",
     "easeBody": "Los últimos días fueron un poco altos, y está bien. Podemos extender el plan a un ritmo más amable.",
     "accelTitle": "Vas adelantada 🌿",
@@ -192,12 +198,32 @@
     "dinner": "una cena fuera",
     "getaway": "una escapada"
   },
+  "wishlist": {
+    "title": "Lista de deseos",
+    "subtitle": "Agrega cosas que te encantaría comprar. Cada una se llena conforme crecen tus ahorros por no fumar.",
+    "itemName": "¿Qué quieres?",
+    "itemPlaceholder": "p. ej. un iPad, una chamarra, un antojo…",
+    "itemPrice": "¿Cuánto cuesta?",
+    "add": "Agregar a la lista",
+    "empty": "Aún nada — agrega tu primera meta arriba.",
+    "reached": "¡Alcanzado! 🎉"
+  },
   "health": {
     "title": "Tu recuperación",
     "count": "{{reached}} de {{total}}",
     "towards": "Hacia {{title}}",
     "allReached": "¡Lograste todos los hitos! 🎉",
     "disclaimer": "Información general de bienestar, no consejo médico.",
+    "sinceLast": "Sin fumar: {{time}}",
+    "setback": "Fumar pausa tu recuperación, pero cada nuevo intento cuenta. Tú puedes 💚",
+    "dur": {
+      "min_one": "{{count}} min",
+      "min_other": "{{count}} min",
+      "hour_one": "{{count}} hora",
+      "hour_other": "{{count}} horas",
+      "day_one": "{{count}} día",
+      "day_other": "{{count}} días"
+    },
     "milestones": {
       "pulse": {
         "title": "Pulso y presión",
@@ -328,6 +354,30 @@
     "version": "Versión {{version}}",
     "privacy": "Tus datos nunca salen de tu teléfono. Sin cuenta, sin nube, sin rastreo.",
     "madeBy": "Hecho por {{name}}"
+  },
+  "godmode": {
+    "title": "Modo Dios 🔧",
+    "subtitle": "Solo dev — edita el estado en vivo. Las estadísticas derivadas (ahorro, tendencia) siguen los registros que pongas aquí.",
+    "coins": "Monedas",
+    "walletPending": "Cartera {{wallet}} · Pendiente {{pending}}",
+    "setWallet": "Fijar cartera",
+    "set": "Fijar",
+    "plus1000": "+1000",
+    "plus500pending": "+500 pendiente",
+    "movePending": "Pasar pendiente → cartera",
+    "planDay": "Día del plan",
+    "dayOf": "Día {{day}} de {{total}}",
+    "noPlan": "Sin plan",
+    "dayMinus": "Día −1",
+    "dayPlus": "Día +1",
+    "cigaretteLogs": "Registros de cigarros",
+    "today": "Hoy: {{count}}",
+    "plusToday": "+1 hoy",
+    "plusYesterday": "+1 ayer",
+    "clearLogs": "Borrar registros",
+    "reset": "Reiniciar",
+    "rerunOnboarding": "Rehacer introducción",
+    "wipe": "Borrar todo"
   },
   "screens": {
     "about": "Hecho con cariño, en tu dispositivo.",

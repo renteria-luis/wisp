@@ -13,6 +13,7 @@ import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { useWishlist } from '@/store/useWishlist';
 import { todayISO } from '@/utils/date';
 
 const TABLES = [
@@ -54,6 +55,7 @@ export function collectAppState(): Record<string, unknown> {
     plan: usePlan.getState().plan,
     companion: { owned: companion.owned, equipped: companion.equipped },
     economy: { balance: economy.balance, pending: economy.pending },
+    wishlist: useWishlist.getState().items,
   };
 }
 
@@ -91,6 +93,7 @@ export async function wipeAppData(): Promise<void> {
   useEconomy.getState().reset();
   useCompanion.getState().reset();
   usePlan.getState().clearPlan();
+  useWishlist.getState().reset();
   useSettings.getState().reset();
   useSettings.getState().setOnboardingCompleted(false);
   await useLogs
