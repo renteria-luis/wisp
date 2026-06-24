@@ -154,6 +154,17 @@ export default function Space() {
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
       <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
+        <View className="flex-row justify-end">
+          <Pressable
+            onPress={() => router.push('/settings')}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.title')}
+            hitSlop={8}
+            className="px-2 py-1"
+          >
+            <Text className="text-xl">⚙️</Text>
+          </Pressable>
+        </View>
         <View className="items-center">
           <Companion
             vitality={score}

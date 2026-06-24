@@ -1,5 +1,4 @@
 import '../src/global.css';
-import '@/i18n';
 
 import {
   DarkTheme,
@@ -13,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { applyLanguage } from '@/i18n';
 import {
   configureNotificationHandler,
   rescheduleTriggerNotifications,
@@ -28,6 +28,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void (async () => {
+      applyLanguage(useSettings.getState().language);
       await useLogs.getState().init();
       await useEconomy
         .getState()

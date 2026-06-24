@@ -37,4 +37,10 @@ if (!i18n.isInitialized) {
   });
 }
 
+/** Apply a language override, or follow the device locale when `null`. */
+export function applyLanguage(language: SupportedLanguage | null): void {
+  // eslint-disable-next-line import/no-named-as-default-member
+  void i18n.changeLanguage(language ?? detectDeviceLanguage());
+}
+
 export default i18n;
