@@ -2,7 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AllowanceBars } from '@/components/ui/AllowanceBars';
+import { Sparkline } from '@/components/charts/Sparkline';
+import { TrendChart } from '@/components/charts/TrendChart';
+import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
@@ -43,6 +45,10 @@ export default function Progress() {
 
   const isReduction = plan.track === 'gradual_reduction';
   const replan = data.recommendation;
+  const elapsedHours = Math.max(
+    0,
+    (Date.now() - new Date(plan.startDate).getTime()) / 3_600_000,
+  );
 
   const applyReplan = () => {
     if (replan.action === 'hold') return;
@@ -64,6 +70,8 @@ export default function Progress() {
           {t('tabs.progress')}
         </Text>
 
+        <HealthTimeline elapsedHours={elapsedHours} />
+
         <Card>
           <Text className="text-sm font-medium text-ink-soft">
             {t('progress.trend')}
@@ -76,11 +84,11 @@ export default function Progress() {
               {t('progress.perDayAvg')}
             </Text>
           </View>
-          <View className="mt-4">
-            <AllowanceBars
-              allowances={data.actual.slice(-14)}
+          <View className="mt-3">
+            <TrendChart
+              actual={data.actual.slice(-14)}
+              allowances={data.allowances.slice(-14)}
               max={Math.max(plan.baseline, 1)}
-              days={14}
             />
           </View>
         </Card>
@@ -109,6 +117,11 @@ export default function Progress() {
           <Text className="mt-1 text-sm text-ink-mute">
             {t('progress.cigsAvoided', { count: data.avoided })}
           </Text>
+          {data.savedSeries.length > 1 ? (
+            <View className="mt-3">
+              <Sparkline values={data.savedSeries} />
+            </View>
+          ) : null}
         </Card>
 
         {isReduction && replan.action !== 'hold' ? (

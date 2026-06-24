@@ -139,12 +139,73 @@
     "saved": "Dinero ahorrado",
     "cigsAvoided_one": "{{count}} cigarrillo evitado",
     "cigsAvoided_other": "{{count}} cigarrillos evitados",
+    "legendActual": "Real",
+    "legendTarget": "Meta",
     "easeTitle": "Bajemos el ritmo",
     "easeBody": "Los últimos días fueron un poco altos, y está bien. Podemos extender el plan a un ritmo más amable.",
     "accelTitle": "Vas adelantada 🌿",
     "accelBody": "Has estado cómodamente por debajo de la meta. ¿Quieres terminar un poco antes?",
     "easeCta": "Ajustar mi plan",
     "accelCta": "Acelerar"
+  },
+  "health": {
+    "title": "Tu recuperación",
+    "count": "{{reached}} de {{total}}",
+    "towards": "Hacia {{title}}",
+    "allReached": "¡Lograste todos los hitos! 🎉",
+    "disclaimer": "Información general de bienestar, no consejo médico.",
+    "milestones": {
+      "pulse": {
+        "title": "Pulso y presión",
+        "body": "Tu ritmo cardíaco y presión arterial empiezan a normalizarse.",
+        "when": "20 min"
+      },
+      "co": {
+        "title": "Oxígeno en sangre",
+        "body": "El monóxido de carbono baja y el oxígeno vuelve a niveles normales.",
+        "when": "12 h"
+      },
+      "nicotine": {
+        "title": "Sin nicotina",
+        "body": "La mayor parte de la nicotina sale de tu cuerpo y el ánimo empieza a estabilizarse.",
+        "when": "1 día"
+      },
+      "senses": {
+        "title": "Gusto y olfato",
+        "body": "Las terminaciones nerviosas se recuperan: la comida sabe y huele mejor.",
+        "when": "2 días"
+      },
+      "breathing": {
+        "title": "Respirar mejor",
+        "body": "Los bronquios se relajan y tienes más energía.",
+        "when": "3 días"
+      },
+      "circulation": {
+        "title": "Circulación",
+        "body": "La circulación mejora y moverte cuesta menos.",
+        "when": "2 semanas"
+      },
+      "lungs": {
+        "title": "Pulmones más limpios",
+        "body": "Los cilios se recuperan: menos tos y menos falta de aire.",
+        "when": "1 mes"
+      },
+      "lungFunction": {
+        "title": "Capacidad pulmonar",
+        "body": "Tu función pulmonar sigue subiendo de forma notable.",
+        "when": "3 meses"
+      },
+      "heart": {
+        "title": "Corazón más fuerte",
+        "body": "Tu riesgo de enfermedad cardíaca baja a la mitad que el de quien fuma.",
+        "when": "1 año"
+      },
+      "lungCancer": {
+        "title": "Riesgo reducido",
+        "body": "Tu riesgo de cáncer de pulmón cae cerca de la mitad que el de quien fuma.",
+        "when": "10 años"
+      }
+    }
   },
   "space": {
     "coins_one": "{{count}} moneda",

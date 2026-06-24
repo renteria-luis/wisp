@@ -11,7 +11,7 @@ import {
   recommendReplan,
   type ReplanRecommendation,
 } from '@/engine/adherence';
-import { cigarettesAvoided, moneySaved } from '@/engine/savings';
+import { cigarettesAvoided, moneySaved, savingsSeries } from '@/engine/savings';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
@@ -30,6 +30,8 @@ export interface ProgressData {
   totalCigarettes: number;
   avoided: number;
   saved: number;
+  /** Cumulative money saved per day — powers the savings sparkline. */
+  savedSeries: number[];
   recommendation: ReplanRecommendation;
 }
 
@@ -88,6 +90,12 @@ export function useProgressData(): ProgressData {
       totalCigarettes: actual.reduce((s, n) => s + n, 0),
       avoided: cigarettesAvoided(baseline, paidActual),
       saved: moneySaved({
+        baseline,
+        actualDaily: paidActual,
+        packPrice: pricing.packPrice,
+        cigsPerPack: pricing.cigsPerPack,
+      }),
+      savedSeries: savingsSeries({
         baseline,
         actualDaily: paidActual,
         packPrice: pricing.packPrice,

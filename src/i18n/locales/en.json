@@ -139,12 +139,73 @@
     "saved": "Money saved",
     "cigsAvoided_one": "{{count}} cigarette avoided",
     "cigsAvoided_other": "{{count}} cigarettes avoided",
+    "legendActual": "Actual",
+    "legendTarget": "Target",
     "easeTitle": "Let's ease the pace",
     "easeBody": "The last few days ran a little high — and that's okay. We can stretch the plan to a gentler pace.",
     "accelTitle": "You're ahead 🌿",
     "accelBody": "You've been comfortably under target. Want to finish a little sooner?",
     "easeCta": "Adjust my plan",
     "accelCta": "Speed up"
+  },
+  "health": {
+    "title": "Your recovery",
+    "count": "{{reached}} of {{total}}",
+    "towards": "Towards {{title}}",
+    "allReached": "Every milestone reached 🎉",
+    "disclaimer": "General wellbeing information, not medical advice.",
+    "milestones": {
+      "pulse": {
+        "title": "Pulse & pressure",
+        "body": "Your heart rate and blood pressure begin to settle back to normal.",
+        "when": "20 min"
+      },
+      "co": {
+        "title": "Blood oxygen",
+        "body": "Carbon monoxide clears and your blood oxygen returns to normal.",
+        "when": "12 h"
+      },
+      "nicotine": {
+        "title": "Nicotine clears",
+        "body": "Most nicotine has left your body and your mood starts to steady.",
+        "when": "1 day"
+      },
+      "senses": {
+        "title": "Taste & smell",
+        "body": "Nerve endings recover, so food tastes and smells better.",
+        "when": "2 days"
+      },
+      "breathing": {
+        "title": "Easier breathing",
+        "body": "Your bronchial tubes relax and your energy lifts.",
+        "when": "3 days"
+      },
+      "circulation": {
+        "title": "Circulation",
+        "body": "Circulation improves and moving around feels easier.",
+        "when": "2 weeks"
+      },
+      "lungs": {
+        "title": "Cleaner lungs",
+        "body": "Cilia regrow, so you cough less and feel less short of breath.",
+        "when": "1 month"
+      },
+      "lungFunction": {
+        "title": "Lung capacity",
+        "body": "Your lung function keeps climbing noticeably.",
+        "when": "3 months"
+      },
+      "heart": {
+        "title": "Stronger heart",
+        "body": "Your risk of heart disease is now about half that of a smoker.",
+        "when": "1 year"
+      },
+      "lungCancer": {
+        "title": "Lower risk",
+        "body": "Your risk of lung cancer drops to about half that of a smoker.",
+        "when": "10 years"
+      }
+    }
   },
   "space": {
     "coins_one": "{{count}} coin",
