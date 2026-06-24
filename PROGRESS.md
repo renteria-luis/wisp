@@ -1,59 +1,61 @@
 # PROGRESS
 
-## Current phase: 5 — Craving toolkit & triggers/notifications (status: done)
+## Current phase: 7 — i18n, personal touches & polish (status: done)
 
-The panic button is real: a craving modal with an animated breathing guide, a
-"this passes in ~3 min" timer, and rotating distractions; plus local trigger
-notifications, a situational "I'm out / drinking" support burst, and quiet hours.
-`lint`, `typecheck`, and **63 tests** pass; iOS and web bundles export cleanly
-(SDK 54 / Expo Go).
+Wisp now feels like a finished v1: a full Settings screen, on-device data
+export/erase, a daily mood check-in, the personal dedication + easter eggs, a
+"what you could buy instead" savings goal, and app-wide dark mode. `lint`,
+`typecheck`, and **71 tests** pass; iOS and web bundles export cleanly
+(SDK 54 / Expo Go). Only **Phase 8 (release prep)** remains.
 
-> **Phases done:** 0 (scaffold), 2 (onboarding & plan engine), 1 (data layer),
-> 3 (adherence & savings), 4 (companion & economy), and now 5 (craving &
-> notifications). All merged to `main`, each runnable + tested. (Commits carry no
-> the agent attribution, per request.)
+> **Phases done:** 0 (scaffold), 1 (data layer), 2 (onboarding & plan engine),
+> 3 (adherence & savings), 4 (companion & economy), 5 (craving & notifications),
+> 6 (charts & health timeline), 7 (polish). Plus post-roadmap work: an SDK-54
+> retarget, a UX batch (claimable pending coins, cosmetic preview, God Mode),
+> cigarette source/manner logging (shared/gifted), and unlockable companion
+> characters. All merged to `main`; commits carry no the agent attribution.
 
-## Done (Phase 5)
+## Done (Phase 7)
 
-- **Craving toolkit** (`src/components/craving/`, `app/craving.tsx`): a tabbed
-  panic button — `BreathingGuide` (inhale/hold/exhale circle, haptic per phase),
-  `CravingTimer` (3-min SVG ring countdown), `Distraction` (rotating tips). An
-  "I resisted" action logs the craving + awards coins. Reached from a Home button.
-- **Triggers engine** (`src/engine/triggers.ts`, pure + 5 tests): default per-
-  category windows → daily notification specs, overnight-aware quiet-hours
-  filtering, and the situational support cadence.
-- **Scheduler** (`src/notifications/scheduler.ts`): local `expo-notifications`
-  (lazy-imported), permission request, daily trigger nudges, and the situational
-  burst — all deep-linking to `/craving`.
-- **Settings + wiring:** `useSettings` gains quiet hours, a notifications flag,
-  and `situationalUntil`. Permission is asked **after onboarding** (in context);
-  schedules refresh on launch; tapping a notification opens the craving toolkit;
-  a Home toggle starts situational support.
-- EN/ES strings for the toolkit + notifications (locale parity test passes).
+- **Settings** (`app/settings.tsx`, reached via the gear in Space): edit your
+  name + companion name, profile (gender/age/years), pricing/currency,
+  notification toggle + quiet-hours steppers (reschedules on change), and a
+  language override (auto/en/es) applied on launch.
+- **Data ownership** (`src/utils/appData.ts`, §12): one-tap **export** of every
+  store + SQLite table to a shared JSON file, and a confirmed **erase all**.
+  Native modules (`expo-file-system`/`expo-sharing`) are lazy-imported.
+- **Daily mood check-in** (`app/checkin.tsx`): a warm 5-mood ritual that writes
+  to `check_in` and awards coins once per day.
+- **Personal touches** (`personal.config.ts`, §11): the About screen (dedication,
+  version, privacy, credits) plus all four easter eggs — companion long-press
+  heart burst, one-time savings note, hidden Space star, optional special-date
+  greeting.
+- **Savings goals** (§6.8): a "what you could buy instead" next-goal bar in the
+  Progress savings card.
+- **Dark mode** (§17): `dark:` variants across the shared components and every
+  screen/chart; follows the system appearance.
+- EN/ES strings for all of the above (locale-parity test passes).
 
 ## Next steps
 
-- **Phase 6 — Charts & health timeline.**
-  1. Custom animated SVG charts (`src/components/charts/`): cigarette trend,
-     savings over time, allowance vs actual — built on react-native-svg +
-     Reanimated.
-  2. `src/engine/health.ts`: the recovery-milestone dataset (§6.7), personalized
-     framing (gender/age/years), anchored from quit/zero date; brief "not medical
-     advice" note.
-  - DoD: Progress shows animated charts + the health timeline.
+- **Phase 8 — Release prep (optional, needs a $99 Apple Developer account).**
+  1. `eas.json` profiles (dev/preview/production) + `app.config.ts` bundle id,
+     name, icon, splash, min iOS 16.
+  2. EAS dev build → **TestFlight** submit (both iPhones).
+  3. Optional StoreKit wiring for the existing `isPremium` flag (forced open).
+  - DoD: an installable TestFlight build on both phones.
 
 ## Notes / deviations from PROJECT.md
 
-- **Notifications are local-only** (as designed, §9) and run in Expo Go on iOS.
-  Trigger **time windows use sensible defaults per category** (precise per-window
-  config — e.g. Tiffani's 15/15/30 breaks — is a Phase-7 settings screen);
-  quiet-hours defaults to 22:00–07:00.
-- **Inventory in Zustand** (`useCompanion`), not the SQLite `inventory` table from
-  §16; only the unbounded `economy_ledger` uses SQLite.
-- **Retargeted to Expo SDK 54** so the app runs in the released Expo Go (expo 54,
-  react 19.1, RN 0.81, expo-router 6, reanimated 4.1); `ThemeProvider` from
-  `@react-navigation/native`.
-- _(Carried)_ `plan_state`/settings in Zustand; repos validated via bundling +
-  dev-seed (no SQLite Jest mock); typed routes on but `tsc`/CI run with
-  `.expo/types` absent; Spanish feminine for the dedicatee; route files
-  default-export, shared modules named.
+- **Companion characters are placeholder SVG silhouettes.** The user wants to
+  replace them with detailed, Secret-style **AI-generated original** art later
+  (e.g. Niji Journey / Recraft-to-SVG), swapped per vitality band. Tracked as a
+  visual follow-up, not a blocker.
+- **Dark mode follows the system** (no in-app Light/Dark override toggle yet).
+- **Trigger windows use sensible per-category defaults**; a precise per-window
+  editor (e.g. Tiffani's 15/15/30 breaks) is still future polish.
+- _(Carried)_ Notifications are local-only (Expo Go iOS); inventory lives in
+  Zustand, not the SQLite `inventory` table; only `economy_ledger` uses SQLite;
+  retargeted to **Expo SDK 54**; typed routes on but `tsc`/CI run with
+  `.expo/types` absent; SVG/Reanimated charts; Spanish feminine for the
+  dedicatee; route files default-export, shared modules named.

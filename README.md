@@ -66,15 +66,15 @@ The single source of truth for scope and architecture is **[PROJECT.md](./PROJEC
 
 Built in token-safe phases — every phase ends runnable, tested, and committed.
 
-- **Phase 0 — Scaffold & foundations** ✅ _(current)_
-- Phase 1 — Data layer & models
-- Phase 2 — Onboarding & plan engine
-- Phase 3 — Adherence, re-planning & savings
-- Phase 4 — Companion, vitality & economy
-- Phase 5 — Craving toolkit & triggers/notifications
-- Phase 6 — Charts & health timeline
-- Phase 7 — i18n, personal touches & polish
-- Phase 8 — Release prep (TestFlight)
+- **Phase 0 — Scaffold & foundations** ✅
+- **Phase 1 — Data layer & models** ✅
+- **Phase 2 — Onboarding & plan engine** ✅
+- **Phase 3 — Adherence, re-planning & savings** ✅
+- **Phase 4 — Companion, vitality & economy** ✅
+- **Phase 5 — Craving toolkit & triggers/notifications** ✅
+- **Phase 6 — Charts & health timeline** ✅
+- **Phase 7 — i18n, personal touches & polish** ✅ _(settings, export/reset, mood check-in, easter eggs, dark mode)_
+- **Phase 8 — Release prep (TestFlight)** ⏳ _(next — needs an Apple Developer account)_
 
 ## Privacy
 
