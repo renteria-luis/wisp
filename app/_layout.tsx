@@ -71,6 +71,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="log" options={{ presentation: 'modal' }} />
             <Stack.Screen name="craving" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
             <Stack.Screen name="about" options={{ presentation: 'modal' }} />
             <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
             <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />

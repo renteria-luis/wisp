@@ -60,7 +60,8 @@
     "logAction": "Log",
     "cravingAction": "I'm having a craving",
     "situationalStart": "I'm out / drinking 🍸",
-    "situationalActive": "Extra support is on 💚"
+    "situationalActive": "Extra support is on 💚",
+    "checkInAction": "Check-in"
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",
@@ -307,6 +308,18 @@
     "triggerBody": "This is a usual moment for a cigarette. Want to try 2 minutes with me instead?",
     "situationalTitle": "I'm right here",
     "situationalBody": "Tricky moment? Tap for a quick breath or a craving timer."
+  },
+  "checkin": {
+    "title": "How are you feeling?",
+    "subtitle": "A moment for you. There are no wrong answers.",
+    "reward": "Check in to earn {{count}} coins today",
+    "alreadyToday": "You already checked in today 💛",
+    "save": "Save"
+  },
+  "about": {
+    "version": "Version {{version}}",
+    "privacy": "Your data never leaves your phone. No account, no cloud, no tracking.",
+    "madeBy": "Made by {{name}}"
   },
   "screens": {
     "about": "Made with care, on your device.",

@@ -10,6 +10,7 @@ import { CharacterIcon } from '@/components/companion/characters';
 import { Button } from '@/components/ui/Button';
 import { COSMETICS, cosmeticById, dailyRotation } from '@/engine/cosmetics';
 import { useVitality } from '@/hooks/useVitality';
+import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { useEconomy } from '@/store/useEconomy';
 import { colors } from '@/theme/tokens';
@@ -84,6 +85,7 @@ export default function Space() {
   const equip = useCompanion((s) => s.equip);
 
   const [preview, setPreview] = useState<Cosmetic | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
 
   // Hidden God-mode trigger: 7 quick taps on the balance (dev builds only).
   const godTaps = useRef(0);
@@ -270,6 +272,21 @@ export default function Space() {
             />
           ))}
         </View>
+
+        <Pressable
+          onPress={() => setShowHidden((v) => !v)}
+          accessibilityRole="button"
+          accessibilityLabel="✦"
+          hitSlop={8}
+          className="items-center pt-6"
+        >
+          <Text className="text-base text-neutral-300">✦</Text>
+        </Pressable>
+        {showHidden ? (
+          <Text className="text-center text-xs text-ink-mute">
+            {personal.easterEggs.hiddenSpaceNote}
+          </Text>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

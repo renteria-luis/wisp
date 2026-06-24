@@ -1,11 +1,13 @@
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Companion } from '@/components/companion/Companion';
 import { Button } from '@/components/ui/Button';
+import { HeartBurst } from '@/components/ui/HeartBurst';
 import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useVitality } from '@/hooks/useVitality';
@@ -38,6 +40,30 @@ export default function Home() {
   const { score, band } = useVitality();
   const equipped = useCompanion((s) => s.equipped);
   const name = userName || personal.dedicateeName;
+
+  // Easter egg: long-press the companion 5× within 3s for a heart burst (§11).
+  const [burst, setBurst] = useState(false);
+  const [eggVisible, setEggVisible] = useState(false);
+  const longPresses = useRef<number[]>([]);
+  const onCompanionLongPress = () => {
+    const now = Date.now();
+    longPresses.current = [
+      ...longPresses.current.filter((ts) => now - ts < 3000),
+      now,
+    ];
+    if (longPresses.current.length >= 5) {
+      longPresses.current = [];
+      setBurst(true);
+      setEggVisible(true);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+  };
+
+  // Optional special-date greeting (inert unless personal.specialDate is set).
+  const subtitle =
+    personal.specialDate === todayISO().slice(5)
+      ? personal.easterEggs.specialDateGreeting
+      : t('home.subtitle', { companion: companionName });
 
   const companionColor =
     cosmeticById(equipped.companion_color ?? '')?.swatch ??
@@ -77,19 +103,26 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
       <View className="flex-1 items-center justify-center px-6">
-        <Companion
-          vitality={score}
-          band={band}
-          color={companionColor}
-          accessoryColor={accessoryColor}
-          character={equipped.character}
-        />
+        <Pressable
+          onLongPress={onCompanionLongPress}
+          delayLongPress={300}
+          accessibilityRole="image"
+          accessibilityLabel={companionName}
+        >
+          <Companion
+            vitality={score}
+            band={band}
+            color={companionColor}
+            accessoryColor={accessoryColor}
+            character={equipped.character}
+          />
+        </Pressable>
 
         <Text className="mt-8 text-3xl font-bold text-ink">
           {t('home.greeting', { name })}
         </Text>
         <Text className="mt-3 text-center text-base leading-6 text-ink-soft">
-          {t('home.subtitle', { companion: companionName })}
+          {subtitle}
         </Text>
 
         {status ? (
@@ -109,18 +142,46 @@ export default function Home() {
           variant="secondary"
           onPress={() => router.push('/log')}
         />
-        <Pressable
-          onPress={onSituational}
-          accessibilityRole="button"
-          className="items-center py-1"
-        >
-          <Text className="text-sm font-medium text-ink-soft">
-            {situationalActive
-              ? t('home.situationalActive')
-              : t('home.situationalStart')}
-          </Text>
-        </Pressable>
+        <View className="flex-row justify-center gap-6 pt-1">
+          <Pressable
+            onPress={() => router.push('/checkin')}
+            accessibilityRole="button"
+            className="py-1"
+          >
+            <Text className="text-sm font-medium text-ink-soft">
+              {t('home.checkInAction')}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={onSituational}
+            accessibilityRole="button"
+            className="py-1"
+          >
+            <Text className="text-sm font-medium text-ink-soft">
+              {situationalActive
+                ? t('home.situationalActive')
+                : t('home.situationalStart')}
+            </Text>
+          </Pressable>
+        </View>
       </View>
+
+      <HeartBurst visible={burst} onDone={() => setBurst(false)} />
+      {eggVisible ? (
+        <Pressable
+          onPress={() => setEggVisible(false)}
+          className="absolute inset-0 items-center justify-center bg-black/20 px-8"
+        >
+          <View className="rounded-2xl bg-neutral-0 p-5">
+            <Text className="text-center text-base leading-6 text-ink">
+              {personal.easterEggs.companionLongPress}
+            </Text>
+            <Text className="mt-3 text-center text-xs text-ink-mute">
+              {t('common.close')}
+            </Text>
+          </View>
+        </Pressable>
+      ) : null}
     </SafeAreaView>
   );
 }

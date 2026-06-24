@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Sparkline } from '@/components/charts/Sparkline';
@@ -14,6 +14,7 @@ import {
   rebuildReductionPlan,
 } from '@/engine/planEngine';
 import { useProgressData } from '@/hooks/useProgressData';
+import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { todayISO } from '@/utils/date';
@@ -33,6 +34,8 @@ export default function Progress() {
   const plan = usePlan((s) => s.plan);
   const setPlan = usePlan((s) => s.setPlan);
   const currency = useSettings((s) => s.pricing.currency);
+  const seenEggs = useSettings((s) => s.seenEggs);
+  const markEggSeen = useSettings((s) => s.markEggSeen);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -49,6 +52,10 @@ export default function Progress() {
     0,
     (Date.now() - new Date(plan.startDate).getTime()) / 3_600_000,
   );
+  // Easter egg: a one-time note once savings cross a meaningful amount (§11).
+  const savingsEgg =
+    data.saved >= (personal.specialNumber ?? 100) &&
+    !seenEggs.includes('savings');
 
   const applyReplan = () => {
     if (replan.action === 'hold') return;
@@ -123,6 +130,23 @@ export default function Progress() {
             </View>
           ) : null}
         </Card>
+
+        {savingsEgg ? (
+          <Card className="border-accent-300 bg-accent-50">
+            <Text className="text-base leading-6 text-ink">
+              {personal.easterEggs.savingsOrStreakNote}
+            </Text>
+            <Pressable
+              onPress={() => markEggSeen('savings')}
+              accessibilityRole="button"
+              className="mt-3 self-end"
+            >
+              <Text className="text-sm font-semibold text-primary-600">
+                {t('common.close')}
+              </Text>
+            </Pressable>
+          </Card>
+        ) : null}
 
         {isReduction && replan.action !== 'hold' ? (
           <Card className="border-accent-300 bg-accent-50">

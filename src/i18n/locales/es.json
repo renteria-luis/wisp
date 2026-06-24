@@ -60,7 +60,8 @@
     "logAction": "Registrar",
     "cravingAction": "Tengo un antojo",
     "situationalStart": "Estoy fuera / bebiendo 🍸",
-    "situationalActive": "Apoyo extra activado 💚"
+    "situationalActive": "Apoyo extra activado 💚",
+    "checkInAction": "Registro"
   },
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",
@@ -307,6 +308,18 @@
     "triggerBody": "Suele ser un momento de cigarro. ¿Probamos 2 minutos juntas en su lugar?",
     "situationalTitle": "Aquí estoy",
     "situationalBody": "¿Momento difícil? Toca para respirar o un temporizador de antojo."
+  },
+  "checkin": {
+    "title": "¿Cómo te sientes?",
+    "subtitle": "Un momento para ti. No hay respuestas incorrectas.",
+    "reward": "Regístrate para ganar {{count}} monedas hoy",
+    "alreadyToday": "Ya te registraste hoy 💛",
+    "save": "Guardar"
+  },
+  "about": {
+    "version": "Versión {{version}}",
+    "privacy": "Tus datos nunca salen de tu teléfono. Sin cuenta, sin nube, sin rastreo.",
+    "madeBy": "Hecho por {{name}}"
   },
   "screens": {
     "about": "Hecho con cariño, en tu dispositivo.",

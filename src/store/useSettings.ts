@@ -31,6 +31,8 @@ interface SettingsState {
   notificationsEnabled: boolean;
   /** ISO until which situational "I'm out" support is active; null = off. */
   situationalUntil: string | null;
+  /** Ids of one-time easter eggs already revealed (so they don't repeat). */
+  seenEggs: string[];
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -43,6 +45,7 @@ interface SettingsState {
   setQuietHours: (quietHours: QuietHours | null) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   setSituationalUntil: (iso: string | null) => void;
+  markEggSeen: (id: string) => void;
   reset: () => void;
 }
 
@@ -62,6 +65,7 @@ const initialState = {
   } as QuietHours | null,
   notificationsEnabled: false,
   situationalUntil: null as string | null,
+  seenEggs: [] as string[],
 };
 
 export const useSettings = create<SettingsState>()(
@@ -83,6 +87,8 @@ export const useSettings = create<SettingsState>()(
       setNotificationsEnabled: (notificationsEnabled) =>
         set({ notificationsEnabled }),
       setSituationalUntil: (situationalUntil) => set({ situationalUntil }),
+      markEggSeen: (id) =>
+        set((s) => (s.seenEggs.includes(id) ? s : { seenEggs: [...s.seenEggs, id] })),
       reset: () => set({ ...initialState }),
     }),
     {
