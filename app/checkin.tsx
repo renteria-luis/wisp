@@ -61,7 +61,7 @@ export default function CheckIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
       <View className="flex-row justify-end px-4 pt-2">
         <Pressable
           onPress={() => router.back()}
@@ -77,8 +77,8 @@ export default function CheckIn() {
       </View>
 
       <View className="flex-1 px-6 pt-4">
-        <Text className="text-2xl font-bold text-ink">{t('checkin.title')}</Text>
-        <Text className="mt-2 text-base leading-6 text-ink-soft">
+        <Text className="text-2xl font-bold text-ink dark:text-neutral-50">{t('checkin.title')}</Text>
+        <Text className="mt-2 text-base leading-6 text-ink-soft dark:text-neutral-300">
           {t('checkin.subtitle')}
         </Text>
 
@@ -91,8 +91,8 @@ export default function CheckIn() {
               accessibilityState={{ selected: mood === m.value }}
               className={`h-16 w-16 items-center justify-center rounded-2xl border ${
                 mood === m.value
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-neutral-200 bg-neutral-0'
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900'
+                  : 'border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900'
               }`}
             >
               <Text className="text-3xl">{m.emoji}</Text>
@@ -100,7 +100,7 @@ export default function CheckIn() {
           ))}
         </View>
 
-        <Text className="mt-8 text-center text-sm text-ink-mute">
+        <Text className="mt-8 text-center text-sm text-ink-mute dark:text-neutral-400">
           {already
             ? t('checkin.alreadyToday')
             : t('checkin.reward', { count: BONUS_CHECK_IN })}

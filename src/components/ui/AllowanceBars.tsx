@@ -24,7 +24,7 @@ export function AllowanceBars({ allowances, days = 7, max }: Props) {
             style={{ height: Math.max(4, Math.round((a / peak) * 80)) }}
             className="w-full rounded-md bg-primary-400"
           />
-          <Text className="mt-1 text-[10px] text-ink-mute">{a}</Text>
+          <Text className="mt-1 text-[10px] text-ink-mute dark:text-neutral-400">{a}</Text>
         </View>
       ))}
     </View>

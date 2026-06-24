@@ -150,16 +150,16 @@ function Row({
       <View className="flex-1 pb-5">
         <View className="flex-row items-center justify-between">
           <Text
-            className={`text-sm font-semibold ${done ? 'text-ink' : 'text-ink-mute'}`}
+            className={`text-sm font-semibold ${done ? 'text-ink dark:text-neutral-50' : 'text-ink-mute dark:text-neutral-500'}`}
           >
             {t(`health.milestones.${id}.title`)}
           </Text>
-          <Text className="text-[11px] text-ink-mute">
+          <Text className="text-[11px] text-ink-mute dark:text-neutral-400">
             {t(`health.milestones.${id}.when`)}
           </Text>
         </View>
         <Text
-          className={`mt-0.5 text-xs leading-4 ${done ? 'text-ink-soft' : 'text-ink-mute'}`}
+          className={`mt-0.5 text-xs leading-4 ${done ? 'text-ink-soft dark:text-neutral-300' : 'text-ink-mute dark:text-neutral-500'}`}
         >
           {t(`health.milestones.${id}.body`)}
         </Text>
@@ -191,9 +191,9 @@ export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
   }));
 
   return (
-    <View className="rounded-2xl border border-neutral-200 bg-neutral-0 p-4">
+    <View className="rounded-2xl border border-neutral-200 bg-neutral-0 p-4 dark:border-neutral-800 dark:bg-neutral-900">
       <View className="flex-row items-center justify-between">
-        <Text className="text-base font-semibold text-ink">
+        <Text className="text-base font-semibold text-ink dark:text-neutral-50">
           {t('health.title')}
         </Text>
         <View className="rounded-full bg-primary-100 px-2.5 py-1">
@@ -204,14 +204,14 @@ export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
       </View>
 
       {next ? (
-        <View className="mt-3 rounded-xl bg-primary-50 p-3">
+        <View className="mt-3 rounded-xl bg-primary-50 p-3 dark:bg-primary-900">
           <View className="flex-row items-center justify-between">
-            <Text className="flex-1 text-xs font-medium text-ink-soft">
+            <Text className="flex-1 text-xs font-medium text-ink-soft dark:text-neutral-200">
               {t('health.towards', {
                 title: t(`health.milestones.${next.milestone.id}.title`),
               })}
             </Text>
-            <Text className="text-xs font-bold text-primary-700">
+            <Text className="text-xs font-bold text-primary-700 dark:text-primary-100">
               {Math.round(progress * 100)}%
             </Text>
           </View>
@@ -232,7 +232,7 @@ export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
           </View>
         </View>
       ) : (
-        <Text className="mt-3 rounded-xl bg-primary-50 p-3 text-sm font-medium text-primary-700">
+        <Text className="mt-3 rounded-xl bg-primary-50 p-3 text-sm font-medium text-primary-700 dark:bg-primary-900 dark:text-primary-100">
           {t('health.allReached')}
         </Text>
       )}
@@ -255,7 +255,7 @@ export function HealthTimeline({ elapsedHours }: { elapsedHours: number }) {
         ))}
       </View>
 
-      <Text className="text-[11px] leading-4 text-ink-mute">
+      <Text className="text-[11px] leading-4 text-ink-mute dark:text-neutral-400">
         {t('health.disclaimer')}
       </Text>
     </View>

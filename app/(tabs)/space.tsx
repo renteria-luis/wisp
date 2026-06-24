@@ -35,12 +35,12 @@ function CosmeticTile({
     <Pressable
       onPress={() => onPress(cosmetic)}
       accessibilityRole="button"
-      className={`w-[30%] items-center rounded-2xl border bg-neutral-0 p-3 ${
+      className={`w-[30%] items-center rounded-2xl border bg-neutral-0 dark:bg-neutral-900 p-3 ${
         equipped
           ? 'border-primary-500'
           : previewing
             ? 'border-accent-400'
-            : 'border-neutral-200'
+            : 'border-neutral-200 dark:border-neutral-800'
       }`}
     >
       {cosmetic.type === 'character' ? (
@@ -51,7 +51,7 @@ function CosmeticTile({
           className="h-12 w-12 rounded-full"
         />
       )}
-      <Text className="mt-2 text-[11px] text-ink-mute">
+      <Text className="mt-2 text-[11px] text-ink-mute dark:text-neutral-400">
         {cosmetic.type === 'character'
           ? t(`character.${cosmetic.id}`)
           : t(`cosmeticType.${cosmetic.type}`)}
@@ -61,11 +61,11 @@ function CosmeticTile({
           {t('space.equipped')}
         </Text>
       ) : owned ? (
-        <Text className="text-xs font-medium text-ink-soft">
+        <Text className="text-xs font-medium text-ink-soft dark:text-neutral-300">
           {t('space.owned')}
         </Text>
       ) : (
-        <Text className="text-xs font-semibold text-ink">{cosmetic.price}</Text>
+        <Text className="text-xs font-semibold text-ink dark:text-neutral-50">{cosmetic.price}</Text>
       )}
     </Pressable>
   );
@@ -154,7 +154,7 @@ export default function Space() {
   const canAfford = preview ? balance >= preview.price : false;
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
         <View className="flex-row justify-end">
           <Pressable
@@ -188,9 +188,9 @@ export default function Space() {
         </Pressable>
 
         {pending > 0 ? (
-          <View className="flex-row items-center justify-between rounded-2xl border border-accent-300 bg-accent-50 px-4 py-3">
+          <View className="flex-row items-center justify-between rounded-2xl border border-accent-300 bg-accent-50 dark:bg-accent-900 px-4 py-3">
             <View>
-              <Text className="text-xs text-ink-mute">{t('space.earned')}</Text>
+              <Text className="text-xs text-ink-mute dark:text-neutral-400">{t('space.earned')}</Text>
               <Text className="text-lg font-bold text-accent-700">
                 {t('space.pending', { count: pending })}
               </Text>
@@ -202,7 +202,7 @@ export default function Space() {
         ) : null}
 
         {preview ? (
-          <View className="gap-2 rounded-2xl border border-accent-300 bg-neutral-0 p-3">
+          <View className="gap-2 rounded-2xl border border-accent-300 bg-neutral-0 dark:bg-neutral-900 p-3">
             <View className="flex-row items-center gap-3">
               {preview.type === 'character' ? (
                 <CharacterIcon id={preview.id} color={preview.swatch} size={32} />
@@ -212,13 +212,13 @@ export default function Space() {
                   className="h-8 w-8 rounded-full"
                 />
               )}
-              <Text className="flex-1 text-sm font-medium text-ink">
+              <Text className="flex-1 text-sm font-medium text-ink dark:text-neutral-50">
                 {preview.type === 'character'
                   ? t(`character.${preview.id}`)
                   : t(`cosmeticType.${preview.type}`)}
               </Text>
               <Pressable onPress={() => setPreview(null)} className="px-2 py-1">
-                <Text className="text-sm text-ink-mute">
+                <Text className="text-sm text-ink-mute dark:text-neutral-400">
                   {t('common.close')}
                 </Text>
               </Pressable>
@@ -241,7 +241,7 @@ export default function Space() {
           </View>
         ) : null}
 
-        <Text className="mt-2 text-sm font-semibold text-ink">
+        <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
           {t('space.dailyToday')}
         </Text>
         <View className="flex-row flex-wrap gap-3">
@@ -257,7 +257,7 @@ export default function Space() {
           ))}
         </View>
 
-        <Text className="mt-2 text-sm font-semibold text-ink">
+        <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
           {t('space.shop')}
         </Text>
         <View className="flex-row flex-wrap gap-3">
@@ -283,7 +283,7 @@ export default function Space() {
           <Text className="text-base text-neutral-300">✦</Text>
         </Pressable>
         {showHidden ? (
-          <Text className="text-center text-xs text-ink-mute">
+          <Text className="text-center text-xs text-ink-mute dark:text-neutral-400">
             {personal.easterEggs.hiddenSpaceNote}
           </Text>
         ) : null}

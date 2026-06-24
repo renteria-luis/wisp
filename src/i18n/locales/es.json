@@ -177,12 +177,20 @@
     "cigsAvoided_other": "{{count}} cigarrillos evitados",
     "legendActual": "Real",
     "legendTarget": "Meta",
+    "nextGoal": "Hacia {{goal}}",
     "easeTitle": "Bajemos el ritmo",
     "easeBody": "Los últimos días fueron un poco altos, y está bien. Podemos extender el plan a un ritmo más amable.",
     "accelTitle": "Vas adelantada 🌿",
     "accelBody": "Has estado cómodamente por debajo de la meta. ¿Quieres terminar un poco antes?",
     "easeCta": "Ajustar mi plan",
     "accelCta": "Acelerar"
+  },
+  "goals": {
+    "coffee": "un café",
+    "lunch": "una comida",
+    "movie": "el cine",
+    "dinner": "una cena fuera",
+    "getaway": "una escapada"
   },
   "health": {
     "title": "Tu recuperación",

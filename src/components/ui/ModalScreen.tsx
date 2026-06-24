@@ -16,7 +16,7 @@ export function ModalScreen({ title, message, footnote }: Props) {
   const { t } = useTranslation();
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
       <View className="flex-row justify-end px-4 pt-2">
         <Pressable
           onPress={() => router.back()}
@@ -32,12 +32,14 @@ export function ModalScreen({ title, message, footnote }: Props) {
       </View>
 
       <View className="flex-1 items-center justify-center px-8">
-        <Text className="mb-2 text-2xl font-semibold text-ink">{title}</Text>
-        <Text className="text-center text-base leading-6 text-ink-soft">
+        <Text className="mb-2 text-2xl font-semibold text-ink dark:text-neutral-50">
+          {title}
+        </Text>
+        <Text className="text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
           {message}
         </Text>
         {footnote ? (
-          <Text className="mt-6 text-center text-xs text-ink-mute">
+          <Text className="mt-6 text-center text-xs text-ink-mute dark:text-neutral-400">
             {footnote}
           </Text>
         ) : null}

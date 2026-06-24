@@ -11,14 +11,14 @@ type Props = {
 
 const container: Record<Variant, string> = {
   primary: 'bg-primary-500 active:opacity-90',
-  secondary: 'bg-primary-100 active:opacity-80',
+  secondary: 'bg-primary-100 active:opacity-80 dark:bg-primary-900',
   ghost: 'bg-transparent active:opacity-60',
 };
 
 const labelColor: Record<Variant, string> = {
   primary: 'text-ink-invert',
-  secondary: 'text-primary-700',
-  ghost: 'text-ink-soft',
+  secondary: 'text-primary-700 dark:text-primary-100',
+  ghost: 'text-ink-soft dark:text-neutral-300',
 };
 
 export function Button({

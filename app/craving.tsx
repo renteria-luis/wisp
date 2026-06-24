@@ -42,7 +42,7 @@ export default function Craving() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
       <View className="flex-row justify-end px-4 pt-2">
         <Pressable
           onPress={() => router.back()}
@@ -58,10 +58,10 @@ export default function Craving() {
       </View>
 
       <ScrollView contentContainerClassName="gap-5 px-6 pb-6">
-        <Text className="text-2xl font-bold text-ink">
+        <Text className="text-2xl font-bold text-ink dark:text-neutral-50">
           {t('craving.title')}
         </Text>
-        <Text className="text-base leading-6 text-ink-soft">
+        <Text className="text-base leading-6 text-ink-soft dark:text-neutral-300">
           {t('craving.subtitle')}
         </Text>
 

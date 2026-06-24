@@ -177,12 +177,20 @@
     "cigsAvoided_other": "{{count}} cigarettes avoided",
     "legendActual": "Actual",
     "legendTarget": "Target",
+    "nextGoal": "Toward {{goal}}",
     "easeTitle": "Let's ease the pace",
     "easeBody": "The last few days ran a little high — and that's okay. We can stretch the plan to a gentler pace.",
     "accelTitle": "You're ahead 🌿",
     "accelBody": "You've been comfortably under target. Want to finish a little sooner?",
     "easeCta": "Adjust my plan",
     "accelCta": "Speed up"
+  },
+  "goals": {
+    "coffee": "a coffee",
+    "lunch": "lunch out",
+    "movie": "a movie",
+    "dinner": "dinner out",
+    "getaway": "a weekend away"
   },
   "health": {
     "title": "Your recovery",

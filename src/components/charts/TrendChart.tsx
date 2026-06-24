@@ -159,13 +159,13 @@ export function TrendChart({ actual, allowances, max, height = 132 }: Props) {
       <View className="mt-2 flex-row justify-center gap-5">
         <View className="flex-row items-center gap-1.5">
           <View className="h-2 w-4 rounded-full bg-primary-500" />
-          <Text className="text-[11px] text-ink-mute">
+          <Text className="text-[11px] text-ink-mute dark:text-neutral-400">
             {t('progress.legendActual')}
           </Text>
         </View>
         <View className="flex-row items-center gap-1.5">
           <View className="h-0.5 w-4 rounded-full bg-accent-400" />
-          <Text className="text-[11px] text-ink-mute">
+          <Text className="text-[11px] text-ink-mute dark:text-neutral-400">
             {t('progress.legendTarget')}
           </Text>
         </View>

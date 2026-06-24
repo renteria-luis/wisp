@@ -38,7 +38,7 @@ const LANGS: { value: SupportedLanguage | null; key: string }[] = [
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-3">
-      <Text className="text-sm font-semibold uppercase tracking-wide text-ink-mute">
+      <Text className="text-sm font-semibold uppercase tracking-wide text-ink-mute dark:text-neutral-400">
         {title}
       </Text>
       <Card>
@@ -61,14 +61,14 @@ function TextField({
 }) {
   return (
     <View>
-      <Text className="mb-1 text-sm font-medium text-ink-soft">{label}</Text>
-      <View className="rounded-xl border border-neutral-200 bg-neutral-0 px-4">
+      <Text className="mb-1 text-sm font-medium text-ink-soft dark:text-neutral-300">{label}</Text>
+      <View className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900 px-4">
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={colors.ink.mute}
-          className="py-3 text-base text-ink"
+          className="py-3 text-base text-ink dark:text-neutral-50"
         />
       </View>
     </View>
@@ -91,7 +91,7 @@ function Stepper({
   const step = (d: number) => onChange(Math.min(max, Math.max(min, value + d)));
   return (
     <View className="flex-row items-center justify-between">
-      <Text className="text-sm font-medium text-ink-soft">{label}</Text>
+      <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">{label}</Text>
       <View className="flex-row items-center gap-3">
         <Pressable
           onPress={() => step(-1)}
@@ -101,7 +101,7 @@ function Stepper({
         >
           <Text className="text-lg font-bold text-primary-700">−</Text>
         </Pressable>
-        <Text className="w-14 text-center text-base font-semibold text-ink">
+        <Text className="w-14 text-center text-base font-semibold text-ink dark:text-neutral-50">
           {String(value).padStart(2, '0')}:00
         </Text>
         <Pressable
@@ -173,9 +173,9 @@ export default function Settings() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
       <View className="flex-row items-center justify-between px-5 pb-2 pt-2">
-        <Text className="text-xl font-bold text-ink">{t('settings.title')}</Text>
+        <Text className="text-xl font-bold text-ink dark:text-neutral-50">{t('settings.title')}</Text>
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -206,7 +206,7 @@ export default function Settings() {
 
         <Section title={t('settings.profile')}>
           <View>
-            <Text className="mb-2 text-sm font-medium text-ink-soft">
+            <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
               {t('settings.gender')}
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -246,7 +246,7 @@ export default function Settings() {
             onChange={(v) => s.setPricing({ cigsPerPack: v ?? 20 })}
           />
           <View>
-            <Text className="mb-2 text-sm font-medium text-ink-soft">
+            <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
               {t('settings.currency')}
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -264,7 +264,7 @@ export default function Settings() {
 
         <Section title={t('settings.notifications')}>
           <View className="flex-row items-center justify-between">
-            <Text className="flex-1 pr-3 text-sm font-medium text-ink-soft">
+            <Text className="flex-1 pr-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
               {t('settings.enableNotifications')}
             </Text>
             <Switch
@@ -273,7 +273,7 @@ export default function Settings() {
               trackColor={{ true: colors.primary['400'] }}
             />
           </View>
-          <Text className="text-xs text-ink-mute">{t('settings.quietHours')}</Text>
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">{t('settings.quietHours')}</Text>
           <Stepper
             label={t('settings.quietStart')}
             value={quiet.start.hour}
@@ -300,7 +300,7 @@ export default function Settings() {
         </Section>
 
         <Section title={t('settings.data')}>
-          <Text className="text-xs leading-5 text-ink-mute">
+          <Text className="text-xs leading-5 text-ink-mute dark:text-neutral-400">
             {t('settings.dataNote')}
           </Text>
           <Button

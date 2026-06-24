@@ -32,22 +32,22 @@ export default function Readiness() {
       onNext={() => router.push('/plan-preview')}
     >
       <View>
-        <Text className="mb-3 text-sm font-medium text-ink-soft">
+        <Text className="mb-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.readiness.confidence')}
         </Text>
         <Scale value={readiness} onChange={(v) => patch({ readiness: v })} />
         <View className="mt-2 flex-row justify-between">
-          <Text className="text-xs text-ink-mute">
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">
             {t('onboarding.readiness.confidenceLow')}
           </Text>
-          <Text className="text-xs text-ink-mute">
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">
             {t('onboarding.readiness.confidenceHigh')}
           </Text>
         </View>
       </View>
 
       <View>
-        <Text className="mb-2 text-sm font-medium text-ink-soft">
+        <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.readiness.firstCig')}
         </Text>
         <View className="flex-row flex-wrap gap-2">
@@ -63,7 +63,7 @@ export default function Readiness() {
       </View>
 
       <View>
-        <Text className="mb-2 text-sm font-medium text-ink-soft">
+        <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.readiness.preference')}
         </Text>
         <View className="gap-2">

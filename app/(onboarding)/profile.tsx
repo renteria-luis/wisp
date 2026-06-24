@@ -24,7 +24,7 @@ export default function Profile() {
       onNext={() => router.push('/triggers')}
     >
       <View>
-        <Text className="mb-2 text-sm font-medium text-ink-soft">
+        <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.profile.gender')}
         </Text>
         <View className="flex-row flex-wrap gap-2">

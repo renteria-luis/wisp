@@ -19,11 +19,20 @@ import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { todayISO } from '@/utils/date';
 
+/** "What you could buy instead" goals, cheapest → priciest (§6.8). */
+const SAVINGS_GOALS = [
+  { key: 'coffee', price: 5 },
+  { key: 'lunch', price: 15 },
+  { key: 'movie', price: 30 },
+  { key: 'dinner', price: 60 },
+  { key: 'getaway', price: 250 },
+] as const;
+
 function Stat({ value, label }: { value: number | string; label: string }) {
   return (
     <View className="flex-1 items-center">
-      <Text className="text-3xl font-bold text-ink">{value}</Text>
-      <Text className="mt-1 text-center text-xs text-ink-mute">{label}</Text>
+      <Text className="text-3xl font-bold text-ink dark:text-neutral-50">{value}</Text>
+      <Text className="mt-1 text-center text-xs text-ink-mute dark:text-neutral-400">{label}</Text>
     </View>
   );
 }
@@ -56,6 +65,9 @@ export default function Progress() {
   const savingsEgg =
     data.saved >= (personal.specialNumber ?? 100) &&
     !seenEggs.includes('savings');
+  // Next "what you could buy instead" goal still ahead of current savings.
+  const nextGoal = SAVINGS_GOALS.find((g) => g.price > data.saved);
+  const goalPct = nextGoal ? Math.min(1, data.saved / nextGoal.price) : 1;
 
   const applyReplan = () => {
     if (replan.action === 'hold') return;
@@ -71,23 +83,23 @@ export default function Progress() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
-        <Text className="text-2xl font-bold text-ink">
+        <Text className="text-2xl font-bold text-ink dark:text-neutral-50">
           {t('tabs.progress')}
         </Text>
 
         <HealthTimeline elapsedHours={elapsedHours} />
 
         <Card>
-          <Text className="text-sm font-medium text-ink-soft">
+          <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
             {t('progress.trend')}
           </Text>
           <View className="mt-1 flex-row items-baseline gap-2">
-            <Text className="text-4xl font-bold text-ink">
+            <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
               {data.trend.toFixed(1)}
             </Text>
-            <Text className="text-sm text-ink-mute">
+            <Text className="text-sm text-ink-mute dark:text-neutral-400">
               {t('progress.perDayAvg')}
             </Text>
           </View>
@@ -115,13 +127,13 @@ export default function Progress() {
         </Card>
 
         <Card>
-          <Text className="text-sm font-medium text-ink-soft">
+          <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
             {t('progress.saved')}
           </Text>
-          <Text className="mt-1 text-4xl font-bold text-ink">
+          <Text className="mt-1 text-4xl font-bold text-ink dark:text-neutral-50">
             {data.saved.toFixed(2)} {currency}
           </Text>
-          <Text className="mt-1 text-sm text-ink-mute">
+          <Text className="mt-1 text-sm text-ink-mute dark:text-neutral-400">
             {t('progress.cigsAvoided', { count: data.avoided })}
           </Text>
           {data.savedSeries.length > 1 ? (
@@ -129,11 +141,30 @@ export default function Progress() {
               <Sparkline values={data.savedSeries} />
             </View>
           ) : null}
+          {nextGoal ? (
+            <View className="mt-4">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-xs text-ink-soft dark:text-neutral-300">
+                  {t('progress.nextGoal', { goal: t(`goals.${nextGoal.key}`) })}
+                </Text>
+                <Text className="text-xs text-ink-mute dark:text-neutral-400">
+                  {Math.round(goalPct * 100)}%
+                </Text>
+              </View>
+              <View className="mt-1 h-2 flex-row overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                <View
+                  style={{ flex: Math.max(0.0001, goalPct) }}
+                  className="rounded-full bg-primary-400"
+                />
+                <View style={{ flex: Math.max(0.0001, 1 - goalPct) }} />
+              </View>
+            </View>
+          ) : null}
         </Card>
 
         {savingsEgg ? (
-          <Card className="border-accent-300 bg-accent-50">
-            <Text className="text-base leading-6 text-ink">
+          <Card className="border-accent-300 bg-accent-50 dark:border-accent-700 dark:bg-accent-900">
+            <Text className="text-base leading-6 text-ink dark:text-neutral-50">
               {personal.easterEggs.savingsOrStreakNote}
             </Text>
             <Pressable
@@ -149,13 +180,13 @@ export default function Progress() {
         ) : null}
 
         {isReduction && replan.action !== 'hold' ? (
-          <Card className="border-accent-300 bg-accent-50">
-            <Text className="text-base font-semibold text-ink">
+          <Card className="border-accent-300 bg-accent-50 dark:border-accent-700 dark:bg-accent-900">
+            <Text className="text-base font-semibold text-ink dark:text-neutral-50">
               {replan.action === 'ease'
                 ? t('progress.easeTitle')
                 : t('progress.accelTitle')}
             </Text>
-            <Text className="mb-3 mt-1 text-sm leading-5 text-ink-soft">
+            <Text className="mb-3 mt-1 text-sm leading-5 text-ink-soft dark:text-neutral-300">
               {replan.action === 'ease'
                 ? t('progress.easeBody')
                 : t('progress.accelBody')}

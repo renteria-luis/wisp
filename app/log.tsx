@@ -61,7 +61,7 @@ export default function Log() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
       <View className="flex-row justify-end px-4 pt-2">
         <Pressable
           onPress={() => router.back()}
@@ -77,7 +77,7 @@ export default function Log() {
       </View>
 
       <ScrollView contentContainerClassName="gap-6 px-6 pb-6 pt-2">
-        <Text className="text-2xl font-bold text-ink">{t('log.title')}</Text>
+        <Text className="text-2xl font-bold text-ink dark:text-neutral-50">{t('log.title')}</Text>
 
         <View className="flex-row gap-2">
           <OptionChip
@@ -93,7 +93,7 @@ export default function Log() {
         </View>
 
         <View>
-          <Text className="mb-2 text-sm font-medium text-ink-soft">
+          <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
             {t('log.triggerLabel')}
           </Text>
           <View className="flex-row flex-wrap gap-2">
@@ -111,7 +111,7 @@ export default function Log() {
         {mode === 'smoked' ? (
           <>
             <View>
-              <Text className="mb-2 text-sm font-medium text-ink-soft">
+              <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
                 {t('log.mannerLabel')}
               </Text>
               <View className="flex-row gap-2">
@@ -129,7 +129,7 @@ export default function Log() {
             </View>
 
             <View>
-              <Text className="mb-2 text-sm font-medium text-ink-soft">
+              <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
                 {t('log.sourceLabel')}
               </Text>
               <View className="flex-row gap-2">
@@ -150,7 +150,7 @@ export default function Log() {
 
         {mode === 'resisted' ? (
           <View>
-            <Text className="mb-3 text-sm font-medium text-ink-soft">
+            <Text className="mb-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
               {t('log.intensityLabel')}
             </Text>
             <Scale value={intensity} onChange={setIntensity} />

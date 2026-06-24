@@ -17,16 +17,16 @@ export function Distraction() {
 
   return (
     <View className="gap-4 py-4">
-      <Text className="text-center text-base leading-6 text-ink-soft">
+      <Text className="text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
         {t('craving.distraction.intro')}
       </Text>
       <View className="gap-3">
         {picks.map((key) => (
           <View
             key={key}
-            className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 py-3"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900 px-4 py-3"
           >
-            <Text className="text-base text-ink">
+            <Text className="text-base text-ink dark:text-neutral-50">
               {t(`craving.distraction.items.${key}`)}
             </Text>
           </View>

@@ -102,7 +102,7 @@ export default function PlanPreview() {
       onNext={onConfirm}
       nextLabel={t('onboarding.preview.confirm')}
     >
-      <Text className="text-base leading-6 text-ink">
+      <Text className="text-base leading-6 text-ink dark:text-neutral-50">
         {t('onboarding.preview.greeting', { name: onboarding.name.trim() })}
       </Text>
 
@@ -110,16 +110,16 @@ export default function PlanPreview() {
         <Text className="text-xs font-semibold uppercase tracking-wide text-accent-600">
           {t('onboarding.preview.suggested')}
         </Text>
-        <Text className="mt-1 text-xl font-bold text-ink">
+        <Text className="mt-1 text-xl font-bold text-ink dark:text-neutral-50">
           {t(`plan.track.${chosenTrack}`)}
         </Text>
-        <Text className="mt-2 text-sm leading-5 text-ink-soft">
+        <Text className="mt-2 text-sm leading-5 text-ink-soft dark:text-neutral-300">
           {t(`plan.rationale.${chosenTrack}`)}
         </Text>
       </Card>
 
       <View>
-        <Text className="mb-2 text-sm font-medium text-ink-soft">
+        <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.preview.chooseTrack')}
         </Text>
         <View className="flex-row gap-2">
@@ -138,23 +138,23 @@ export default function PlanPreview() {
         {chosenTrack === 'gradual_reduction' ? (
           <View className="gap-3">
             <View className="flex-row justify-between">
-              <Text className="text-sm text-ink-soft">
+              <Text className="text-sm text-ink-soft dark:text-neutral-300">
                 {t('plan.todayTarget')}
               </Text>
-              <Text className="text-sm font-semibold text-ink">
+              <Text className="text-sm font-semibold text-ink dark:text-neutral-50">
                 {t('plan.cigarettes', { count: allowanceForDay(plan, 0) })}
               </Text>
             </View>
             <View className="flex-row justify-between">
-              <Text className="text-sm text-ink-soft">
+              <Text className="text-sm text-ink-soft dark:text-neutral-300">
                 {t('plan.targetDate')}
               </Text>
-              <Text className="text-sm font-semibold text-ink">
+              <Text className="text-sm font-semibold text-ink dark:text-neutral-50">
                 {formatMedium(plan.targetDate)}
               </Text>
             </View>
             <View>
-              <Text className="mb-2 text-sm text-ink-soft">
+              <Text className="mb-2 text-sm text-ink-soft dark:text-neutral-300">
                 {t('plan.weekAhead')}
               </Text>
               <AllowanceBars allowances={plan.allowances} max={baseline} />
@@ -163,14 +163,14 @@ export default function PlanPreview() {
         ) : (
           <View className="gap-3">
             <View className="flex-row justify-between">
-              <Text className="text-sm text-ink-soft">
+              <Text className="text-sm text-ink-soft dark:text-neutral-300">
                 {t('plan.quitDate')}
               </Text>
-              <Text className="text-sm font-semibold text-ink">
+              <Text className="text-sm font-semibold text-ink dark:text-neutral-50">
                 {formatMedium(plan.startDate)}
               </Text>
             </View>
-            <Text className="text-sm leading-5 text-ink-soft">
+            <Text className="text-sm leading-5 text-ink-soft dark:text-neutral-300">
               {t('plan.criticalWindow', { days: plan.nDays })}
             </Text>
           </View>

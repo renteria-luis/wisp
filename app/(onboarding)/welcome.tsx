@@ -15,7 +15,7 @@ export default function Welcome() {
   const patch = useOnboarding((s) => s.patch);
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top', 'bottom']}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top', 'bottom']}>
       <View className="flex-1 justify-center px-6">
         <View className="mb-10 items-center">
           <View className="h-28 w-28 items-center justify-center rounded-full bg-primary-100">
@@ -23,15 +23,15 @@ export default function Welcome() {
           </View>
         </View>
 
-        <Text className="text-center text-3xl font-bold text-ink">
+        <Text className="text-center text-3xl font-bold text-ink dark:text-neutral-50">
           {t('onboarding.welcomeTitle')}
         </Text>
-        <Text className="mt-3 text-center text-base leading-6 text-ink-soft">
+        <Text className="mt-3 text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
           {t('onboarding.welcomeBody')}
         </Text>
 
         <View className="mt-8">
-          <Text className="mb-1 text-sm font-medium text-ink-soft">
+          <Text className="mb-1 text-sm font-medium text-ink-soft dark:text-neutral-300">
             {t('onboarding.nameLabel')}
           </Text>
           <TextInput
@@ -39,7 +39,7 @@ export default function Welcome() {
             onChangeText={(v) => patch({ name: v })}
             placeholder={t('onboarding.namePlaceholder')}
             placeholderTextColor={colors.ink.mute}
-            className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 py-3 text-base text-ink"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900 px-4 py-3 text-base text-ink dark:text-neutral-50"
             returnKeyType="next"
             autoCapitalize="words"
           />

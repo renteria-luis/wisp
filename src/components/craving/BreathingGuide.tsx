@@ -47,7 +47,7 @@ export function BreathingGuide() {
           className="h-48 w-48 rounded-full bg-primary-300"
         />
       </View>
-      <Text className="text-2xl font-semibold text-ink">
+      <Text className="text-2xl font-semibold text-ink dark:text-neutral-50">
         {t(`craving.breathing.${PHASES[index]!.key}`)}
       </Text>
     </View>

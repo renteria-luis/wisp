@@ -35,15 +35,20 @@ export function OnboardingStep({
   const { t } = useTranslation();
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top', 'bottom']}>
+    <SafeAreaView
+      className="flex-1 bg-cream dark:bg-neutral-950"
+      edges={['top', 'bottom']}
+    >
       <ScrollView
         contentContainerClassName="grow px-6 pb-6 pt-4"
         keyboardShouldPersistTaps="handled"
       >
         <ProgressDots index={stepIndex} total={totalSteps} />
-        <Text className="mt-6 text-2xl font-bold text-ink">{title}</Text>
+        <Text className="mt-6 text-2xl font-bold text-ink dark:text-neutral-50">
+          {title}
+        </Text>
         {subtitle ? (
-          <Text className="mt-2 text-base leading-6 text-ink-soft">
+          <Text className="mt-2 text-base leading-6 text-ink-soft dark:text-neutral-300">
             {subtitle}
           </Text>
         ) : null}

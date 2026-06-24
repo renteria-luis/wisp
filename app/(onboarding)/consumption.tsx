@@ -47,7 +47,7 @@ export default function Consumption() {
         placeholder="20"
       />
       <View>
-        <Text className="mb-2 text-sm font-medium text-ink-soft">
+        <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.consumption.currency')}
         </Text>
         <View className="flex-row flex-wrap gap-2">

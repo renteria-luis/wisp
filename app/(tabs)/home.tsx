@@ -101,7 +101,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <View className="flex-1 items-center justify-center px-6">
         <Pressable
           onLongPress={onCompanionLongPress}
@@ -118,10 +118,10 @@ export default function Home() {
           />
         </Pressable>
 
-        <Text className="mt-8 text-3xl font-bold text-ink">
+        <Text className="mt-8 text-3xl font-bold text-ink dark:text-neutral-50">
           {t('home.greeting', { name })}
         </Text>
-        <Text className="mt-3 text-center text-base leading-6 text-ink-soft">
+        <Text className="mt-3 text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
           {subtitle}
         </Text>
 
@@ -148,7 +148,7 @@ export default function Home() {
             accessibilityRole="button"
             className="py-1"
           >
-            <Text className="text-sm font-medium text-ink-soft">
+            <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
               {t('home.checkInAction')}
             </Text>
           </Pressable>
@@ -157,7 +157,7 @@ export default function Home() {
             accessibilityRole="button"
             className="py-1"
           >
-            <Text className="text-sm font-medium text-ink-soft">
+            <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
               {situationalActive
                 ? t('home.situationalActive')
                 : t('home.situationalStart')}
@@ -172,11 +172,11 @@ export default function Home() {
           onPress={() => setEggVisible(false)}
           className="absolute inset-0 items-center justify-center bg-black/20 px-8"
         >
-          <View className="rounded-2xl bg-neutral-0 p-5">
-            <Text className="text-center text-base leading-6 text-ink">
+          <View className="rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900">
+            <Text className="text-center text-base leading-6 text-ink dark:text-neutral-50">
               {personal.easterEggs.companionLongPress}
             </Text>
-            <Text className="mt-3 text-center text-xs text-ink-mute">
+            <Text className="mt-3 text-center text-xs text-ink-mute dark:text-neutral-400">
               {t('common.close')}
             </Text>
           </View>

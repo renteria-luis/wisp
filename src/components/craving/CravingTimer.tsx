@@ -52,12 +52,12 @@ export function CravingTimer() {
           />
         </Svg>
         <View className="absolute inset-0 items-center justify-center">
-          <Text className="text-4xl font-bold text-ink">
+          <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
             {minutes}:{String(seconds).padStart(2, '0')}
           </Text>
         </View>
       </View>
-      <Text className="px-6 text-center text-base leading-6 text-ink-soft">
+      <Text className="px-6 text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
         {done ? t('craving.timer.done') : t('craving.timer.message')}
       </Text>
     </View>
