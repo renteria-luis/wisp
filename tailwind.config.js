@@ -15,6 +15,7 @@ module.exports = {
     extend: {
       colors: {
         primary: palette.primary,
+        secondary: palette.secondary,
         accent: palette.accent,
         neutral: palette.neutral,
         ink: palette.ink,
