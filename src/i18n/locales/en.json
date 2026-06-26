@@ -163,7 +163,8 @@
     "journey": "Journey progress",
     "savedSoFar": "Saved so far",
     "nextMilestone": "Next health milestone",
-    "noPlan": "No plan yet — finish onboarding to get started."
+    "noPlan": "No plan yet — finish onboarding to get started.",
+    "ebooks": "📚 Free reads"
   },
   "log": {
     "title": "Log",
@@ -501,7 +502,8 @@
     "owned": "Owned",
     "equipped": "Equipped",
     "dressUp": "Dress up",
-    "worn": "Wearing"
+    "worn": "Wearing",
+    "ownedTitle": "Yours"
   },
   "wear": {
     "spr_beanie": "Beanie",
@@ -599,5 +601,38 @@
   "screens": {
     "about": "Made with care, on your device.",
     "settings": "Language, profile, notifications, and your data."
+  },
+  "ebooks": {
+    "title": "Free reads",
+    "subtitle": "Trusted, free guides from official health bodies. They open in your browser.",
+    "open": "Read",
+    "disclaimer": "External resources from public health bodies. General information, not medical advice.",
+    "items": {
+      "clearing_air": {
+        "title": "Clearing the Air",
+        "author": "National Cancer Institute",
+        "desc": "A friendly, step-by-step guide to quitting and staying smoke-free."
+      },
+      "clear_horizons": {
+        "title": "Clear Horizons",
+        "author": "National Cancer Institute",
+        "desc": "A quit guide written especially for smokers over 50."
+      },
+      "sg_consumer": {
+        "title": "What You Need to Know About Quitting",
+        "author": "U.S. Surgeon General, 2020",
+        "desc": "Short, practical advice on quitting from the Surgeon General."
+      },
+      "sg_report": {
+        "title": "Smoking Cessation — full report",
+        "author": "U.S. Surgeon General, 2020",
+        "desc": "The complete scientific report on the benefits of quitting."
+      },
+      "who_benefits": {
+        "title": "Health Benefits of Quitting",
+        "author": "World Health Organization",
+        "desc": "WHO’s timeline of how your body recovers after you quit."
+      }
+    }
   }
 }

@@ -163,7 +163,8 @@
     "journey": "Progreso del camino",
     "savedSoFar": "Ahorrado hasta ahora",
     "nextMilestone": "Próximo hito de salud",
-    "noPlan": "Aún no hay plan — termina la introducción para empezar."
+    "noPlan": "Aún no hay plan — termina la introducción para empezar.",
+    "ebooks": "📚 Lecturas gratis"
   },
   "log": {
     "title": "Registrar",
@@ -501,7 +502,8 @@
     "owned": "En posesión",
     "equipped": "Equipado",
     "dressUp": "Vístelo",
-    "worn": "Puesto"
+    "worn": "Puesto",
+    "ownedTitle": "Lo que tienes"
   },
   "wear": {
     "spr_beanie": "Gorro",
@@ -599,5 +601,38 @@
   "screens": {
     "about": "Hecho con cariño, en tu dispositivo.",
     "settings": "Idioma, perfil, notificaciones y tus datos."
+  },
+  "ebooks": {
+    "title": "Lecturas gratis",
+    "subtitle": "Guías confiables y gratuitas de organismos oficiales de salud. Se abren en tu navegador.",
+    "open": "Leer",
+    "disclaimer": "Recursos externos de organismos de salud pública. Información general, no consejo médico.",
+    "items": {
+      "clearing_air": {
+        "title": "Clearing the Air",
+        "author": "Instituto Nacional del Cáncer (EE. UU.)",
+        "desc": "Una guía amable, paso a paso, para dejar de fumar y mantenerte sin fumar."
+      },
+      "clear_horizons": {
+        "title": "Clear Horizons",
+        "author": "Instituto Nacional del Cáncer (EE. UU.)",
+        "desc": "Una guía pensada especialmente para fumadores mayores de 50."
+      },
+      "sg_consumer": {
+        "title": "Lo que necesitas saber para dejarlo",
+        "author": "Surgeon General de EE. UU., 2020",
+        "desc": "Consejos breves y prácticos para dejar de fumar, del Surgeon General."
+      },
+      "sg_report": {
+        "title": "Dejar de fumar — informe completo",
+        "author": "Surgeon General de EE. UU., 2020",
+        "desc": "El informe científico completo sobre los beneficios de dejarlo."
+      },
+      "who_benefits": {
+        "title": "Beneficios de dejar de fumar",
+        "author": "Organización Mundial de la Salud",
+        "desc": "La línea de tiempo de la OMS sobre cómo se recupera tu cuerpo al dejarlo."
+      }
+    }
   }
 }

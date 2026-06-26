@@ -114,6 +114,8 @@ export default function Space() {
     preview?.type === 'character' ? preview.id : equipped.character;
 
   const rotation = useMemo(() => dailyRotation(todayISO()), []);
+  const ownedCosmetics = COSMETICS.filter((c) => owned.includes(c.id));
+  const shopCosmetics = COSMETICS.filter((c) => !owned.includes(c.id));
 
   const onClaim = async () => {
     const amount = await claim();
@@ -257,21 +259,45 @@ export default function Space() {
           ))}
         </View>
 
-        <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
-          {t('space.shop')}
-        </Text>
-        <View className="flex-row flex-wrap gap-3">
-          {COSMETICS.map((c) => (
-            <CosmeticTile
-              key={c.id}
-              cosmetic={c}
-              owned={owned.includes(c.id)}
-              equipped={isEquipped(c)}
-              previewing={preview?.id === c.id}
-              onPress={onPreview}
-            />
-          ))}
-        </View>
+        {ownedCosmetics.length > 0 ? (
+          <>
+            <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
+              {t('space.ownedTitle')}
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {ownedCosmetics.map((c) => (
+                <CosmeticTile
+                  key={c.id}
+                  cosmetic={c}
+                  owned
+                  equipped={isEquipped(c)}
+                  previewing={preview?.id === c.id}
+                  onPress={onPreview}
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
+
+        {shopCosmetics.length > 0 ? (
+          <>
+            <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
+              {t('space.shop')}
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {shopCosmetics.map((c) => (
+                <CosmeticTile
+                  key={c.id}
+                  cosmetic={c}
+                  owned={false}
+                  equipped={isEquipped(c)}
+                  previewing={preview?.id === c.id}
+                  onPress={onPreview}
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
 
         <Pressable
           onPress={() => setShowHidden((v) => !v)}

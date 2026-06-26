@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AllowanceBars } from '@/components/ui/AllowanceBars';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -153,6 +154,12 @@ export default function Plan() {
             <ProgressBar progress={next.progress} />
           </Card>
         ) : null}
+
+        <Button
+          label={t('plan.ebooks')}
+          variant="secondary"
+          onPress={() => router.push('/ebooks')}
+        />
       </ScrollView>
     </SafeAreaView>
   );
