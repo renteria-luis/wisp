@@ -1,6 +1,7 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -29,6 +30,7 @@ function useNow(intervalMs = 1000): number {
 }
 
 type NodeState = 'reached' | 'current' | 'future';
+type PhaseState = 'done' | 'current' | 'locked';
 
 function Check({ color = colors.neutral['0'] }: { color?: string }) {
   return (
@@ -124,48 +126,92 @@ function MilestoneRow({
   );
 }
 
-function PhaseSection({
+function PhaseCard({
   phaseId,
   state,
   reachedInPhase,
   total,
   expanded,
   onToggle,
+  countdown,
   children,
 }: {
   phaseId: string;
-  state: 'done' | 'current' | 'locked';
+  state: PhaseState;
   reachedInPhase: number;
   total: number;
   expanded: boolean;
   onToggle: () => void;
+  countdown?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useTranslation();
-  const badge = state === 'done' ? '✓' : state === 'locked' ? '🔒' : '';
+  const name = t(`health.phases.${phaseId}.name`);
+  const subtitle = t(`health.phases.${phaseId}.subtitle`);
+
+  if (state === 'current') {
+    // The active phase: an eye-catching gradient header + white body.
+    return (
+      <View className="overflow-hidden rounded-2xl border border-accent-200 dark:border-accent-800">
+        <Pressable onPress={onToggle} accessibilityRole="button">
+          <View className="overflow-hidden px-4 py-3">
+            <LinearGradient
+              colors={[colors.accent['400'], colors.accent['600']]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <View className="flex-row items-center justify-between">
+              <Text className="text-lg font-bold text-white">{name}</Text>
+              <Text className="text-xs font-semibold text-white/90">
+                {reachedInPhase}/{total}
+              </Text>
+            </View>
+            <Text className="mt-0.5 text-xs text-white/80">{subtitle}</Text>
+          </View>
+        </Pressable>
+        <View className="bg-neutral-0 px-4 py-3 dark:bg-neutral-900">
+          {countdown}
+          {expanded ? <View className="mt-2 gap-1">{children}</View> : null}
+        </View>
+      </View>
+    );
+  }
+
+  const done = state === 'done';
   return (
-    <View className="border-t border-neutral-100 py-2 dark:border-neutral-800">
+    <View
+      className={`overflow-hidden rounded-2xl border ${
+        done
+          ? 'border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900'
+          : 'border-neutral-200 bg-neutral-0 dark:border-neutral-800 dark:bg-neutral-900'
+      }`}
+    >
       <Pressable
         onPress={onToggle}
         accessibilityRole="button"
-        className="flex-row items-center justify-between py-1"
+        className="flex-row items-center justify-between px-4 py-3"
       >
         <View className="flex-1 flex-row items-center gap-2">
-          <Text className="text-xs text-ink-mute dark:text-neutral-400">
-            {expanded ? '▾' : '▸'}
-          </Text>
-          <Text
-            className={`text-sm font-semibold ${state === 'locked' ? 'text-ink-mute dark:text-neutral-500' : 'text-ink dark:text-neutral-50'}`}
-          >
-            {t(`health.phases.${phaseId}`)}
-          </Text>
-          {badge ? <Text className="text-xs">{badge}</Text> : null}
+          <Text>{done ? '✅' : '🔒'}</Text>
+          <View className="flex-1">
+            <Text
+              className={`text-base font-bold ${done ? 'text-ink dark:text-neutral-50' : 'text-ink-mute dark:text-neutral-500'}`}
+            >
+              {name}
+            </Text>
+            <Text className="text-xs text-ink-mute dark:text-neutral-400">
+              {subtitle}
+            </Text>
+          </View>
         </View>
-        <Text className="text-[11px] text-ink-mute dark:text-neutral-400">
-          {reachedInPhase}/{total}
+        <Text className="text-xs text-ink-mute dark:text-neutral-400">
+          {reachedInPhase}/{total} {expanded ? '▾' : '▸'}
         </Text>
       </Pressable>
-      {expanded ? <View className="mt-1 gap-1 pl-1">{children}</View> : null}
+      {expanded ? (
+        <View className="gap-1 px-4 pb-3 pt-1">{children}</View>
+      ) : null}
     </View>
   );
 }
@@ -224,7 +270,7 @@ type Props = {
   overQuota?: boolean;
 };
 
-/** The recovery hero: phased milestones that light up as recovery hours grow,
+/** The recovery hero: modular phase boxes that light up as recovery hours grow,
  *  a live smoke-free counter and a live countdown to the next milestone. */
 export function HealthTimeline({
   recoveryStartMs,
@@ -267,96 +313,96 @@ export function HealthTimeline({
     ? HEALTH_MILESTONES.find((m) => m.id === detailId)
     : null;
 
-  return (
-    <View className="rounded-2xl border border-neutral-200 bg-neutral-0 p-4 dark:border-neutral-800 dark:bg-neutral-900">
+  const countdown = next ? (
+    <View className="rounded-xl bg-primary-50 p-3 dark:bg-primary-900">
       <View className="flex-row items-center justify-between">
-        <Text className="text-base font-semibold text-ink dark:text-neutral-50">
-          {t('health.title')}
+        <Text className="flex-1 pr-2 text-xs font-medium text-ink-soft dark:text-neutral-200">
+          {t('health.towards', {
+            title: t(`health.milestones.${next.milestone.id}.title`),
+          })}
         </Text>
-        <View className="rounded-full bg-primary-100 px-2.5 py-1 dark:bg-primary-900">
-          <Text className="text-xs font-semibold text-primary-700 dark:text-primary-100">
+        <Text className="text-xs font-bold text-primary-700 dark:text-primary-100">
+          {formatCountDown(secondsToNext, t)}
+        </Text>
+      </View>
+      <View className="mt-2">
+        <ProgressBar progress={next.progress} />
+      </View>
+    </View>
+  ) : (
+    <Text className="rounded-xl bg-primary-50 p-3 text-sm font-medium text-primary-700 dark:bg-primary-900 dark:text-primary-100">
+      {t('health.allReached')}
+    </Text>
+  );
+
+  return (
+    <View className="gap-3">
+      <View className="flex-row items-center justify-between">
+        <View className="flex-1 pr-2">
+          <Text className="text-lg font-bold text-ink dark:text-neutral-50">
+            {t('health.title')}
+          </Text>
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">
+            {t('health.sinceLast', { time: formatCountUp(smokeFreeSeconds, t) })}
+          </Text>
+        </View>
+        <View className="rounded-full bg-primary-100 px-3 py-1.5 dark:bg-primary-900">
+          <Text className="text-xs font-bold text-primary-700 dark:text-primary-100">
             {t('health.count', { reached, total })}
           </Text>
         </View>
       </View>
 
-      <Text className="mt-1 text-xs text-ink-mute dark:text-neutral-400">
-        {t('health.sinceLast', { time: formatCountUp(smokeFreeSeconds, t) })}
-      </Text>
-
       {overQuota ? (
-        <Text className="mt-3 rounded-xl bg-accent-50 p-3 text-xs leading-5 text-accent-700 dark:bg-accent-900 dark:text-accent-100">
+        <Text className="rounded-xl bg-accent-50 p-3 text-xs leading-5 text-accent-700 dark:bg-accent-900 dark:text-accent-100">
           {t('health.setback')}
         </Text>
       ) : null}
 
-      {next ? (
-        <View className="mt-3 rounded-xl bg-primary-50 p-3 dark:bg-primary-900">
-          <View className="flex-row items-center justify-between">
-            <Text className="flex-1 pr-2 text-xs font-medium text-ink-soft dark:text-neutral-200">
-              {t('health.towards', {
-                title: t(`health.milestones.${next.milestone.id}.title`),
-              })}
-            </Text>
-            <Text className="text-xs font-bold text-primary-700 dark:text-primary-100">
-              {formatCountDown(secondsToNext, t)}
-            </Text>
-          </View>
-          <View className="mt-2">
-            <ProgressBar progress={next.progress} />
-          </View>
-        </View>
-      ) : (
-        <Text className="mt-3 rounded-xl bg-primary-50 p-3 text-sm font-medium text-primary-700 dark:bg-primary-900 dark:text-primary-100">
-          {t('health.allReached')}
-        </Text>
-      )}
+      {HEALTH_PHASES.map((phase, i) => {
+        const reachedInPhase = phase.milestones.filter(
+          (m) => reachedById.get(m.id)?.reached,
+        ).length;
+        const state: PhaseState =
+          i < phaseIndex ? 'done' : i === phaseIndex ? 'current' : 'locked';
+        return (
+          <PhaseCard
+            key={phase.id}
+            phaseId={phase.id}
+            state={state}
+            reachedInPhase={reachedInPhase}
+            total={phase.milestones.length}
+            expanded={expanded.has(phase.id)}
+            countdown={state === 'current' ? countdown : undefined}
+            onToggle={() =>
+              setExpanded((prev) => {
+                const set = new Set(prev);
+                if (set.has(phase.id)) set.delete(phase.id);
+                else set.add(phase.id);
+                return set;
+              })
+            }
+          >
+            {phase.milestones.map((mst) => {
+              const node: NodeState = reachedById.get(mst.id)?.reached
+                ? 'reached'
+                : mst.id === next?.milestone.id
+                  ? 'current'
+                  : 'future';
+              return (
+                <MilestoneRow
+                  key={mst.id}
+                  id={mst.id}
+                  state={node}
+                  onPress={() => setDetailId(mst.id)}
+                />
+              );
+            })}
+          </PhaseCard>
+        );
+      })}
 
-      <View className="mt-3">
-        {HEALTH_PHASES.map((phase, i) => {
-          const reachedInPhase = phase.milestones.filter(
-            (m) => reachedById.get(m.id)?.reached,
-          ).length;
-          const state =
-            i < phaseIndex ? 'done' : i === phaseIndex ? 'current' : 'locked';
-          return (
-            <PhaseSection
-              key={phase.id}
-              phaseId={phase.id}
-              state={state}
-              reachedInPhase={reachedInPhase}
-              total={phase.milestones.length}
-              expanded={expanded.has(phase.id)}
-              onToggle={() =>
-                setExpanded((prev) => {
-                  const set = new Set(prev);
-                  if (set.has(phase.id)) set.delete(phase.id);
-                  else set.add(phase.id);
-                  return set;
-                })
-              }
-            >
-              {phase.milestones.map((m) => {
-                const node: NodeState = reachedById.get(m.id)?.reached
-                  ? 'reached'
-                  : m.id === next?.milestone.id
-                    ? 'current'
-                    : 'future';
-                return (
-                  <MilestoneRow
-                    key={m.id}
-                    id={m.id}
-                    state={node}
-                    onPress={() => setDetailId(m.id)}
-                  />
-                );
-              })}
-            </PhaseSection>
-          );
-        })}
-      </View>
-
-      <Text className="mt-3 text-[11px] leading-4 text-ink-mute dark:text-neutral-400">
+      <Text className="text-[11px] leading-4 text-ink-mute dark:text-neutral-400">
         {t('health.disclaimer')}
       </Text>
 

@@ -1,13 +1,17 @@
 /**
  * Recovery-milestone timeline (PROJECT.md §6 — health). Pure.
  *
- * A sequence of improvements that typically follow quitting, grouped into
- * phases (levels). General wellbeing info, NOT medical advice — the UI shows a
- * disclaimer. Copy (title/body/detail/fact) lives in i18n under
- * `health.milestones.<id>.*`; the citation `source` lives here as data (names +
- * years read the same in any language). Sources are a solid first pass —
- * primarily the U.S. Surgeon General's 1990 report "The Health Benefits of
- * Smoking Cessation", with CDC, American Cancer Society (ACS) and NHS.
+ * ~30 improvements that typically follow quitting, grouped into named phases.
+ * General wellbeing info, NOT medical advice — the UI shows a disclaimer. Copy
+ * (title/body/when/detail/fact) lives in i18n under `health.milestones.<id>.*`
+ * and phase names under `health.phases.<id>.*`; the citation `source` lives here
+ * as data (names/years read the same in any language).
+ *
+ * Sources, primarily: U.S. Surgeon General reports (1990 "The Health Benefits of
+ * Smoking Cessation"; 2020 "Smoking Cessation"), CDC, American Cancer Society
+ * (ACS), NHS, WHO. Early pharmacokinetics: Benowitz, NEJM 2010. Withdrawal time
+ * course: Hughes 2007. Dopamine normalization at ~3 months: Vernaleken et al.,
+ * Biological Psychiatry 2016. A few wellbeing points are marked as estimates.
  */
 
 const HOUR = 1;
@@ -29,52 +33,79 @@ export interface HealthPhase {
   milestones: HealthMilestone[];
 }
 
-const SGR = 'U.S. Surgeon General, 1990';
+const SGR = 'U.S. Surgeon General';
 const ACS = 'American Cancer Society';
 const NHS = 'NHS (UK)';
 const CDC = 'CDC';
+const WHO = 'WHO';
+const BENOWITZ = 'Benowitz, NEJM 2010';
+const HUGHES = 'Hughes, 2007';
+const ESTIMATE = 'General wellbeing estimate';
 
 /** Phases (levels), each with ascending milestones. */
 export const HEALTH_PHASES: HealthPhase[] = [
   {
     id: 'p1',
     milestones: [
-      { id: 'pulse', atHours: 20 / 60, source: `${SGR}; ${ACS}` },
-      { id: 'nicotine', atHours: 2 * HOUR, source: 'Benowitz, NEJM 2009' },
-      { id: 'co_half', atHours: 8 * HOUR, source: NHS },
-      { id: 'co_normal', atHours: 12 * HOUR, source: `${SGR}; ${CDC}` },
+      { id: 'm_20min', atHours: 20 / 60, source: `${SGR}; ${CDC}` },
+      { id: 'm_30min', atHours: 0.5, source: ESTIMATE },
+      { id: 'm_1h', atHours: 1, source: BENOWITZ },
+      { id: 'm_2h', atHours: 2, source: BENOWITZ },
+      { id: 'm_6h', atHours: 6, source: BENOWITZ },
+      { id: 'm_8h', atHours: 8, source: NHS },
+      { id: 'm_12h', atHours: 12, source: `${SGR}; ${CDC}` },
     ],
   },
   {
     id: 'p2',
     milestones: [
-      { id: 'heart_24h', atHours: 1 * DAY, source: `${SGR}; AHA` },
-      { id: 'senses', atHours: 2 * DAY, source: `${ACS}; ${NHS}` },
-      { id: 'breathing', atHours: 3 * DAY, source: `${ACS}; ${NHS}` },
+      { id: 'm_24h', atHours: 1 * DAY, source: `${SGR}; AHA` },
+      { id: 'm_36h', atHours: 1.5 * DAY, source: ESTIMATE },
+      { id: 'm_48h', atHours: 2 * DAY, source: `${ACS}; ${NHS}` },
+      { id: 'm_72h', atHours: 3 * DAY, source: `${ACS}; ${NHS}` },
     ],
   },
   {
     id: 'p3',
     milestones: [
-      { id: 'circulation', atHours: 2 * WEEK, source: SGR },
-      { id: 'withdrawal', atHours: 4 * WEEK, source: 'Hughes, 2007' },
+      { id: 'm_1week', atHours: 1 * WEEK, source: HUGHES },
+      { id: 'm_10day', atHours: 10 * DAY, source: HUGHES },
+      { id: 'm_2week', atHours: 2 * WEEK, source: SGR },
+      { id: 'm_3week', atHours: 3 * WEEK, source: SGR },
+      { id: 'm_1month', atHours: 1 * MONTH, source: HUGHES },
+      { id: 'm_6week', atHours: 6 * WEEK, source: 'Oral-health research' },
     ],
   },
   {
     id: 'p4',
     milestones: [
-      { id: 'lungs', atHours: 1 * MONTH, source: ACS },
-      { id: 'lung_function', atHours: 3 * MONTH, source: SGR },
-      { id: 'cilia', atHours: 9 * MONTH, source: `${ACS}; ${SGR}` },
+      { id: 'm_2month', atHours: 2 * MONTH, source: ESTIMATE },
+      {
+        id: 'm_3month',
+        atHours: 3 * MONTH,
+        source: `${SGR}; Vernaleken et al., Biol. Psychiatry 2016`,
+      },
+      { id: 'm_4month', atHours: 4 * MONTH, source: SGR },
+      { id: 'm_5month', atHours: 5 * MONTH, source: ESTIMATE },
+      { id: 'm_6month', atHours: 6 * MONTH, source: ACS },
+      { id: 'm_9month', atHours: 9 * MONTH, source: `${ACS}; ${SGR}` },
     ],
   },
   {
     id: 'p5',
     milestones: [
-      { id: 'heart_1y', atHours: 1 * YEAR, source: `${SGR}; ${ACS}` },
-      { id: 'stroke', atHours: 5 * YEAR, source: `${SGR}; ${CDC}` },
-      { id: 'lung_cancer', atHours: 10 * YEAR, source: `${SGR}; ${ACS}` },
-      { id: 'chd', atHours: 15 * YEAR, source: SGR },
+      { id: 'm_1year', atHours: 1 * YEAR, source: `${SGR}; ${ACS}` },
+      { id: 'm_18month', atHours: 18 * MONTH, source: ESTIMATE },
+      { id: 'm_2year', atHours: 2 * YEAR, source: ESTIMATE },
+    ],
+  },
+  {
+    id: 'p6',
+    milestones: [
+      { id: 'm_5year', atHours: 5 * YEAR, source: `${SGR}; ${CDC}; ${WHO}` },
+      { id: 'm_10year', atHours: 10 * YEAR, source: `${SGR}; ${ACS}` },
+      { id: 'm_15year', atHours: 15 * YEAR, source: SGR },
+      { id: 'm_20year', atHours: 20 * YEAR, source: `${SGR} 2020; ${WHO}` },
     ],
   },
 ];

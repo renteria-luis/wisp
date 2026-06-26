@@ -31,9 +31,17 @@
     "quietStart": "From",
     "quietEnd": "Until",
     "language": "Language",
-    "lang": { "auto": "Automatic", "en": "English", "es": "Español" },
+    "lang": {
+      "auto": "Automatic",
+      "en": "English",
+      "es": "Español"
+    },
     "appearance": "Appearance",
-    "theme": { "system": "Automatic", "light": "Light", "dark": "Dark" },
+    "theme": {
+      "system": "Automatic",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "data": "Data",
     "dataNote": "Everything stays on your phone. Export a copy or erase it all.",
     "export": "Export my data",
@@ -241,124 +249,241 @@
       "y": "{{count}}y"
     },
     "phases": {
-      "p1": "First hours",
-      "p2": "First days",
-      "p3": "First weeks",
-      "p4": "First months",
-      "p5": "Long term"
+      "p1": {
+        "name": "First Light",
+        "subtitle": "Your body begins to reset"
+      },
+      "p2": {
+        "name": "Through the Storm",
+        "subtitle": "The hardest hours, passing"
+      },
+      "p3": {
+        "name": "Finding Footing",
+        "subtitle": "Cravings loosen their grip"
+      },
+      "p4": {
+        "name": "Taking Root",
+        "subtitle": "Lungs and mind heal"
+      },
+      "p5": {
+        "name": "Full Stride",
+        "subtitle": "A stronger heart"
+      },
+      "p6": {
+        "name": "Open Horizons",
+        "subtitle": "Risk fades into the distance"
+      }
     },
     "milestones": {
-      "pulse": {
+      "m_20min": {
         "title": "Pulse & pressure",
-        "body": "Your heart rate and blood pressure begin to settle toward normal.",
+        "body": "Heart rate and blood pressure ease toward normal.",
         "when": "20 min",
-        "detail": "Within about 20 minutes of your last cigarette, the spike in heart rate and blood pressure caused by nicotine starts easing back toward your baseline.",
-        "fact": "Nicotine speeds your heart up by roughly 10–20 beats per minute while you smoke."
+        "detail": "Within ~20 minutes of your last cigarette, the heart-rate and blood-pressure spike from nicotine starts settling toward your baseline.",
+        "fact": "Nicotine speeds your heart by ~10–20 beats per minute while you smoke."
       },
-      "nicotine": {
-        "title": "Nicotine falling",
-        "body": "Nicotine drops by about half; early cravings may appear.",
+      "m_30min": {
+        "title": "Warm hands",
+        "body": "Circulation reaches your fingers and toes again.",
+        "when": "30 min",
+        "detail": "Nicotine narrows small blood vessels; as it fades, blood flows back to your hands and feet and they warm up.",
+        "fact": "Cold fingertips are a classic sign of a fresh cigarette."
+      },
+      "m_1h": {
+        "title": "Nicotine clearing",
+        "body": "Nicotine starts leaving your blood.",
+        "when": "1 h",
+        "detail": "Nicotine has a half-life of about one to two hours, so its level in your blood is already dropping.",
+        "fact": "By two hours, about half of it is already gone."
+      },
+      "m_2h": {
+        "title": "First cravings",
+        "body": "Nicotine is half gone; cravings may knock.",
         "when": "2 h",
-        "detail": "Nicotine has a half-life of about 2 hours, so its level in your blood is already dropping — which is also why early cravings tend to show up around now.",
-        "fact": "By 2 hours, roughly half the nicotine from your last cigarette is gone."
+        "detail": "As nicotine drops by roughly half, the first cravings tend to appear. Each one passes in a few minutes.",
+        "fact": "A craving rarely lasts longer than 3–5 minutes."
       },
-      "co_half": {
+      "m_6h": {
+        "title": "Calmer rhythm",
+        "body": "Heart rate and breathing settle.",
+        "when": "6 h",
+        "detail": "By about six hours nearly all the nicotine from your last cigarette has been metabolized and your heart rate and breathing are calmer.",
+        "fact": "Only ~3% of that nicotine remains after six hours."
+      },
+      "m_8h": {
         "title": "Oxygen rising",
-        "body": "Carbon monoxide halves and more oxygen reaches your body.",
+        "body": "Carbon monoxide halves; more oxygen flows.",
         "when": "8 h",
-        "detail": "Carbon monoxide from smoke takes the place of oxygen in your red blood cells. By about 8 hours it has roughly halved, so your blood carries more oxygen again.",
-        "fact": "Carbon monoxide is the same gas that comes out of a car's exhaust."
+        "detail": "Carbon monoxide takes oxygen’s place in your blood. Its level roughly halves by eight hours, so your blood carries more oxygen.",
+        "fact": "Carbon monoxide is the same gas that comes from a car’s exhaust."
       },
-      "co_normal": {
+      "m_12h": {
         "title": "Blood near normal",
-        "body": "Carbon monoxide clears and blood-oxygen returns to normal.",
+        "body": "Carbon monoxide clears; blood oxygen normal.",
         "when": "12 h",
-        "detail": "By around 12 hours smoke-free, carbon monoxide has largely cleared and your blood-oxygen level is back to normal.",
-        "fact": "More oxygen means less of that mid-afternoon sluggishness."
+        "detail": "By around twelve hours, carbon monoxide has largely cleared and your blood-oxygen level returns to normal.",
+        "fact": "More oxygen means less of that afternoon slump."
       },
-      "heart_24h": {
+      "m_24h": {
         "title": "Heart eases",
-        "body": "Your risk of a heart attack already begins to fall.",
+        "body": "Heart-attack risk already starts to fall.",
         "when": "1 day",
-        "detail": "After a full day, the strain smoking puts on your heart begins to lift and heart-attack risk starts to decline. Withdrawal can also peak around now — it passes.",
+        "detail": "After a full day, the extra strain on your heart begins to lift and heart-attack risk starts to decline. Withdrawal can peak now — it passes.",
         "fact": "Even one smoke-free day measurably lowers strain on your heart."
       },
-      "senses": {
+      "m_36h": {
+        "title": "Peak passing",
+        "body": "The loudest cravings start to fade.",
+        "when": "36 h",
+        "detail": "Cravings and irritability tend to peak around a day and a half, then begin easing as your body adjusts.",
+        "fact": "This is often the toughest moment — and it’s downhill after."
+      },
+      "m_48h": {
         "title": "Taste & smell",
-        "body": "Nerve endings start to regrow; food tastes and smells better.",
+        "body": "Nerve endings regrow; food comes alive.",
         "when": "2 days",
-        "detail": "Around 48 hours, nerve endings damaged by smoking begin regrowing, and your senses of taste and smell noticeably sharpen.",
-        "fact": "Many people say food 'comes alive' again around day two."
+        "detail": "Around 48 hours, nerve endings damaged by smoking start regrowing and your senses of taste and smell sharpen noticeably.",
+        "fact": "Many people say food ‘comes alive’ on day two."
       },
-      "breathing": {
-        "title": "Easier breathing",
-        "body": "Bronchial tubes relax and your energy lifts.",
+      "m_72h": {
+        "title": "Easier breath",
+        "body": "Airways relax; energy lifts.",
         "when": "3 days",
-        "detail": "By about 72 hours the bronchial tubes relax, breathing feels easier and energy rises — even as the last of the acute withdrawal fades.",
-        "fact": "Your body is essentially nicotine-free by this point."
+        "detail": "By about 72 hours the bronchial tubes relax, breathing feels easier and energy rises — and you’re now essentially nicotine-free.",
+        "fact": "Three days in, the physical addiction is largely behind you."
       },
-      "circulation": {
+      "m_1week": {
+        "title": "One week strong",
+        "body": "The first week is hardest — and it’s done.",
+        "when": "1 week",
+        "detail": "Most relapses happen in the first week, so reaching seven days is a real turning point. Cravings are already shorter and less frequent.",
+        "fact": "Make it past week one and your odds jump dramatically."
+      },
+      "m_10day": {
+        "title": "Cravings shrink",
+        "body": "Urges are briefer and easier to ride out.",
+        "when": "10 days",
+        "detail": "By about ten days, cravings are typically short — a few minutes — and come less often.",
+        "fact": "Each craving you ride out makes the next one weaker."
+      },
+      "m_2week": {
         "title": "Circulation",
-        "body": "Circulation improves and moving around feels easier.",
+        "body": "Blood flows easier; moving feels lighter.",
         "when": "2 weeks",
-        "detail": "Over the first couple of weeks, circulation improves and lung function starts to climb, so walking and exercise feel easier.",
-        "fact": "Better circulation also helps wounds heal faster."
+        "detail": "Around two weeks, circulation improves and lung function begins to climb, so walking and exercise feel easier. Gum blood flow nears a non-smoker’s.",
+        "fact": "Better circulation also helps cuts and gums heal."
       },
-      "withdrawal": {
+      "m_3week": {
+        "title": "Real stamina",
+        "body": "Lung function rises; exercise gets easier.",
+        "when": "3 weeks",
+        "detail": "By three weeks, measurable lung-function gains mean you can do more before getting winded.",
+        "fact": "Many people notice stairs are suddenly easier."
+      },
+      "m_1month": {
         "title": "Mind settles",
-        "body": "The strongest withdrawal symptoms ease off.",
+        "body": "The strongest withdrawal has passed.",
         "when": "1 month",
-        "detail": "Most acute withdrawal — irritability, restlessness, low mood — peaks in the first week and largely settles within three to four weeks.",
-        "fact": "Cravings become shorter and less frequent from here on."
+        "detail": "Acute withdrawal — irritability, restlessness, low mood — largely settles within three to four weeks, and sleep often improves.",
+        "fact": "Cravings become occasional rather than constant."
       },
-      "lungs": {
-        "title": "Cleaner lungs",
-        "body": "Tiny lung hairs recover, so you cough less.",
-        "when": "1 month",
-        "detail": "By around a month, the cilia (tiny hairs that clear the lungs) start working again, reducing coughing and shortness of breath.",
-        "fact": "Cilia are your lungs' built-in self-cleaning system."
+      "m_6week": {
+        "title": "Healthier mouth",
+        "body": "Gums and mouth recover.",
+        "when": "6 weeks",
+        "detail": "Within about six weeks, blood flow and healing in the gums improve, lowering the risk of gum disease.",
+        "fact": "Smokers heal from dental work noticeably slower."
       },
-      "lung_function": {
-        "title": "Lung capacity",
-        "body": "Lung function keeps climbing noticeably.",
+      "m_2month": {
+        "title": "More energy",
+        "body": "Circulation and stamina keep climbing.",
+        "when": "2 months",
+        "detail": "Around two months, stronger circulation and lung function show up as steadier energy and easier exercise.",
+        "fact": "Workouts that felt hard at week one feel routine now."
+      },
+      "m_3month": {
+        "title": "Reward reset",
+        "body": "Lung function up; brain dopamine normalizes.",
         "when": "3 months",
-        "detail": "Across the first one to three months, lung function improves substantially as airways heal and inflammation falls.",
-        "fact": "Climbing stairs gets noticeably easier around now."
+        "detail": "Lung function can be up 10–30%, and brain-imaging studies show the dopamine (reward) system returns to a non-smoker’s level by about three months.",
+        "fact": "A PET study found the smoking dopamine deficit fully normalized at 3 months."
       },
-      "cilia": {
+      "m_4month": {
         "title": "Clearer lungs",
-        "body": "Cilia fully recover; less coughing and infection.",
-        "when": "9 months",
-        "detail": "By about nine months the cilia have largely recovered, so the lungs clear mucus better and you catch fewer infections.",
-        "fact": "Lung cleaning returns close to that of a non-smoker."
+        "body": "Coughing and wheezing keep fading.",
+        "when": "4 months",
+        "detail": "As airways heal and inflammation falls, coughing and wheezing keep declining through these months.",
+        "fact": "Your lungs are actively rebuilding their lining."
       },
-      "heart_1y": {
+      "m_5month": {
+        "title": "Smoke feels foreign",
+        "body": "Cravings are rare; the habit loosens.",
+        "when": "5 months",
+        "detail": "By around five months, cravings are infrequent and smoking starts to feel like something you used to do.",
+        "fact": "New smoke-free routines have largely taken over."
+      },
+      "m_6month": {
+        "title": "Calm under stress",
+        "body": "You handle stress without a cigarette.",
+        "when": "6 months",
+        "detail": "By six months many people cope with stress smoke-free, and coughing and mucus are much reduced.",
+        "fact": "Your go-to stress response is no longer nicotine."
+      },
+      "m_9month": {
+        "title": "Lungs rebuilt",
+        "body": "Cilia fully recover; fewer infections.",
+        "when": "9 months",
+        "detail": "By about nine months the cilia have largely recovered, so your lungs clear mucus well and you catch fewer infections.",
+        "fact": "Cilia are your lungs’ tiny self-cleaning brushes."
+      },
+      "m_1year": {
         "title": "Stronger heart",
-        "body": "Heart-disease risk is about half that of a smoker.",
+        "body": "Heart-disease risk is about half a smoker’s.",
         "when": "1 year",
         "detail": "One year smoke-free, your excess risk of coronary heart disease is about half that of someone who still smokes.",
-        "fact": "Your heart-attack risk keeps falling year after year."
+        "fact": "Your heart keeps getting safer every year from here."
       },
-      "stroke": {
+      "m_18month": {
+        "title": "Steady and free",
+        "body": "Smoke-free is your new normal.",
+        "when": "18 months",
+        "detail": "By a year and a half, smoke-free living is well established and your body keeps repairing quietly in the background.",
+        "fact": "Most ex-smokers say cravings are now rare surprises."
+      },
+      "m_2year": {
+        "title": "Near-normal heart",
+        "body": "Heart-attack risk keeps approaching normal.",
+        "when": "2 years",
+        "detail": "Around two years, heart-attack risk continues dropping toward that of a never-smoker.",
+        "fact": "Two years is a milestone few relapse past."
+      },
+      "m_5year": {
         "title": "Lower stroke risk",
-        "body": "Stroke risk falls toward that of a non-smoker.",
+        "body": "Stroke risk falls toward a never-smoker’s.",
         "when": "5 years",
-        "detail": "Within about five years, the risk of stroke drops substantially, approaching that of a person who never smoked.",
+        "detail": "Within about five years, stroke risk drops substantially, and the risk of mouth, throat and esophagus cancers is roughly halved.",
         "fact": "Blood vessels widen and clot less easily over these years."
       },
-      "lung_cancer": {
+      "m_10year": {
         "title": "Lower cancer risk",
-        "body": "Lung-cancer death risk is about half that of a smoker.",
+        "body": "Lung-cancer death risk is about half a smoker’s.",
         "when": "10 years",
-        "detail": "By ten years, the risk of dying from lung cancer is roughly half that of someone who keeps smoking.",
-        "fact": "Risk of several other cancers falls too."
+        "detail": "By ten years, the risk of dying from lung cancer is roughly half that of someone who keeps smoking, and several other cancer risks fall too.",
+        "fact": "Risk of larynx and pancreatic cancer also drops."
       },
-      "chd": {
+      "m_15year": {
         "title": "Heart like a non-smoker",
-        "body": "Heart-disease risk nears that of someone who never smoked.",
+        "body": "Heart-disease risk nears a never-smoker’s.",
         "when": "15 years",
-        "detail": "After fifteen years smoke-free, the risk of coronary heart disease is close to that of a person who never smoked.",
-        "fact": "Fifteen years undoes most of the cardiovascular risk."
+        "detail": "After fifteen years, the risk of coronary heart disease is close to that of a person who never smoked.",
+        "fact": "Fifteen years undoes most cardiovascular risk."
+      },
+      "m_20year": {
+        "title": "Full circle",
+        "body": "Smoking-related death risk nears normal.",
+        "when": "20 years",
+        "detail": "By around twenty years, the risk of death from smoking-related causes approaches that of someone who never smoked.",
+        "fact": "Two decades on, your body has reclaimed most of the risk."
       }
     }
   },

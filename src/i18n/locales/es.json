@@ -31,9 +31,17 @@
     "quietStart": "Desde",
     "quietEnd": "Hasta",
     "language": "Idioma",
-    "lang": { "auto": "Automático", "en": "English", "es": "Español" },
+    "lang": {
+      "auto": "Automático",
+      "en": "English",
+      "es": "Español"
+    },
     "appearance": "Apariencia",
-    "theme": { "system": "Automático", "light": "Claro", "dark": "Oscuro" },
+    "theme": {
+      "system": "Automático",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
     "data": "Datos",
     "dataNote": "Todo se queda en tu teléfono. Exporta una copia o bórralo todo.",
     "export": "Exportar mis datos",
@@ -241,124 +249,241 @@
       "y": "{{count}}a"
     },
     "phases": {
-      "p1": "Primeras horas",
-      "p2": "Primeros días",
-      "p3": "Primeras semanas",
-      "p4": "Primeros meses",
-      "p5": "Largo plazo"
+      "p1": {
+        "name": "Primer destello",
+        "subtitle": "Tu cuerpo empieza a reiniciarse"
+      },
+      "p2": {
+        "name": "Cruzando la tormenta",
+        "subtitle": "Las horas más duras, pasando"
+      },
+      "p3": {
+        "name": "Encontrando el equilibrio",
+        "subtitle": "Los antojos aflojan"
+      },
+      "p4": {
+        "name": "Echando raíces",
+        "subtitle": "Pulmones y mente sanan"
+      },
+      "p5": {
+        "name": "A todo ritmo",
+        "subtitle": "Un corazón más fuerte"
+      },
+      "p6": {
+        "name": "Horizontes abiertos",
+        "subtitle": "El riesgo se desvanece"
+      }
     },
     "milestones": {
-      "pulse": {
+      "m_20min": {
         "title": "Pulso y presión",
-        "body": "Tu ritmo cardíaco y presión arterial empiezan a normalizarse.",
+        "body": "El ritmo cardíaco y la presión se acercan a lo normal.",
         "when": "20 min",
-        "detail": "A los ~20 minutos del último cigarro, la subida de ritmo cardíaco y presión que causa la nicotina empieza a volver hacia tu nivel normal.",
-        "fact": "La nicotina acelera tu corazón unos 10–20 latidos por minuto mientras fumas."
+        "detail": "A los ~20 minutos del último cigarro, la subida de ritmo cardíaco y presión por la nicotina empieza a volver a tu nivel normal.",
+        "fact": "La nicotina acelera tu corazón ~10–20 latidos por minuto mientras fumas."
       },
-      "nicotine": {
-        "title": "La nicotina baja",
-        "body": "La nicotina baja casi a la mitad; pueden aparecer antojos.",
+      "m_30min": {
+        "title": "Manos tibias",
+        "body": "La circulación vuelve a tus dedos de manos y pies.",
+        "when": "30 min",
+        "detail": "La nicotina estrecha los vasos pequeños; al irse, la sangre vuelve a manos y pies y se entibian.",
+        "fact": "Las yemas frías son una señal clásica de un cigarro reciente."
+      },
+      "m_1h": {
+        "title": "La nicotina se va",
+        "body": "La nicotina empieza a salir de tu sangre.",
+        "when": "1 h",
+        "detail": "La nicotina tiene una vida media de una a dos horas, así que su nivel en sangre ya está bajando.",
+        "fact": "A las dos horas, casi la mitad ya desapareció."
+      },
+      "m_2h": {
+        "title": "Primeros antojos",
+        "body": "La nicotina bajó a la mitad; pueden venir antojos.",
         "when": "2 h",
-        "detail": "La nicotina tiene una vida media de ~2 horas, así que su nivel en sangre ya está bajando — por eso también aparecen los primeros antojos hacia ahora.",
-        "fact": "A las 2 horas ya se fue cerca de la mitad de la nicotina del último cigarro."
+        "detail": "Al bajar la nicotina casi a la mitad, suelen aparecer los primeros antojos. Cada uno pasa en pocos minutos.",
+        "fact": "Un antojo casi nunca dura más de 3–5 minutos."
       },
-      "co_half": {
+      "m_6h": {
+        "title": "Ritmo más calmo",
+        "body": "Ritmo cardíaco y respiración se calman.",
+        "when": "6 h",
+        "detail": "Hacia las seis horas casi toda la nicotina del último cigarro se metabolizó y tu ritmo cardíaco y respiración están más calmos.",
+        "fact": "Solo queda ~3% de esa nicotina tras seis horas."
+      },
+      "m_8h": {
         "title": "Sube el oxígeno",
-        "body": "El monóxido de carbono baja a la mitad y llega más oxígeno.",
+        "body": "El monóxido de carbono baja a la mitad; más oxígeno.",
         "when": "8 h",
-        "detail": "El monóxido de carbono del humo ocupa el lugar del oxígeno en tus glóbulos rojos. Hacia las 8 horas ya bajó casi a la mitad, así que tu sangre lleva más oxígeno.",
-        "fact": "El monóxido de carbono es el mismo gas que sale del escape de un auto."
+        "detail": "El monóxido de carbono ocupa el lugar del oxígeno en la sangre. Hacia las ocho horas baja casi a la mitad, así que llevas más oxígeno.",
+        "fact": "El monóxido de carbono es el mismo gas del escape de un auto."
       },
-      "co_normal": {
+      "m_12h": {
         "title": "Sangre casi normal",
-        "body": "El monóxido de carbono se limpia y el oxígeno se normaliza.",
+        "body": "El monóxido se limpia; oxígeno normal.",
         "when": "12 h",
-        "detail": "Hacia las 12 horas sin fumar, el monóxido de carbono casi desapareció y tu nivel de oxígeno en sangre vuelve a la normalidad.",
-        "fact": "Más oxígeno significa menos de ese bajón de media tarde."
+        "detail": "Hacia las doce horas, el monóxido de carbono casi desapareció y tu nivel de oxígeno en sangre vuelve a la normalidad.",
+        "fact": "Más oxígeno significa menos bajón de la tarde."
       },
-      "heart_24h": {
+      "m_24h": {
         "title": "Alivio al corazón",
-        "body": "Tu riesgo de infarto ya empieza a bajar.",
+        "body": "El riesgo de infarto ya empieza a bajar.",
         "when": "1 día",
-        "detail": "Tras un día completo, el esfuerzo extra que el tabaco pone en tu corazón empieza a aliviarse y baja el riesgo de infarto. La abstinencia también puede llegar a su pico ahora — pasa.",
-        "fact": "Hasta un solo día sin fumar reduce de forma medible el esfuerzo del corazón."
+        "detail": "Tras un día, el esfuerzo extra en tu corazón empieza a aliviarse y baja el riesgo de infarto. La abstinencia puede llegar a su pico ahora — pasa.",
+        "fact": "Hasta un solo día sin fumar reduce el esfuerzo del corazón."
       },
-      "senses": {
+      "m_36h": {
+        "title": "El pico pasa",
+        "body": "Los antojos más fuertes empiezan a ceder.",
+        "when": "36 h",
+        "detail": "Los antojos y la irritabilidad suelen llegar a su pico hacia el día y medio, y luego empiezan a ceder mientras tu cuerpo se ajusta.",
+        "fact": "Suele ser el momento más duro — y después es cuesta abajo."
+      },
+      "m_48h": {
         "title": "Gusto y olfato",
-        "body": "Las terminaciones nerviosas se recuperan; comer sabe mejor.",
+        "body": "Las terminaciones nerviosas se regeneran; la comida revive.",
         "when": "2 días",
         "detail": "Hacia las 48 horas, las terminaciones nerviosas dañadas por fumar empiezan a regenerarse y tu gusto y olfato se afinan notablemente.",
-        "fact": "Mucha gente dice que la comida 'revive' hacia el segundo día."
+        "fact": "Mucha gente dice que la comida ‘revive’ al segundo día."
       },
-      "breathing": {
+      "m_72h": {
         "title": "Respirar mejor",
-        "body": "Los bronquios se relajan y sube tu energía.",
+        "body": "Las vías respiratorias se relajan; sube la energía.",
         "when": "3 días",
-        "detail": "Hacia las 72 horas los bronquios se relajan, respirar cuesta menos y sube la energía — mientras se va lo más fuerte de la abstinencia.",
-        "fact": "Tu cuerpo ya está prácticamente libre de nicotina en este punto."
+        "detail": "Hacia las 72 horas los bronquios se relajan, respirar cuesta menos y sube la energía — y ya estás prácticamente libre de nicotina.",
+        "fact": "A los tres días, la adicción física quedó casi atrás."
       },
-      "circulation": {
+      "m_1week": {
+        "title": "Una semana fuerte",
+        "body": "La primera semana es la más dura — y ya está.",
+        "when": "1 semana",
+        "detail": "La mayoría de las recaídas ocurre la primera semana, así que llegar a siete días es un punto de quiebre real. Los antojos ya son más cortos y menos frecuentes.",
+        "fact": "Pasa la primera semana y tus probabilidades suben muchísimo."
+      },
+      "m_10day": {
+        "title": "Antojos más chicos",
+        "body": "Las ganas son más breves y fáciles de aguantar.",
+        "when": "10 días",
+        "detail": "Hacia los diez días, los antojos suelen ser cortos — pocos minutos — y vienen menos seguido.",
+        "fact": "Cada antojo que aguantas debilita al siguiente."
+      },
+      "m_2week": {
         "title": "Circulación",
-        "body": "La circulación mejora y moverte cuesta menos.",
+        "body": "La sangre fluye mejor; moverte se siente liviano.",
         "when": "2 semanas",
-        "detail": "En las primeras semanas, la circulación mejora y la función pulmonar empieza a subir, así que caminar y hacer ejercicio cuesta menos.",
-        "fact": "Mejor circulación también ayuda a que las heridas sanen más rápido."
+        "detail": "Hacia las dos semanas, la circulación mejora y la función pulmonar empieza a subir, así que caminar y ejercitarte cuesta menos. El flujo en las encías se acerca al de un no fumador.",
+        "fact": "Mejor circulación también ayuda a sanar heridas y encías."
       },
-      "withdrawal": {
+      "m_3week": {
+        "title": "Aguante real",
+        "body": "Sube la función pulmonar; el ejercicio cuesta menos.",
+        "when": "3 semanas",
+        "detail": "A las tres semanas, las mejoras medibles de función pulmonar te dejan hacer más antes de quedarte sin aire.",
+        "fact": "Mucha gente nota que las escaleras de repente cuestan menos."
+      },
+      "m_1month": {
         "title": "La mente se calma",
-        "body": "Los síntomas de abstinencia más fuertes ceden.",
+        "body": "Lo más fuerte de la abstinencia ya pasó.",
         "when": "1 mes",
-        "detail": "La abstinencia aguda — irritabilidad, inquietud, bajo ánimo — llega a su pico la primera semana y en gran parte se calma en tres o cuatro semanas.",
-        "fact": "Los antojos se vuelven más cortos y menos frecuentes de aquí en adelante."
+        "detail": "La abstinencia aguda — irritabilidad, inquietud, bajo ánimo — se calma en gran parte en tres o cuatro semanas, y el sueño suele mejorar.",
+        "fact": "Los antojos pasan a ser ocasionales, no constantes."
       },
-      "lungs": {
-        "title": "Pulmones más limpios",
-        "body": "Los pequeños cilios se recuperan y toses menos.",
-        "when": "1 mes",
-        "detail": "Hacia el mes, los cilios (pelitos que limpian los pulmones) vuelven a funcionar, reduciendo la tos y la falta de aire.",
-        "fact": "Los cilios son el sistema de autolimpieza de tus pulmones."
+      "m_6week": {
+        "title": "Boca más sana",
+        "body": "Las encías y la boca se recuperan.",
+        "when": "6 semanas",
+        "detail": "Hacia las seis semanas, el flujo de sangre y la cicatrización en las encías mejoran, bajando el riesgo de enfermedad de las encías.",
+        "fact": "Quien fuma sana del trabajo dental notablemente más lento."
       },
-      "lung_function": {
-        "title": "Capacidad pulmonar",
-        "body": "Tu función pulmonar sigue subiendo notablemente.",
+      "m_2month": {
+        "title": "Más energía",
+        "body": "Circulación y aguante siguen subiendo.",
+        "when": "2 meses",
+        "detail": "Hacia los dos meses, una mejor circulación y función pulmonar se notan como energía más estable y ejercicio más fácil.",
+        "fact": "Lo que costaba en la semana uno ahora es rutina."
+      },
+      "m_3month": {
+        "title": "Reinicio del placer",
+        "body": "Sube la función pulmonar; la dopamina se normaliza.",
         "when": "3 meses",
-        "detail": "En los primeros uno a tres meses, la función pulmonar mejora bastante mientras las vías respiratorias sanan y baja la inflamación.",
-        "fact": "Subir escaleras cuesta notablemente menos hacia ahora."
+        "detail": "La función pulmonar puede subir 10–30%, y estudios de imagen cerebral muestran que el sistema de dopamina (recompensa) vuelve al nivel de un no fumador hacia los tres meses.",
+        "fact": "Un estudio PET halló que el déficit de dopamina se normalizó por completo a los 3 meses."
       },
-      "cilia": {
+      "m_4month": {
         "title": "Pulmones más claros",
-        "body": "Los cilios se recuperan del todo; menos tos e infecciones.",
+        "body": "La tos y los silbidos siguen bajando.",
+        "when": "4 meses",
+        "detail": "Mientras las vías respiratorias sanan y baja la inflamación, la tos y los silbidos siguen disminuyendo en estos meses.",
+        "fact": "Tus pulmones están reconstruyendo activamente su recubrimiento."
+      },
+      "m_5month": {
+        "title": "Fumar se siente ajeno",
+        "body": "Los antojos son raros; el hábito se suelta.",
+        "when": "5 meses",
+        "detail": "Hacia los cinco meses, los antojos son poco frecuentes y fumar empieza a sentirse como algo que solías hacer.",
+        "fact": "Las nuevas rutinas sin fumar ya tomaron el control."
+      },
+      "m_6month": {
+        "title": "Calma bajo estrés",
+        "body": "Manejas el estrés sin un cigarro.",
+        "when": "6 meses",
+        "detail": "Hacia los seis meses mucha gente afronta el estrés sin fumar, y la tos y el moco bajan bastante.",
+        "fact": "Tu respuesta al estrés ya no es la nicotina."
+      },
+      "m_9month": {
+        "title": "Pulmones reconstruidos",
+        "body": "Los cilios se recuperan del todo; menos infecciones.",
         "when": "9 meses",
-        "detail": "Hacia los nueve meses los cilios ya se recuperaron en gran parte, así que los pulmones limpian mejor el moco y te enfermas menos.",
-        "fact": "La limpieza pulmonar vuelve cerca de la de un no fumador."
+        "detail": "Hacia los nueve meses los cilios ya se recuperaron en gran parte, así que tus pulmones limpian bien el moco y te enfermas menos.",
+        "fact": "Los cilios son los pequeños cepillos autolimpiantes de tus pulmones."
       },
-      "heart_1y": {
+      "m_1year": {
         "title": "Corazón más fuerte",
-        "body": "El riesgo cardíaco baja a la mitad que el de quien fuma.",
+        "body": "El riesgo cardíaco es ~la mitad que el de quien fuma.",
         "when": "1 año",
-        "detail": "A un año sin fumar, tu exceso de riesgo de enfermedad coronaria es cerca de la mitad que el de alguien que sigue fumando.",
-        "fact": "Tu riesgo de infarto sigue bajando año tras año."
+        "detail": "A un año sin fumar, tu exceso de riesgo de enfermedad coronaria es cerca de la mitad que el de quien sigue fumando.",
+        "fact": "Tu corazón se vuelve más seguro cada año de aquí en más."
       },
-      "stroke": {
+      "m_18month": {
+        "title": "Firme y libre",
+        "body": "Vivir sin fumar es tu nueva normalidad.",
+        "when": "18 meses",
+        "detail": "Al año y medio, la vida sin fumar ya está bien asentada y tu cuerpo sigue reparándose en silencio.",
+        "fact": "Casi todos los ex fumadores dicen que los antojos ya son sorpresas raras."
+      },
+      "m_2year": {
+        "title": "Corazón casi normal",
+        "body": "El riesgo de infarto sigue acercándose a lo normal.",
+        "when": "2 años",
+        "detail": "Hacia los dos años, el riesgo de infarto sigue bajando hacia el de quien nunca fumó.",
+        "fact": "Dos años es un hito del que pocos recaen."
+      },
+      "m_5year": {
         "title": "Menos riesgo de derrame",
         "body": "El riesgo de derrame baja hacia el de un no fumador.",
         "when": "5 años",
-        "detail": "Hacia los cinco años, el riesgo de accidente cerebrovascular baja bastante, acercándose al de alguien que nunca fumó.",
-        "fact": "Los vasos sanguíneos se ensanchan y coagulan menos en estos años."
+        "detail": "Hacia los cinco años, el riesgo de derrame baja bastante, y el de cánceres de boca, garganta y esófago se reduce casi a la mitad.",
+        "fact": "Los vasos se ensanchan y coagulan menos en estos años."
       },
-      "lung_cancer": {
+      "m_10year": {
         "title": "Menos riesgo de cáncer",
-        "body": "El riesgo de morir por cáncer de pulmón baja a la mitad.",
+        "body": "El riesgo de morir por cáncer de pulmón es ~la mitad.",
         "when": "10 años",
-        "detail": "A los diez años, el riesgo de morir por cáncer de pulmón es aproximadamente la mitad que el de quien sigue fumando.",
-        "fact": "También baja el riesgo de varios otros cánceres."
+        "detail": "A los diez años, el riesgo de morir por cáncer de pulmón es cerca de la mitad que el de quien sigue fumando, y bajan varios otros cánceres.",
+        "fact": "También baja el riesgo de cáncer de laringe y páncreas."
       },
-      "chd": {
+      "m_15year": {
         "title": "Corazón de no fumador",
         "body": "El riesgo cardíaco se acerca al de quien nunca fumó.",
         "when": "15 años",
-        "detail": "Tras quince años sin fumar, el riesgo de enfermedad coronaria se acerca al de una persona que nunca fumó.",
+        "detail": "Tras quince años, el riesgo de enfermedad coronaria se acerca al de una persona que nunca fumó.",
         "fact": "Quince años revierten la mayor parte del riesgo cardiovascular."
+      },
+      "m_20year": {
+        "title": "Círculo completo",
+        "body": "El riesgo de muerte por fumar se acerca a lo normal.",
+        "when": "20 años",
+        "detail": "Hacia los veinte años, el riesgo de muerte por causas ligadas al tabaco se acerca al de quien nunca fumó.",
+        "fact": "Dos décadas después, tu cuerpo recuperó la mayor parte del riesgo."
       }
     }
   },
