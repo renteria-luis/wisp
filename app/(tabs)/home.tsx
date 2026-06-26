@@ -5,10 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SpriteCompanion } from '@/components/companion/SpriteCompanion';
+import { Companion } from '@/components/companion/Companion';
 import { Button } from '@/components/ui/Button';
 import { HeartBurst } from '@/components/ui/HeartBurst';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useVitality } from '@/hooks/useVitality';
 import {
@@ -21,6 +22,7 @@ import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { applyTheme } from '@/theme/appearance';
+import { colors } from '@/theme/tokens';
 import { daysBetween, todayISO } from '@/utils/date';
 
 const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
@@ -37,8 +39,8 @@ export default function Home() {
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
-  const { band } = useVitality();
-  const worn = useCompanion((s) => s.worn);
+  const { score, band } = useVitality();
+  const equipped = useCompanion((s) => s.equipped);
   const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
 
@@ -65,6 +67,11 @@ export default function Home() {
     personal.specialDate === todayISO().slice(5)
       ? personal.easterEggs.specialDateGreeting
       : t('home.subtitle', { companion: companionName });
+
+  const companionColor =
+    cosmeticById(equipped.companion_color ?? '')?.swatch ??
+    colors.primary['400'];
+  const accessoryColor = cosmeticById(equipped.accessory ?? '')?.swatch;
 
   const situationalActive =
     situationalUntil != null &&
@@ -125,7 +132,13 @@ export default function Home() {
           accessibilityRole="image"
           accessibilityLabel={companionName}
         >
-          <SpriteCompanion band={band} worn={worn} size={230} />
+          <Companion
+            vitality={score}
+            band={band}
+            color={companionColor}
+            accessoryColor={accessoryColor}
+            character={equipped.character}
+          />
         </Pressable>
 
         <Text className="mt-8 text-3xl font-bold text-ink dark:text-neutral-50">
