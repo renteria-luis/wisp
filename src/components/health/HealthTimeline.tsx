@@ -1,33 +1,41 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
-import Animated, {
-  cancelAnimation,
-  Easing,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import { Modal, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { ProgressBar } from '@/components/ui/ProgressBar';
 import {
   HEALTH_MILESTONES,
+  HEALTH_PHASES,
+  type HealthMilestone,
+  currentPhaseId,
   milestoneTimeline,
   nextMilestone,
   reachedCount,
 } from '@/engine/health';
 import { colors } from '@/theme/tokens';
+import { formatCountDown, formatCountUp } from '@/utils/duration';
+
+const HOUR_MS = 3_600_000;
+
+/** Re-renders once a second so the counters and countdown stay live. */
+function useNow(intervalMs = 1000): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
 
 type NodeState = 'reached' | 'current' | 'future';
 
-function Check() {
+function Check({ color = colors.neutral['0'] }: { color?: string }) {
   return (
-    <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Svg width={11} height={11} viewBox="0 0 24 24">
       <Path
         d="M5 13 L10 18 L19 6"
-        stroke={colors.neutral['0']}
+        stroke={color}
         strokeWidth={3.5}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -38,45 +46,12 @@ function Check() {
 }
 
 function Node({ state }: { state: NodeState }) {
-  const reduced = useReducedMotion();
-  const pulse = useSharedValue(0);
-
-  useEffect(() => {
-    if (reduced || state !== 'current') return;
-    pulse.value = withRepeat(
-      withTiming(1, { duration: 1600, easing: Easing.out(Easing.ease) }),
-      -1,
-      false,
-    );
-    return () => cancelAnimation(pulse);
-  }, [state, reduced, pulse]);
-
-  const ring = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + pulse.value * 0.8 }],
-    opacity: 0.45 * (1 - pulse.value),
-  }));
-
   return (
-    <View className="h-6 w-6 items-center justify-center">
-      {state === 'current' ? (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              height: 22,
-              width: 22,
-              borderRadius: 999,
-              backgroundColor: colors.accent['400'],
-            },
-            ring,
-          ]}
-        />
-      ) : null}
+    <View className="h-5 w-5 items-center justify-center">
       <View
         style={{
-          height: 22,
-          width: 22,
+          height: 18,
+          width: 18,
           borderRadius: 999,
           alignItems: 'center',
           justifyContent: 'center',
@@ -96,8 +71,8 @@ function Node({ state }: { state: NodeState }) {
         ) : state === 'current' ? (
           <View
             style={{
-              height: 7,
-              width: 7,
+              height: 6,
+              width: 6,
               borderRadius: 999,
               backgroundColor: colors.accent['500'],
             }}
@@ -108,46 +83,27 @@ function Node({ state }: { state: NodeState }) {
   );
 }
 
-function Row({
+function MilestoneRow({
   id,
   state,
-  isFirst,
-  isLast,
+  onPress,
 }: {
   id: string;
   state: NodeState;
-  isFirst: boolean;
-  isLast: boolean;
+  onPress: () => void;
 }) {
   const { t } = useTranslation();
   const done = state !== 'future';
-  const lineTop = state === 'reached' ? colors.primary['400'] : colors.neutral['200'];
-  // the segment below is "done" when the next node is reached/current
   return (
-    <View className="flex-row gap-3">
-      <View className="w-6 items-center">
-        <View
-          style={{
-            width: 2,
-            flex: 1,
-            backgroundColor: isFirst ? 'transparent' : lineTop,
-          }}
-        />
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      className="flex-row gap-3 py-1"
+    >
+      <View className="w-5 items-center pt-0.5">
         <Node state={state} />
-        <View
-          style={{
-            width: 2,
-            flex: 1,
-            backgroundColor: isLast
-              ? 'transparent'
-              : state === 'reached'
-                ? colors.primary['400']
-                : colors.neutral['200'],
-          }}
-        />
       </View>
-
-      <View className="flex-1 pb-5">
+      <View className="flex-1">
         <View className="flex-row items-center justify-between">
           <Text
             className={`text-sm font-semibold ${done ? 'text-ink dark:text-neutral-50' : 'text-ink-mute dark:text-neutral-500'}`}
@@ -164,47 +120,152 @@ function Row({
           {t(`health.milestones.${id}.body`)}
         </Text>
       </View>
+    </Pressable>
+  );
+}
+
+function PhaseSection({
+  phaseId,
+  state,
+  reachedInPhase,
+  total,
+  expanded,
+  onToggle,
+  children,
+}: {
+  phaseId: string;
+  state: 'done' | 'current' | 'locked';
+  reachedInPhase: number;
+  total: number;
+  expanded: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  const badge = state === 'done' ? '✓' : state === 'locked' ? '🔒' : '';
+  return (
+    <View className="border-t border-neutral-100 py-2 dark:border-neutral-800">
+      <Pressable
+        onPress={onToggle}
+        accessibilityRole="button"
+        className="flex-row items-center justify-between py-1"
+      >
+        <View className="flex-1 flex-row items-center gap-2">
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">
+            {expanded ? '▾' : '▸'}
+          </Text>
+          <Text
+            className={`text-sm font-semibold ${state === 'locked' ? 'text-ink-mute dark:text-neutral-500' : 'text-ink dark:text-neutral-50'}`}
+          >
+            {t(`health.phases.${phaseId}`)}
+          </Text>
+          {badge ? <Text className="text-xs">{badge}</Text> : null}
+        </View>
+        <Text className="text-[11px] text-ink-mute dark:text-neutral-400">
+          {reachedInPhase}/{total}
+        </Text>
+      </Pressable>
+      {expanded ? <View className="mt-1 gap-1 pl-1">{children}</View> : null}
     </View>
   );
 }
 
-function durationLabel(
-  t: ReturnType<typeof useTranslation>['t'],
-  hours: number,
-): string {
-  if (hours < 1) return t('health.dur.min', { count: Math.round(hours * 60) });
-  if (hours < 48) return t('health.dur.hour', { count: Math.round(hours) });
-  return t('health.dur.day', { count: Math.round(hours / 24) });
-}
-
-/** The recovery hero: milestones that light up with time SINCE THE LAST cigarette
- *  — it grows while smoke-free and resets when a cigarette is logged. */
-export function HealthTimeline({
-  elapsedHours,
-  overQuota = false,
+function DetailModal({
+  milestone,
+  onClose,
 }: {
-  elapsedHours: number;
-  overQuota?: boolean;
+  milestone: HealthMilestone;
+  onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const reduced = useReducedMotion();
-  const timeline = milestoneTimeline(elapsedHours);
-  const next = nextMilestone(elapsedHours);
-  const reached = reachedCount(elapsedHours);
-  const total = HEALTH_MILESTONES.length;
-  const currentId = next?.milestone.id;
-  const progress = next?.progress ?? 1;
+  const id = milestone.id;
+  return (
+    <Modal transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable
+        onPress={onClose}
+        className="flex-1 items-center justify-center bg-black/40 px-6"
+      >
+        <View className="w-full rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900">
+          <View className="flex-row items-baseline justify-between">
+            <Text className="flex-1 pr-2 text-lg font-bold text-ink dark:text-neutral-50">
+              {t(`health.milestones.${id}.title`)}
+            </Text>
+            <Text className="text-xs text-ink-mute dark:text-neutral-400">
+              {t(`health.milestones.${id}.when`)}
+            </Text>
+          </View>
+          <Text className="mt-2 text-sm leading-5 text-ink-soft dark:text-neutral-300">
+            {t(`health.milestones.${id}.detail`)}
+          </Text>
+          <Text className="mt-3 text-xs leading-4 text-ink-soft dark:text-neutral-300">
+            💡 {t(`health.milestones.${id}.fact`)}
+          </Text>
+          <Text className="mt-3 text-[11px] text-ink-mute dark:text-neutral-400">
+            {t('health.sourceLabel')}: {milestone.source}
+          </Text>
+          <Text className="mt-1 text-[11px] text-ink-mute dark:text-neutral-400">
+            {t('health.disclaimer')}
+          </Text>
+          <Pressable onPress={onClose} className="mt-4 self-end">
+            <Text className="text-sm font-semibold text-primary-600">
+              {t('common.close')}
+            </Text>
+          </Pressable>
+        </View>
+      </Pressable>
+    </Modal>
+  );
+}
 
-  const [trackW, setTrackW] = useState(0);
-  const bar = useSharedValue(0);
+type Props = {
+  recoveryStartMs: number;
+  setbackHours: number;
+  smokeFreeSinceMs: number;
+  overQuota?: boolean;
+};
+
+/** The recovery hero: phased milestones that light up as recovery hours grow,
+ *  a live smoke-free counter and a live countdown to the next milestone. */
+export function HealthTimeline({
+  recoveryStartMs,
+  setbackHours,
+  smokeFreeSinceMs,
+  overQuota = false,
+}: Props) {
+  const { t } = useTranslation();
+  const now = useNow(1000);
+
+  const recoveryHours = Math.max(
+    0,
+    (now - recoveryStartMs) / HOUR_MS - setbackHours,
+  );
+  const smokeFreeSeconds = Math.max(0, (now - smokeFreeSinceMs) / 1000);
+  const timeline = milestoneTimeline(recoveryHours);
+  const reachedById = new Map(timeline.map((m) => [m.milestone.id, m]));
+  const reached = reachedCount(recoveryHours);
+  const total = HEALTH_MILESTONES.length;
+  const next = nextMilestone(recoveryHours);
+  const phaseId = currentPhaseId(recoveryHours);
+  const phaseIndex = HEALTH_PHASES.findIndex((p) => p.id === phaseId);
+  const secondsToNext = next
+    ? Math.max(0, (next.milestone.atHours - recoveryHours) * 3600)
+    : 0;
+
+  const [expanded, setExpanded] = useState<Set<string>>(
+    () => new Set([phaseId]),
+  );
+  const [detailId, setDetailId] = useState<string | null>(null);
+
+  // Keep the current phase open as it advances (without fighting manual toggles).
   useEffect(() => {
-    bar.value = reduced
-      ? progress
-      : withTiming(progress, { duration: 750, easing: Easing.out(Easing.cubic) });
-  }, [progress, reduced, bar]);
-  const barStyle = useAnimatedStyle(() => ({
-    width: trackW * bar.value,
-  }));
+    setExpanded((prev) =>
+      prev.has(phaseId) ? prev : new Set(prev).add(phaseId),
+    );
+  }, [phaseId]);
+
+  const detail = detailId
+    ? HEALTH_MILESTONES.find((m) => m.id === detailId)
+    : null;
 
   return (
     <View className="rounded-2xl border border-neutral-200 bg-neutral-0 p-4 dark:border-neutral-800 dark:bg-neutral-900">
@@ -212,15 +273,15 @@ export function HealthTimeline({
         <Text className="text-base font-semibold text-ink dark:text-neutral-50">
           {t('health.title')}
         </Text>
-        <View className="rounded-full bg-primary-100 px-2.5 py-1">
-          <Text className="text-xs font-semibold text-primary-700">
+        <View className="rounded-full bg-primary-100 px-2.5 py-1 dark:bg-primary-900">
+          <Text className="text-xs font-semibold text-primary-700 dark:text-primary-100">
             {t('health.count', { reached, total })}
           </Text>
         </View>
       </View>
 
       <Text className="mt-1 text-xs text-ink-mute dark:text-neutral-400">
-        {t('health.sinceLast', { time: durationLabel(t, elapsedHours) })}
+        {t('health.sinceLast', { time: formatCountUp(smokeFreeSeconds, t) })}
       </Text>
 
       {overQuota ? (
@@ -232,29 +293,17 @@ export function HealthTimeline({
       {next ? (
         <View className="mt-3 rounded-xl bg-primary-50 p-3 dark:bg-primary-900">
           <View className="flex-row items-center justify-between">
-            <Text className="flex-1 text-xs font-medium text-ink-soft dark:text-neutral-200">
+            <Text className="flex-1 pr-2 text-xs font-medium text-ink-soft dark:text-neutral-200">
               {t('health.towards', {
                 title: t(`health.milestones.${next.milestone.id}.title`),
               })}
             </Text>
             <Text className="text-xs font-bold text-primary-700 dark:text-primary-100">
-              {Math.round(progress * 100)}%
+              {formatCountDown(secondsToNext, t)}
             </Text>
           </View>
-          <View
-            className="mt-2 h-2 overflow-hidden rounded-full bg-primary-100"
-            onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
-          >
-            <Animated.View
-              style={[
-                {
-                  height: 8,
-                  borderRadius: 999,
-                  backgroundColor: colors.primary['500'],
-                },
-                barStyle,
-              ]}
-            />
+          <View className="mt-2">
+            <ProgressBar progress={next.progress} />
           </View>
         </View>
       ) : (
@@ -263,27 +312,57 @@ export function HealthTimeline({
         </Text>
       )}
 
-      <View className="mt-4">
-        {timeline.map((m, i) => (
-          <Row
-            key={m.milestone.id}
-            id={m.milestone.id}
-            state={
-              m.reached
-                ? 'reached'
-                : m.milestone.id === currentId
-                  ? 'current'
-                  : 'future'
-            }
-            isFirst={i === 0}
-            isLast={i === timeline.length - 1}
-          />
-        ))}
+      <View className="mt-3">
+        {HEALTH_PHASES.map((phase, i) => {
+          const reachedInPhase = phase.milestones.filter(
+            (m) => reachedById.get(m.id)?.reached,
+          ).length;
+          const state =
+            i < phaseIndex ? 'done' : i === phaseIndex ? 'current' : 'locked';
+          return (
+            <PhaseSection
+              key={phase.id}
+              phaseId={phase.id}
+              state={state}
+              reachedInPhase={reachedInPhase}
+              total={phase.milestones.length}
+              expanded={expanded.has(phase.id)}
+              onToggle={() =>
+                setExpanded((prev) => {
+                  const set = new Set(prev);
+                  if (set.has(phase.id)) set.delete(phase.id);
+                  else set.add(phase.id);
+                  return set;
+                })
+              }
+            >
+              {phase.milestones.map((m) => {
+                const node: NodeState = reachedById.get(m.id)?.reached
+                  ? 'reached'
+                  : m.id === next?.milestone.id
+                    ? 'current'
+                    : 'future';
+                return (
+                  <MilestoneRow
+                    key={m.id}
+                    id={m.id}
+                    state={node}
+                    onPress={() => setDetailId(m.id)}
+                  />
+                );
+              })}
+            </PhaseSection>
+          );
+        })}
       </View>
 
-      <Text className="text-[11px] leading-4 text-ink-mute dark:text-neutral-400">
+      <Text className="mt-3 text-[11px] leading-4 text-ink-mute dark:text-neutral-400">
         {t('health.disclaimer')}
       </Text>
+
+      {detail ? (
+        <DetailModal milestone={detail} onClose={() => setDetailId(null)} />
+      ) : null}
     </View>
   );
 }

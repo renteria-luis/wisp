@@ -226,64 +226,134 @@
     "disclaimer": "General wellbeing information, not medical advice.",
     "sinceLast": "Smoke-free: {{time}}",
     "setback": "Smoking pauses your recovery — but every fresh start counts. You've got this 💚",
-    "dur": {
-      "min_one": "{{count}} min",
-      "min_other": "{{count}} min",
-      "hour_one": "{{count}} hour",
-      "hour_other": "{{count}} hours",
-      "day_one": "{{count}} day",
-      "day_other": "{{count}} days"
+    "sourceLabel": "Source",
+    "unit": {
+      "s": "{{count}}s",
+      "m": "{{count}}m",
+      "h": "{{count}}h",
+      "d": "{{count}}d",
+      "mo": "{{count}}mo",
+      "y": "{{count}}y"
+    },
+    "phases": {
+      "p1": "First hours",
+      "p2": "First days",
+      "p3": "First weeks",
+      "p4": "First months",
+      "p5": "Long term"
     },
     "milestones": {
       "pulse": {
         "title": "Pulse & pressure",
-        "body": "Your heart rate and blood pressure begin to settle back to normal.",
-        "when": "20 min"
-      },
-      "co": {
-        "title": "Blood oxygen",
-        "body": "Carbon monoxide clears and your blood oxygen returns to normal.",
-        "when": "12 h"
+        "body": "Your heart rate and blood pressure begin to settle toward normal.",
+        "when": "20 min",
+        "detail": "Within about 20 minutes of your last cigarette, the spike in heart rate and blood pressure caused by nicotine starts easing back toward your baseline.",
+        "fact": "Nicotine speeds your heart up by roughly 10–20 beats per minute while you smoke."
       },
       "nicotine": {
-        "title": "Nicotine clears",
-        "body": "Most nicotine has left your body and your mood starts to steady.",
-        "when": "1 day"
+        "title": "Nicotine falling",
+        "body": "Nicotine drops by about half; early cravings may appear.",
+        "when": "2 h",
+        "detail": "Nicotine has a half-life of about 2 hours, so its level in your blood is already dropping — which is also why early cravings tend to show up around now.",
+        "fact": "By 2 hours, roughly half the nicotine from your last cigarette is gone."
+      },
+      "co_half": {
+        "title": "Oxygen rising",
+        "body": "Carbon monoxide halves and more oxygen reaches your body.",
+        "when": "8 h",
+        "detail": "Carbon monoxide from smoke takes the place of oxygen in your red blood cells. By about 8 hours it has roughly halved, so your blood carries more oxygen again.",
+        "fact": "Carbon monoxide is the same gas that comes out of a car's exhaust."
+      },
+      "co_normal": {
+        "title": "Blood near normal",
+        "body": "Carbon monoxide clears and blood-oxygen returns to normal.",
+        "when": "12 h",
+        "detail": "By around 12 hours smoke-free, carbon monoxide has largely cleared and your blood-oxygen level is back to normal.",
+        "fact": "More oxygen means less of that mid-afternoon sluggishness."
+      },
+      "heart_24h": {
+        "title": "Heart eases",
+        "body": "Your risk of a heart attack already begins to fall.",
+        "when": "1 day",
+        "detail": "After a full day, the strain smoking puts on your heart begins to lift and heart-attack risk starts to decline. Withdrawal can also peak around now — it passes.",
+        "fact": "Even one smoke-free day measurably lowers strain on your heart."
       },
       "senses": {
         "title": "Taste & smell",
-        "body": "Nerve endings recover, so food tastes and smells better.",
-        "when": "2 days"
+        "body": "Nerve endings start to regrow; food tastes and smells better.",
+        "when": "2 days",
+        "detail": "Around 48 hours, nerve endings damaged by smoking begin regrowing, and your senses of taste and smell noticeably sharpen.",
+        "fact": "Many people say food 'comes alive' again around day two."
       },
       "breathing": {
         "title": "Easier breathing",
-        "body": "Your bronchial tubes relax and your energy lifts.",
-        "when": "3 days"
+        "body": "Bronchial tubes relax and your energy lifts.",
+        "when": "3 days",
+        "detail": "By about 72 hours the bronchial tubes relax, breathing feels easier and energy rises — even as the last of the acute withdrawal fades.",
+        "fact": "Your body is essentially nicotine-free by this point."
       },
       "circulation": {
         "title": "Circulation",
         "body": "Circulation improves and moving around feels easier.",
-        "when": "2 weeks"
+        "when": "2 weeks",
+        "detail": "Over the first couple of weeks, circulation improves and lung function starts to climb, so walking and exercise feel easier.",
+        "fact": "Better circulation also helps wounds heal faster."
+      },
+      "withdrawal": {
+        "title": "Mind settles",
+        "body": "The strongest withdrawal symptoms ease off.",
+        "when": "1 month",
+        "detail": "Most acute withdrawal — irritability, restlessness, low mood — peaks in the first week and largely settles within three to four weeks.",
+        "fact": "Cravings become shorter and less frequent from here on."
       },
       "lungs": {
         "title": "Cleaner lungs",
-        "body": "Cilia regrow, so you cough less and feel less short of breath.",
-        "when": "1 month"
+        "body": "Tiny lung hairs recover, so you cough less.",
+        "when": "1 month",
+        "detail": "By around a month, the cilia (tiny hairs that clear the lungs) start working again, reducing coughing and shortness of breath.",
+        "fact": "Cilia are your lungs' built-in self-cleaning system."
       },
-      "lungFunction": {
+      "lung_function": {
         "title": "Lung capacity",
-        "body": "Your lung function keeps climbing noticeably.",
-        "when": "3 months"
+        "body": "Lung function keeps climbing noticeably.",
+        "when": "3 months",
+        "detail": "Across the first one to three months, lung function improves substantially as airways heal and inflammation falls.",
+        "fact": "Climbing stairs gets noticeably easier around now."
       },
-      "heart": {
+      "cilia": {
+        "title": "Clearer lungs",
+        "body": "Cilia fully recover; less coughing and infection.",
+        "when": "9 months",
+        "detail": "By about nine months the cilia have largely recovered, so the lungs clear mucus better and you catch fewer infections.",
+        "fact": "Lung cleaning returns close to that of a non-smoker."
+      },
+      "heart_1y": {
         "title": "Stronger heart",
-        "body": "Your risk of heart disease is now about half that of a smoker.",
-        "when": "1 year"
+        "body": "Heart-disease risk is about half that of a smoker.",
+        "when": "1 year",
+        "detail": "One year smoke-free, your excess risk of coronary heart disease is about half that of someone who still smokes.",
+        "fact": "Your heart-attack risk keeps falling year after year."
       },
-      "lungCancer": {
-        "title": "Lower risk",
-        "body": "Your risk of lung cancer drops to about half that of a smoker.",
-        "when": "10 years"
+      "stroke": {
+        "title": "Lower stroke risk",
+        "body": "Stroke risk falls toward that of a non-smoker.",
+        "when": "5 years",
+        "detail": "Within about five years, the risk of stroke drops substantially, approaching that of a person who never smoked.",
+        "fact": "Blood vessels widen and clot less easily over these years."
+      },
+      "lung_cancer": {
+        "title": "Lower cancer risk",
+        "body": "Lung-cancer death risk is about half that of a smoker.",
+        "when": "10 years",
+        "detail": "By ten years, the risk of dying from lung cancer is roughly half that of someone who keeps smoking.",
+        "fact": "Risk of several other cancers falls too."
+      },
+      "chd": {
+        "title": "Heart like a non-smoker",
+        "body": "Heart-disease risk nears that of someone who never smoked.",
+        "when": "15 years",
+        "detail": "After fifteen years smoke-free, the risk of coronary heart disease is close to that of a person who never smoked.",
+        "fact": "Fifteen years undoes most of the cardiovascular risk."
       }
     }
   },

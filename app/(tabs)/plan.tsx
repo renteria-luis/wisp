@@ -33,7 +33,7 @@ export default function Plan() {
   const dayIndex = Math.max(0, daysBetween(plan.startDate, todayISO()));
   const upcoming = plan.allowances.slice(dayIndex, dayIndex + 7);
   const journeyPct = Math.min(1, (dayIndex + 1) / plan.nDays);
-  const next = nextMilestone(data.smokeFreeHours);
+  const next = nextMilestone(data.recoveryHours);
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>

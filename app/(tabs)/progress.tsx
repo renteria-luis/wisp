@@ -91,7 +91,9 @@ export default function Progress() {
         </Text>
 
         <HealthTimeline
-          elapsedHours={data.smokeFreeHours}
+          recoveryStartMs={data.recoveryStartMs}
+          setbackHours={data.setbackHours}
+          smokeFreeSinceMs={data.smokeFreeSinceMs}
           overQuota={data.overQuota}
         />
 

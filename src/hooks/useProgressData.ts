@@ -12,6 +12,7 @@ import {
   recommendReplan,
   type ReplanRecommendation,
 } from '@/engine/adherence';
+import { totalSetbackHours } from '@/engine/health';
 import { cigarettesAvoided, moneySaved, savingsSeries } from '@/engine/savings';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
@@ -33,9 +34,14 @@ export interface ProgressData {
   saved: number;
   /** Cumulative money saved per day — powers the savings sparkline. */
   savedSeries: number[];
-  /** Hours since the last logged cigarette (or plan start if none). Drives the
-   *  recovery timeline: grows while smoke-free, resets to ~0 on a new log. */
-  smokeFreeHours: number;
+  /** Anchor (ms) for the live smoke-free count-up: last cigarette, or plan start. */
+  smokeFreeSinceMs: number;
+  /** Anchor (ms) for recovery progress (plan start). */
+  recoveryStartMs: number;
+  /** Recovery hours lost to slips so far (deterministic from the daily counts). */
+  setbackHours: number;
+  /** Snapshot recovery hours = elapsed since plan start − setbacks (≥ 0). */
+  recoveryHours: number;
   /** True when the 7-day trend is above today's allowance (gentle setback). */
   overQuota: boolean;
   recommendation: ReplanRecommendation;
@@ -94,12 +100,17 @@ export function useProgressData(): ProgressData {
   return useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];
     const baseline = plan?.baseline ?? 0;
-    const anchorMs = lastCigaretteAt
+    const recoveryStartMs = plan
+      ? new Date(plan.startDate).getTime()
+      : Date.now();
+    const smokeFreeSinceMs = lastCigaretteAt
       ? new Date(lastCigaretteAt).getTime()
-      : plan
-        ? new Date(plan.startDate).getTime()
-        : Date.now();
-    const smokeFreeHours = Math.max(0, (Date.now() - anchorMs) / 3_600_000);
+      : recoveryStartMs;
+    const setbackHours = totalSetbackHours(actual, allowances);
+    const recoveryHours = Math.max(
+      0,
+      (Date.now() - recoveryStartMs) / 3_600_000 - setbackHours,
+    );
     const trend = currentTrend(actual);
     const todayAllowance = allowances.length
       ? (allowances[allowances.length - 1] ?? 0)
@@ -126,7 +137,10 @@ export function useProgressData(): ProgressData {
         packPrice: pricing.packPrice,
         cigsPerPack: pricing.cigsPerPack,
       }),
-      smokeFreeHours,
+      smokeFreeSinceMs,
+      recoveryStartMs,
+      setbackHours,
+      recoveryHours,
       overQuota: trend > todayAllowance + 0.001,
       recommendation: recommendReplan({ actual, allowances }),
     };
