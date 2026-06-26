@@ -168,6 +168,12 @@
     "sourceLabel": "Where was it from?",
     "mine": "My own",
     "gifted": "Someone gave it",
+    "whenLabel": "When was it?",
+    "now": "Now",
+    "hourAgo": "1h ago",
+    "minAgo": "{{count}}m ago",
+    "customAgo": "Or how many minutes ago",
+    "minutes": "min",
     "intensityLabel": "How strong was it?",
     "save": "Save"
   },
@@ -189,7 +195,11 @@
     "accelTitle": "You're ahead 🌿",
     "accelBody": "You've been comfortably under target. Want to finish a little sooner?",
     "easeCta": "Adjust my plan",
-    "accelCta": "Speed up"
+    "accelCta": "Speed up",
+    "confirmEaseTitle": "Ease the pace?",
+    "confirmEaseBody": "We'll rebuild your plan at a gentler pace: your daily targets drop more slowly and your smoke-free date moves later. This can't be undone.",
+    "confirmAccelTitle": "Speed up?",
+    "confirmAccelBody": "We'll rebuild your plan to finish sooner: your daily targets drop faster and your smoke-free date moves earlier. This can't be undone."
   },
   "goals": {
     "coffee": "a coffee",

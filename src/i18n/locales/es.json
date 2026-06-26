@@ -168,6 +168,12 @@
     "sourceLabel": "¿De dónde salió?",
     "mine": "Mío",
     "gifted": "Me lo regalaron",
+    "whenLabel": "¿Cuándo fue?",
+    "now": "Ahora",
+    "hourAgo": "Hace 1h",
+    "minAgo": "Hace {{count}}m",
+    "customAgo": "O hace cuántos minutos",
+    "minutes": "min",
     "intensityLabel": "¿Qué tan fuerte fue?",
     "save": "Guardar"
   },
@@ -189,7 +195,11 @@
     "accelTitle": "Vas adelantada 🌿",
     "accelBody": "Has estado cómodamente por debajo de la meta. ¿Quieres terminar un poco antes?",
     "easeCta": "Ajustar mi plan",
-    "accelCta": "Acelerar"
+    "accelCta": "Acelerar",
+    "confirmEaseTitle": "¿Bajar el ritmo?",
+    "confirmEaseBody": "Reconstruiremos tu plan a un ritmo más suave: tu meta diaria baja más lento y tu fecha sin fumar se mueve más adelante. No se puede deshacer.",
+    "confirmAccelTitle": "¿Acelerar?",
+    "confirmAccelBody": "Reconstruiremos tu plan para terminar antes: tu meta diaria baja más rápido y tu fecha sin fumar se adelanta. No se puede deshacer."
   },
   "goals": {
     "coffee": "un café",

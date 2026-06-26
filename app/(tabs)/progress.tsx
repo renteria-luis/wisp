@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Sparkline } from '@/components/charts/Sparkline';
@@ -16,20 +16,11 @@ import {
   rebuildReductionPlan,
 } from '@/engine/planEngine';
 import { useProgressData } from '@/hooks/useProgressData';
+import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
-import { sortByPrice, useWishlist } from '@/store/useWishlist';
 import { todayISO } from '@/utils/date';
-
-/** "What you could buy instead" goals, cheapest → priciest (§6.8). */
-const SAVINGS_GOALS = [
-  { key: 'coffee', price: 5 },
-  { key: 'lunch', price: 15 },
-  { key: 'movie', price: 30 },
-  { key: 'dinner', price: 60 },
-  { key: 'getaway', price: 250 },
-] as const;
 
 function Stat({ value, label }: { value: number | string; label: string }) {
   return (
@@ -49,7 +40,7 @@ export default function Progress() {
   const currency = useSettings((s) => s.pricing.currency);
   const seenEggs = useSettings((s) => s.seenEggs);
   const markEggSeen = useSettings((s) => s.markEggSeen);
-  const wishItems = useWishlist((s) => s.items);
+  const { nextGoal } = useSavingsGoals(data.saved);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -66,22 +57,6 @@ export default function Progress() {
   const savingsEgg =
     data.saved >= (personal.specialNumber ?? 100) &&
     !seenEggs.includes('savings');
-  // Wishlist drives the savings goals; fall back to the suggested defaults when
-  // the user hasn't added anything yet. Sorted cheapest → priciest.
-  const goals = wishItems.length
-    ? sortByPrice(wishItems).map((i) => ({
-        key: i.id,
-        name: i.name,
-        price: i.price,
-      }))
-    : SAVINGS_GOALS.map((g) => ({
-        key: g.key,
-        name: t(`goals.${g.key}`),
-        price: g.price,
-      }));
-  const nextGoal = goals.find((g) => g.price > data.saved);
-  const goalPct = nextGoal ? Math.min(1, data.saved / nextGoal.price) : 1;
-
   const applyReplan = () => {
     if (replan.action === 'hold') return;
     setPlan(
@@ -92,6 +67,19 @@ export default function Progress() {
         durationFactor:
           replan.action === 'ease' ? EASE_FACTOR : ACCELERATE_FACTOR,
       }),
+    );
+  };
+
+  // Re-planning rewrites the schedule and can't be undone — confirm first (§9).
+  const onReplanPress = () => {
+    const isEase = replan.action === 'ease';
+    Alert.alert(
+      isEase ? t('progress.confirmEaseTitle') : t('progress.confirmAccelTitle'),
+      isEase ? t('progress.confirmEaseBody') : t('progress.confirmAccelBody'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.confirm'), onPress: applyReplan },
+      ],
     );
   };
 
@@ -165,11 +153,11 @@ export default function Progress() {
                     {t('progress.nextGoal', { goal: nextGoal.name })}
                   </Text>
                   <Text className="text-xs text-ink-mute dark:text-neutral-400">
-                    {Math.round(goalPct * 100)}%
+                    {Math.round(nextGoal.pct * 100)}%
                   </Text>
                 </View>
                 <View className="mt-1">
-                  <ProgressBar progress={goalPct} />
+                  <ProgressBar progress={nextGoal.pct} />
                 </View>
               </>
             ) : null}
@@ -221,7 +209,7 @@ export default function Progress() {
                   : t('progress.accelCta')
               }
               variant="secondary"
-              onPress={applyReplan}
+              onPress={onReplanPress}
             />
           </Card>
         ) : null}

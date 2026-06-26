@@ -19,6 +19,8 @@ interface LogInput {
   shared?: boolean;
   /** Someone gave it (gifted) → no money impact. */
   gifted?: boolean;
+  /** ISO timestamp the cigarette was smoked (defaults to now). */
+  timestamp?: string;
 }
 
 interface LogsState {
@@ -65,6 +67,7 @@ export const useLogs = create<LogsState>((set, get) => ({
       note: input?.note,
       shared: input?.shared,
       gifted: input?.gifted,
+      timestamp: input?.timestamp,
     });
     await get().refreshToday();
   },

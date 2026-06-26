@@ -6,6 +6,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
@@ -23,6 +24,8 @@ const CATEGORIES: TriggerCategory[] = [
   'coffee',
 ];
 
+const AGO_OPTIONS = [0, 5, 10, 20, 60];
+
 type Mode = 'smoked' | 'resisted';
 
 export default function Log() {
@@ -37,6 +40,8 @@ export default function Log() {
   // Manner + source default to the full-impact case: own cigarette, whole.
   const [shared, setShared] = useState(false);
   const [gifted, setGifted] = useState(false);
+  // How long ago it was smoked (minutes); 0 = now (the default).
+  const [minutesAgo, setMinutesAgo] = useState(0);
   const [saving, setSaving] = useState(false);
 
   const onSave = async () => {
@@ -44,7 +49,15 @@ export default function Log() {
     setSaving(true);
     try {
       if (mode === 'smoked') {
-        await logCigarette({ trigger: trigger ?? undefined, shared, gifted });
+        await logCigarette({
+          trigger: trigger ?? undefined,
+          shared,
+          gifted,
+          timestamp:
+            minutesAgo > 0
+              ? new Date(Date.now() - minutesAgo * 60_000).toISOString()
+              : undefined,
+        });
       } else {
         await logResisted({ trigger: trigger ?? undefined, intensity });
         await useEconomy
@@ -142,6 +155,36 @@ export default function Log() {
                   label={t('log.gifted')}
                   selected={gifted}
                   onPress={() => setGifted(true)}
+                />
+              </View>
+            </View>
+
+            <View>
+              <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
+                {t('log.whenLabel')}
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {AGO_OPTIONS.map((m) => (
+                  <OptionChip
+                    key={m}
+                    label={
+                      m === 0
+                        ? t('log.now')
+                        : m === 60
+                          ? t('log.hourAgo')
+                          : t('log.minAgo', { count: m })
+                    }
+                    selected={minutesAgo === m}
+                    onPress={() => setMinutesAgo(m)}
+                  />
+                ))}
+              </View>
+              <View className="mt-3">
+                <NumberField
+                  label={t('log.customAgo')}
+                  value={minutesAgo || null}
+                  onChange={(v) => setMinutesAgo(v ?? 0)}
+                  suffix={t('log.minutes')}
                 />
               </View>
             </View>

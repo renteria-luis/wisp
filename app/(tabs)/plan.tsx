@@ -10,6 +10,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { nextMilestone } from '@/engine/health';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useProgressData } from '@/hooks/useProgressData';
+import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { daysBetween, formatMedium, todayISO } from '@/utils/date';
@@ -20,6 +21,7 @@ export default function Plan() {
   const plan = usePlan((s) => s.plan);
   const currency = useSettings((s) => s.pricing.currency);
   const data = useProgressData();
+  const { goals } = useSavingsGoals(data.saved);
 
   if (!plan) {
     return (
@@ -97,24 +99,44 @@ export default function Plan() {
           </Card>
         )}
 
-        {/* Savings so far → wishlist */}
-        <Pressable onPress={() => router.push('/wishlist')}>
-          <Card>
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-sm text-ink-soft dark:text-neutral-300">
-                  {t('plan.savedSoFar')}
+        {/* Savings so far + wishlist preview */}
+        <Card>
+          <Text className="text-sm text-ink-soft dark:text-neutral-300">
+            {t('plan.savedSoFar')}
+          </Text>
+          <Text className="mt-1 text-3xl font-bold text-ink dark:text-neutral-50">
+            {data.saved.toFixed(2)} {currency}
+          </Text>
+          {goals.slice(0, 3).map((g) => (
+            <View key={g.key} className="mt-3">
+              <View className="flex-row items-center justify-between">
+                <Text
+                  numberOfLines={1}
+                  className="flex-1 pr-2 text-xs text-ink-soft dark:text-neutral-300"
+                >
+                  {g.name}
                 </Text>
-                <Text className="mt-1 text-3xl font-bold text-ink dark:text-neutral-50">
-                  {data.saved.toFixed(2)} {currency}
+                <Text
+                  className={`text-xs ${g.reached ? 'font-bold text-primary-600' : 'text-ink-mute dark:text-neutral-400'}`}
+                >
+                  {g.reached ? t('wishlist.reached') : `${Math.round(g.pct * 100)}%`}
                 </Text>
               </View>
-              <Text className="text-sm font-semibold text-primary-600">
-                {t('progress.wishlistLink')}
-              </Text>
+              <View className="mt-1">
+                <ProgressBar progress={g.pct} />
+              </View>
             </View>
-          </Card>
-        </Pressable>
+          ))}
+          <Pressable
+            onPress={() => router.push('/wishlist')}
+            accessibilityRole="button"
+            className="mt-3 self-start"
+          >
+            <Text className="text-sm font-semibold text-primary-600">
+              {t('progress.wishlistLink')}
+            </Text>
+          </Pressable>
+        </Card>
 
         {/* Next recovery milestone */}
         {next ? (
