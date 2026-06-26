@@ -1,71 +1,66 @@
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Companion } from '@/components/companion/Companion';
-import { CharacterIcon } from '@/components/companion/characters';
+import { SpriteCompanion } from '@/components/companion/SpriteCompanion';
+import {
+  SPRITE_ACCESSORIES,
+  toggleWornId,
+  type SpriteAccessory,
+} from '@/components/companion/sprites';
 import { Button } from '@/components/ui/Button';
-import { COSMETICS, cosmeticById, dailyRotation } from '@/engine/cosmetics';
 import { useVitality } from '@/hooks/useVitality';
 import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { useEconomy } from '@/store/useEconomy';
-import { colors } from '@/theme/tokens';
-import type { Cosmetic } from '@/types/domain';
-import { todayISO } from '@/utils/date';
 
-function CosmeticTile({
-  cosmetic,
+function AccessoryTile({
+  accessory,
   owned,
-  equipped,
-  previewing,
+  worn,
+  affordable,
   onPress,
 }: {
-  cosmetic: Cosmetic;
+  accessory: SpriteAccessory;
   owned: boolean;
-  equipped: boolean;
-  previewing: boolean;
-  onPress: (c: Cosmetic) => void;
+  worn: boolean;
+  affordable: boolean;
+  onPress: (a: SpriteAccessory) => void;
 }) {
   const { t } = useTranslation();
   return (
     <Pressable
-      onPress={() => onPress(cosmetic)}
+      onPress={() => onPress(accessory)}
       accessibilityRole="button"
-      className={`w-[30%] items-center rounded-2xl border bg-neutral-0 dark:bg-neutral-900 p-3 ${
-        equipped
-          ? 'border-primary-500'
-          : previewing
-            ? 'border-accent-400'
-            : 'border-neutral-200 dark:border-neutral-800'
+      className={`w-[30%] items-center rounded-2xl border bg-neutral-0 p-3 dark:bg-neutral-900 ${
+        worn ? 'border-primary-500' : 'border-neutral-200 dark:border-neutral-800'
       }`}
     >
-      {cosmetic.type === 'character' ? (
-        <CharacterIcon id={cosmetic.id} color={cosmetic.swatch} size={48} />
-      ) : (
-        <View
-          style={{ backgroundColor: cosmetic.swatch }}
-          className="h-12 w-12 rounded-full"
-        />
-      )}
-      <Text className="mt-2 text-[11px] text-ink-mute dark:text-neutral-400">
-        {cosmetic.type === 'character'
-          ? t(`character.${cosmetic.id}`)
-          : t(`cosmeticType.${cosmetic.type}`)}
+      <Image
+        source={accessory.art}
+        resizeMode="contain"
+        style={{ height: 56, width: 56 }}
+      />
+      <Text className="mt-1 text-[11px] text-ink-mute dark:text-neutral-400">
+        {t(`wear.${accessory.id}`)}
       </Text>
-      {equipped ? (
+      {worn ? (
         <Text className="text-xs font-semibold text-primary-600">
-          {t('space.equipped')}
+          {t('space.worn')}
         </Text>
       ) : owned ? (
         <Text className="text-xs font-medium text-ink-soft dark:text-neutral-300">
           {t('space.owned')}
         </Text>
       ) : (
-        <Text className="text-xs font-semibold text-ink dark:text-neutral-50">{cosmetic.price}</Text>
+        <Text
+          className={`text-xs font-semibold ${affordable ? 'text-ink dark:text-neutral-50' : 'text-ink-mute dark:text-neutral-400'}`}
+        >
+          {accessory.price}
+        </Text>
       )}
     </Pressable>
   );
@@ -74,17 +69,16 @@ function CosmeticTile({
 export default function Space() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { score, band } = useVitality();
+  const { band } = useVitality();
   const balance = useEconomy((s) => s.balance);
   const pending = useEconomy((s) => s.pending);
   const spend = useEconomy((s) => s.spend);
   const claim = useEconomy((s) => s.claim);
   const owned = useCompanion((s) => s.owned);
-  const equipped = useCompanion((s) => s.equipped);
   const add = useCompanion((s) => s.add);
-  const equip = useCompanion((s) => s.equip);
+  const worn = useCompanion((s) => s.worn);
+  const setWorn = useCompanion((s) => s.setWorn);
 
-  const [preview, setPreview] = useState<Cosmetic | null>(null);
   const [showHidden, setShowHidden] = useState(false);
 
   // Hidden God-mode trigger: 7 quick taps on the balance (dev builds only).
@@ -101,57 +95,29 @@ export default function Space() {
     }
   };
 
-  const equippedColor =
-    cosmeticById(equipped.companion_color ?? '')?.swatch ??
-    colors.primary['400'];
-  const equippedAccessory = cosmeticById(equipped.accessory ?? '')?.swatch;
-
-  const shownColor =
-    preview?.type === 'companion_color' ? preview.swatch : equippedColor;
-  const shownAccessory =
-    preview?.type === 'accessory' ? preview.swatch : equippedAccessory;
-  const shownCharacter =
-    preview?.type === 'character' ? preview.id : equipped.character;
-
-  const rotation = useMemo(() => dailyRotation(todayISO()), []);
-
   const onClaim = async () => {
     const amount = await claim();
     if (amount > 0)
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
-  const onPreview = (c: Cosmetic) => {
-    setPreview(c);
-    void Haptics.selectionAsync();
-  };
-
-  const onConfirmPreview = async () => {
-    if (!preview) return;
-    if (owned.includes(preview.id)) {
-      equip(preview);
+  const onAccessory = async (a: SpriteAccessory) => {
+    if (owned.includes(a.id)) {
+      setWorn(toggleWornId(worn, a.id));
       void Haptics.selectionAsync();
-      setPreview(null);
       return;
     }
-    if (balance >= preview.price) {
-      const ok = await spend(preview.price);
+    if (balance >= a.price) {
+      const ok = await spend(a.price);
       if (ok) {
-        add(preview.id);
-        equip(preview);
-        void Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
-        setPreview(null);
+        add(a.id);
+        setWorn(toggleWornId(worn, a.id));
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } else {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
   };
-
-  const isEquipped = (c: Cosmetic) => equipped[c.type] === c.id;
-  const previewOwned = preview ? owned.includes(preview.id) : false;
-  const canAfford = preview ? balance >= preview.price : false;
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
@@ -167,14 +133,9 @@ export default function Space() {
             <Text className="text-xl">⚙️</Text>
           </Pressable>
         </View>
+
         <View className="items-center">
-          <Companion
-            vitality={score}
-            band={band}
-            color={shownColor}
-            accessoryColor={shownAccessory}
-            character={shownCharacter}
-          />
+          <SpriteCompanion band={band} worn={worn} size={220} />
         </View>
 
         <Pressable
@@ -188,9 +149,11 @@ export default function Space() {
         </Pressable>
 
         {pending > 0 ? (
-          <View className="flex-row items-center justify-between rounded-2xl border border-accent-300 bg-accent-50 dark:bg-accent-900 px-4 py-3">
+          <View className="flex-row items-center justify-between rounded-2xl border border-accent-300 bg-accent-50 px-4 py-3 dark:bg-accent-900">
             <View>
-              <Text className="text-xs text-ink-mute dark:text-neutral-400">{t('space.earned')}</Text>
+              <Text className="text-xs text-ink-mute dark:text-neutral-400">
+                {t('space.earned')}
+              </Text>
               <Text className="text-lg font-bold text-accent-700">
                 {t('space.pending', { count: pending })}
               </Text>
@@ -201,74 +164,18 @@ export default function Space() {
           </View>
         ) : null}
 
-        {preview ? (
-          <View className="gap-2 rounded-2xl border border-accent-300 bg-neutral-0 dark:bg-neutral-900 p-3">
-            <View className="flex-row items-center gap-3">
-              {preview.type === 'character' ? (
-                <CharacterIcon id={preview.id} color={preview.swatch} size={32} />
-              ) : (
-                <View
-                  style={{ backgroundColor: preview.swatch }}
-                  className="h-8 w-8 rounded-full"
-                />
-              )}
-              <Text className="flex-1 text-sm font-medium text-ink dark:text-neutral-50">
-                {preview.type === 'character'
-                  ? t(`character.${preview.id}`)
-                  : t(`cosmeticType.${preview.type}`)}
-              </Text>
-              <Pressable onPress={() => setPreview(null)} className="px-2 py-1">
-                <Text className="text-sm text-ink-mute dark:text-neutral-400">
-                  {t('common.close')}
-                </Text>
-              </Pressable>
-            </View>
-            {previewOwned ? (
-              <Button label={t('space.equip')} onPress={onConfirmPreview} />
-            ) : canAfford ? (
-              <Button
-                label={t('space.buyFor', { count: preview.price })}
-                onPress={onConfirmPreview}
-              />
-            ) : (
-              <Button
-                label={t('space.need', { count: preview.price })}
-                variant="secondary"
-                onPress={onConfirmPreview}
-                disabled
-              />
-            )}
-          </View>
-        ) : null}
-
         <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
-          {t('space.dailyToday')}
+          {t('space.dressUp')}
         </Text>
         <View className="flex-row flex-wrap gap-3">
-          {rotation.map((c) => (
-            <CosmeticTile
-              key={c.id}
-              cosmetic={c}
-              owned={owned.includes(c.id)}
-              equipped={isEquipped(c)}
-              previewing={preview?.id === c.id}
-              onPress={onPreview}
-            />
-          ))}
-        </View>
-
-        <Text className="mt-2 text-sm font-semibold text-ink dark:text-neutral-50">
-          {t('space.shop')}
-        </Text>
-        <View className="flex-row flex-wrap gap-3">
-          {COSMETICS.map((c) => (
-            <CosmeticTile
-              key={c.id}
-              cosmetic={c}
-              owned={owned.includes(c.id)}
-              equipped={isEquipped(c)}
-              previewing={preview?.id === c.id}
-              onPress={onPreview}
+          {SPRITE_ACCESSORIES.map((a) => (
+            <AccessoryTile
+              key={a.id}
+              accessory={a}
+              owned={owned.includes(a.id)}
+              worn={worn.includes(a.id)}
+              affordable={balance >= a.price}
+              onPress={onAccessory}
             />
           ))}
         </View>

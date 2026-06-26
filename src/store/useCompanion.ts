@@ -14,9 +14,12 @@ interface CompanionState {
   owned: string[];
   /** Equipped cosmetic id per slot. */
   equipped: Partial<Record<CosmeticType, string>>;
+  /** Equipped sprite-accessory ids worn on the illustrated companion. */
+  worn: string[];
   isOwned: (id: string) => boolean;
   add: (id: string) => void;
   equip: (cosmetic: Cosmetic) => void;
+  setWorn: (worn: string[]) => void;
   reset: () => void;
 }
 
@@ -26,6 +29,7 @@ const initial = {
     companion_color: DEFAULT_COLOR_ID,
     character: DEFAULT_CHARACTER_ID,
   } as Partial<Record<CosmeticType, string>>,
+  worn: [] as string[],
 };
 
 export const useCompanion = create<CompanionState>()(
@@ -39,6 +43,7 @@ export const useCompanion = create<CompanionState>()(
         set((s) => ({
           equipped: { ...s.equipped, [cosmetic.type]: cosmetic.id },
         })),
+      setWorn: (worn) => set({ worn }),
       reset: () => set({ ...initial }),
     }),
     {
@@ -66,7 +71,11 @@ export const useCompanion = create<CompanionState>()(
         }
         return s as CompanionState;
       },
-      partialize: (s) => ({ owned: s.owned, equipped: s.equipped }),
+      partialize: (s) => ({
+        owned: s.owned,
+        equipped: s.equipped,
+        worn: s.worn,
+      }),
     },
   ),
 );

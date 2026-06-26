@@ -289,7 +289,14 @@
     "dailyToday": "Today's picks",
     "shop": "Shop",
     "owned": "Owned",
-    "equipped": "Equipped"
+    "equipped": "Equipped",
+    "dressUp": "Dress up",
+    "worn": "Wearing"
+  },
+  "wear": {
+    "spr_beanie": "Beanie",
+    "spr_bow": "Bow",
+    "spr_hoodie": "Hoodie"
   },
   "cosmeticType": {
     "companion_color": "Color",

@@ -47,3 +47,6 @@ example
 # generated native folders
 /ios
 /android
+
+# raw source art (originals live here; only optimized copies in assets/ ship)
+images_gitignore/
