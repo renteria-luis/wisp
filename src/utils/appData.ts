@@ -56,6 +56,7 @@ export function collectAppState(): Record<string, unknown> {
     companion: { owned: companion.owned, equipped: companion.equipped },
     economy: { balance: economy.balance, pending: economy.pending },
     wishlist: useWishlist.getState().items,
+    purchased: useWishlist.getState().purchased,
   };
 }
 

@@ -190,6 +190,7 @@
     "legendTarget": "Target",
     "nextGoal": "Toward {{goal}}",
     "wishlistLink": "My wishlist ›",
+    "treatedTitle": "What you've treated yourself to",
     "easeTitle": "Let's ease the pace",
     "easeBody": "The last few days ran a little high — and that's okay. We can stretch the plan to a gentler pace.",
     "accelTitle": "You're ahead 🌿",
@@ -216,7 +217,11 @@
     "itemPrice": "How much does it cost?",
     "add": "Add to wishlist",
     "empty": "Nothing yet — add your first goal above.",
-    "reached": "Reached! 🎉"
+    "reached": "Reached! 🎉",
+    "note": "Note (optional)",
+    "notePlaceholder": "Why it matters to you…",
+    "bought": "I bought it 🎁",
+    "treatedTitle": "Things I treated myself to"
   },
   "health": {
     "title": "Your recovery",

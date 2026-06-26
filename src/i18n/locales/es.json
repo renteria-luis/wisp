@@ -190,6 +190,7 @@
     "legendTarget": "Meta",
     "nextGoal": "Hacia {{goal}}",
     "wishlistLink": "Mi lista de deseos ›",
+    "treatedTitle": "Lo que te has dado de gusto",
     "easeTitle": "Bajemos el ritmo",
     "easeBody": "Los últimos días fueron un poco altos, y está bien. Podemos extender el plan a un ritmo más amable.",
     "accelTitle": "Vas adelantada 🌿",
@@ -216,7 +217,11 @@
     "itemPrice": "¿Cuánto cuesta?",
     "add": "Agregar a la lista",
     "empty": "Aún nada — agrega tu primera meta arriba.",
-    "reached": "¡Alcanzado! 🎉"
+    "reached": "¡Alcanzado! 🎉",
+    "note": "Nota (opcional)",
+    "notePlaceholder": "Por qué te importa…",
+    "bought": "Lo compré 🎁",
+    "treatedTitle": "Gustos que me di"
   },
   "health": {
     "title": "Tu recuperación",

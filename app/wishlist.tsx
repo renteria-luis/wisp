@@ -18,28 +18,33 @@ import { useProgressData } from '@/hooks/useProgressData';
 import { useSettings } from '@/store/useSettings';
 import { sortByPrice, useWishlist } from '@/store/useWishlist';
 import { colors } from '@/theme/tokens';
+import { formatMedium } from '@/utils/date';
 
 /** Manage the "save up for" wishlist; each item fills as smoke-free savings grow. */
 export default function Wishlist() {
   const router = useRouter();
   const { t } = useTranslation();
   const items = useWishlist((s) => s.items);
+  const purchased = useWishlist((s) => s.purchased);
   const add = useWishlist((s) => s.add);
   const remove = useWishlist((s) => s.remove);
+  const markBought = useWishlist((s) => s.markBought);
   const currency = useSettings((s) => s.pricing.currency);
   const { saved } = useProgressData();
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState<number | null>(null);
+  const [note, setNote] = useState('');
 
   const sorted = sortByPrice(items);
   const canAdd = name.trim().length > 0 && price != null && price > 0;
 
   const onAdd = () => {
     if (!canAdd || price == null) return;
-    add(name, price);
+    add(name, price, note);
     setName('');
     setPrice(null);
+    setNote('');
   };
 
   return (
@@ -89,6 +94,20 @@ export default function Wishlist() {
               decimal
               suffix={currency}
             />
+            <View>
+              <Text className="mb-1 text-sm font-medium text-ink-soft dark:text-neutral-300">
+                {t('wishlist.note')}
+              </Text>
+              <View className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
+                <TextInput
+                  value={note}
+                  onChangeText={setNote}
+                  placeholder={t('wishlist.notePlaceholder')}
+                  placeholderTextColor={colors.ink.mute}
+                  className="py-3 text-base text-ink dark:text-neutral-50"
+                />
+              </View>
+            </View>
             <Button
               label={t('wishlist.add')}
               onPress={onAdd}
@@ -138,10 +157,46 @@ export default function Wishlist() {
                   </Text>
                 </View>
                 <ProgressBar progress={pct} />
+                {item.note ? (
+                  <Text className="mt-2 text-xs text-ink-mute dark:text-neutral-400">
+                    {item.note}
+                  </Text>
+                ) : null}
+                {done ? (
+                  <View className="mt-3">
+                    <Button
+                      label={t('wishlist.bought')}
+                      onPress={() => markBought(item.id)}
+                    />
+                  </View>
+                ) : null}
               </Card>
             );
           })
         )}
+
+        {purchased.length > 0 ? (
+          <>
+            <Text className="mt-4 text-sm font-semibold text-ink dark:text-neutral-50">
+              {t('wishlist.treatedTitle')}
+            </Text>
+            {purchased.map((p) => (
+              <Card key={p.id}>
+                <View className="flex-row items-center justify-between">
+                  <Text className="flex-1 pr-3 text-base font-semibold text-ink dark:text-neutral-50">
+                    🎁 {p.name}
+                  </Text>
+                  <Text className="text-sm text-ink-mute dark:text-neutral-400">
+                    {p.price.toFixed(2)} {currency}
+                  </Text>
+                </View>
+                <Text className="mt-1 text-xs text-ink-mute dark:text-neutral-400">
+                  {formatMedium(p.purchasedAt)}
+                </Text>
+              </Card>
+            ))}
+          </>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

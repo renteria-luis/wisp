@@ -20,7 +20,8 @@ import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
-import { todayISO } from '@/utils/date';
+import { useWishlist } from '@/store/useWishlist';
+import { formatMedium, todayISO } from '@/utils/date';
 
 function Stat({ value, label }: { value: number | string; label: string }) {
   return (
@@ -41,6 +42,7 @@ export default function Progress() {
   const seenEggs = useSettings((s) => s.seenEggs);
   const markEggSeen = useSettings((s) => s.markEggSeen);
   const { nextGoal } = useSavingsGoals(data.saved);
+  const purchased = useWishlist((s) => s.purchased);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -145,6 +147,29 @@ export default function Progress() {
           {data.savedSeries.length > 1 ? (
             <View className="mt-3">
               <Sparkline values={data.savedSeries} />
+            </View>
+          ) : null}
+          {purchased.length > 0 ? (
+            <View className="mt-4">
+              <Text className="text-xs font-medium text-ink-soft dark:text-neutral-300">
+                {t('progress.treatedTitle')}
+              </Text>
+              {purchased.slice(0, 3).map((p) => (
+                <View
+                  key={p.id}
+                  className="mt-1 flex-row items-center justify-between"
+                >
+                  <Text
+                    numberOfLines={1}
+                    className="flex-1 pr-2 text-xs text-ink dark:text-neutral-50"
+                  >
+                    🎁 {p.name}
+                  </Text>
+                  <Text className="text-xs text-ink-mute dark:text-neutral-400">
+                    {formatMedium(p.purchasedAt)}
+                  </Text>
+                </View>
+              ))}
             </View>
           ) : null}
           <View className="mt-4">
