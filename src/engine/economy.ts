@@ -17,6 +17,19 @@ export const BONUS_RESISTED_CRAVING = 8;
 export const BONUS_WIN_DAY = 15;
 export const BONUS_MILESTONE = 50;
 
+/** Recovery reward: each health milestone reached lifts the coin rate a little,
+ *  capped so it stays meaningful per phase without breaking the economy. */
+export const RECOVERY_MULT_STEP = 0.07;
+export const RECOVERY_MULT_CAP = 3;
+
+/** Coin-rate multiplier for how far along the recovery milestones the user is. */
+export function recoveryMultiplier(milestonesReached: number): number {
+  return Math.min(
+    RECOVERY_MULT_CAP,
+    1 + Math.max(0, milestonesReached) * RECOVERY_MULT_STEP,
+  );
+}
+
 /** Coins/hour at a given smoke-free streak length, stepping up ~GROWTH per day. */
 export function ratePerHour(streakHours: number): number {
   const steps = Math.floor(Math.max(0, streakHours) / STEP_HOURS);

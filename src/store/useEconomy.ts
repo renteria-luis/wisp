@@ -2,12 +2,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { getLastCigaretteTimestamp } from '@/data/repositories/cigaretteLog';
+import {
+  getDailyCigaretteCounts,
+  getLastCigaretteTimestamp,
+} from '@/data/repositories/cigaretteLog';
 import {
   addLedgerEntry,
   type LedgerReason,
 } from '@/data/repositories/economyLedger';
-import { accrueCoins } from '@/engine/economy';
+import { accrueCoins, recoveryMultiplier } from '@/engine/economy';
+import {
+  reachedCount,
+  recoveryHoursFrom,
+  totalSetbackHours,
+} from '@/engine/health';
+import type { Plan } from '@/types/domain';
+import { todayISO } from '@/utils/date';
+import { densifyDailyCounts } from '@/utils/series';
 
 const HOUR_MS = 3_600_000;
 
@@ -25,8 +36,9 @@ interface EconomyState {
   spend: (amount: number, reason?: LedgerReason) => Promise<boolean>;
   /** Move pending coins into the wallet; returns the amount claimed. */
   claim: () => Promise<number>;
-  /** Accrue exponential smoke-free coins into the pending pool. */
-  accrueFromLogs: (planStartISO: string | null) => Promise<void>;
+  /** Accrue exponential smoke-free coins into the pending pool, scaled by how
+   *  far along the recovery milestones the user is. */
+  accrueFromLogs: (plan: Plan | null) => Promise<void>;
   /** Dev / God-mode setters. */
   setBalance: (balance: number) => void;
   setPending: (pending: number) => void;
@@ -90,9 +102,10 @@ export const useEconomy = create<EconomyState>()(
         return amount;
       },
 
-      accrueFromLogs: async (planStartISO) => {
+      accrueFromLogs: async (plan) => {
         try {
           const now = Date.now();
+          const planStartISO = plan?.startDate ?? null;
           const lastCig = await getLastCigaretteTimestamp();
           const streakStartISO =
             lastCig ?? planStartISO ?? new Date(now).toISOString();
@@ -106,8 +119,26 @@ export const useEconomy = create<EconomyState>()(
             set({ lastAccrualAt: new Date(now).toISOString() });
             return;
           }
+
+          // The further along the recovery milestones, the higher the rate.
+          let multiplier = 1;
+          if (plan) {
+            const today = todayISO();
+            const rows = await getDailyCigaretteCounts(plan.startDate, today);
+            const counts = densifyDailyCounts(rows, plan.startDate, today).map(
+              (d) => d.count,
+            );
+            const recoveryHours = recoveryHoursFrom(
+              (now - new Date(plan.startDate).getTime()) / HOUR_MS,
+              totalSetbackHours(counts, plan.allowances),
+            );
+            multiplier = recoveryMultiplier(reachedCount(recoveryHours));
+          }
+
           const streakStartHours = (accrueFromMs - streakStartMs) / HOUR_MS;
-          const coins = Math.round(accrueCoins(streakStartHours, elapsedHours));
+          const coins = Math.round(
+            accrueCoins(streakStartHours, elapsedHours) * multiplier,
+          );
           set({
             pending: Math.round(get().pending + Math.max(0, coins)),
             lastAccrualAt: new Date(now).toISOString(),

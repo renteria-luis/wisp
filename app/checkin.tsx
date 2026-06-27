@@ -62,7 +62,7 @@ export default function CheckIn() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row justify-end px-4 pt-2">
+      <View className="flex-row justify-end px-5 pt-4">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"

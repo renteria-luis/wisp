@@ -11,6 +11,7 @@ import { Distraction } from '@/components/craving/Distraction';
 import { Button } from '@/components/ui/Button';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
+import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 
@@ -24,13 +25,16 @@ export default function Craving() {
   const { t } = useTranslation();
   const [tool, setTool] = useState<Tool>('breathe');
   const [saving, setSaving] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
   const logResisted = useLogs((s) => s.logResistedCraving);
+  const recordHelped = useDistractions((s) => s.recordHelped);
 
   const onResisted = async () => {
     if (saving) return;
     setSaving(true);
     try {
       await logResisted();
+      if (picked) recordHelped(picked);
       await useEconomy
         .getState()
         .award(BONUS_RESISTED_CRAVING, 'resisted_craving');
@@ -43,7 +47,7 @@ export default function Craving() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row justify-end px-4 pt-2">
+      <View className="flex-row justify-end px-5 pt-4">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -81,7 +85,7 @@ export default function Craving() {
         ) : tool === 'wait' ? (
           <CravingTimer />
         ) : (
-          <Distraction />
+          <Distraction selected={picked} onSelect={setPicked} />
         )}
       </ScrollView>
 

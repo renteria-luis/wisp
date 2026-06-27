@@ -8,7 +8,8 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "optional": "Optional",
-    "notMedicalAdvice": "General information, not medical advice."
+    "notMedicalAdvice": "General information, not medical advice.",
+    "ok": "OK"
   },
   "settings": {
     "title": "Settings",
@@ -114,7 +115,8 @@
       "chooseTrack": "Prefer a different approach?",
       "confirm": "Start my plan",
       "greeting": "Hi {{name}} — we'll do this together."
-    }
+    },
+    "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress."
   },
   "gender": {
     "female": "Female",
@@ -129,7 +131,11 @@
     "after_meals": "After meals",
     "stress": "Stress",
     "boredom": "Boredom",
-    "coffee": "Coffee"
+    "coffee": "Coffee",
+    "anger": "Anger",
+    "sadness": "Sadness",
+    "waiting": "Waiting",
+    "reward": "Reward"
   },
   "firstCig": {
     "lt5": "Within 5 minutes",
@@ -164,7 +170,10 @@
     "savedSoFar": "Saved so far",
     "nextMilestone": "Next health milestone",
     "noPlan": "No plan yet — finish onboarding to get started.",
-    "ebooks": "📚 Free reads"
+    "ebooks": "📚 Free reads",
+    "remainingToday": "You have left today",
+    "overBy": "Over by {{count}} 💛",
+    "smokedOf": "{{count}} of {{allowance}} today"
   },
   "log": {
     "title": "Log",
@@ -184,7 +193,13 @@
     "customAgo": "Or how many minutes ago",
     "minutes": "min",
     "intensityLabel": "How strong was it?",
-    "save": "Save"
+    "save": "Save",
+    "noteLabel": "Want to share something? (optional)",
+    "notePlaceholder": "Anything on your mind…",
+    "near2": "You're 2 away from today's limit ({{allowance}}). Can you stop here? You've got this 💚",
+    "near1": "Just 1 left today out of {{allowance}}. You're so close — breathe, you can do it 🌿",
+    "atQuota": "That's your limit for today ({{allowance}}). Smoking more nudges your goal further out — but you made it through today 💚",
+    "overQuota": "Past today's limit — it's okay, don't be hard on yourself. Tomorrow is a fresh start 💛"
   },
   "progress": {
     "trend": "7-day trend",
@@ -209,7 +224,8 @@
     "confirmEaseTitle": "Ease the pace?",
     "confirmEaseBody": "We'll rebuild your plan at a gentler pace: your daily targets drop more slowly and your smoke-free date moves later. This can't be undone.",
     "confirmAccelTitle": "Speed up?",
-    "confirmAccelBody": "We'll rebuild your plan to finish sooner: your daily targets drop faster and your smoke-free date moves earlier. This can't be undone."
+    "confirmAccelBody": "We'll rebuild your plan to finish sooner: your daily targets drop faster and your smoke-free date moves earlier. This can't be undone.",
+    "seeAll": "See all ›"
   },
   "goals": {
     "coffee": "a coffee",
@@ -222,7 +238,7 @@
     "title": "Wishlist",
     "subtitle": "Add things you'd love to buy. Each one fills up as your smoke-free savings grow.",
     "itemName": "What do you want?",
-    "itemPlaceholder": "e.g. an iPad, a jacket, a treat…",
+    "itemPlaceholder": "e.g. clothes, a hoodie, a treat, a trip, just to save…",
     "itemPrice": "How much does it cost?",
     "add": "Add to wishlist",
     "empty": "Nothing yet — add your first goal above.",
@@ -546,13 +562,53 @@
       "intro": "Pick one and do it right now:",
       "more": "Show me others",
       "items": {
-        "water": "Drink a glass of water, slowly.",
-        "walk": "Take a 2-minute walk.",
-        "text": "Text someone you love.",
-        "gum": "Chew gum or brush your teeth.",
-        "music": "Play one favorite song.",
-        "stretch": "Stand up and stretch."
-      }
+        "water": "Drink a glass of water",
+        "deepbreath": "Take 5 slow, deep breaths",
+        "walk": "Go for a short walk",
+        "text": "Text a friend",
+        "gum": "Chew some gum",
+        "music": "Put on a favorite song",
+        "stretch": "Stretch for a minute",
+        "pushups": "Do 10 push-ups",
+        "coldface": "Splash cold water on your face",
+        "brushteeth": "Brush your teeth",
+        "snack": "Grab a healthy snack",
+        "tea": "Make a cup of tea",
+        "mint": "Suck on a mint",
+        "shower": "Take a quick shower",
+        "call": "Call someone you like",
+        "game": "Play a quick phone game",
+        "video": "Watch a funny video",
+        "meditate": "Do a 2-minute meditation",
+        "journal": "Write how you feel",
+        "draw": "Doodle something",
+        "tidy": "Tidy up one small thing",
+        "dishes": "Wash the dishes",
+        "pet": "Play with a pet",
+        "plants": "Water your plants",
+        "dance": "Dance to one song",
+        "sing": "Sing out loud",
+        "run": "Go for a quick run",
+        "jumpingjacks": "Do 20 jumping jacks",
+        "squats": "Do 15 squats",
+        "fidget": "Squeeze a stress ball",
+        "puzzle": "Do a quick puzzle",
+        "read": "Read a few pages",
+        "podcast": "Listen to a podcast",
+        "cook": "Cook or prep something",
+        "todo": "Knock out a small task",
+        "why": "Remember why you're quitting",
+        "treat": "Plan a reward for yourself",
+        "savings": "Check how much you've saved",
+        "futureself": "Picture your smoke-free self",
+        "sunlight": "Step into the sun",
+        "freshair": "Get some fresh air",
+        "countdown": "Count down from 100",
+        "ice": "Hold an ice cube",
+        "sour": "Eat something sour",
+        "gratitude": "Name 3 things you're grateful for"
+      },
+      "whatWorked": "What's worked for you"
     },
     "resisted": "I resisted 💪"
   },

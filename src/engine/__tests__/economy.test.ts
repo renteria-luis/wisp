@@ -5,8 +5,21 @@ import {
   BASE_RATE,
   MAX_RATE,
   ratePerHour,
+  RECOVERY_MULT_CAP,
+  recoveryMultiplier,
   STEP_HOURS,
 } from '../economy';
+
+describe('recoveryMultiplier', () => {
+  it('is 1× at the start and grows with milestones reached', () => {
+    expect(recoveryMultiplier(0)).toBe(1);
+    expect(recoveryMultiplier(5)).toBeGreaterThan(recoveryMultiplier(2));
+  });
+
+  it('is capped so the economy never runs away', () => {
+    expect(recoveryMultiplier(1000)).toBe(RECOVERY_MULT_CAP);
+  });
+});
 
 describe('ratePerHour', () => {
   it('starts at BASE_RATE and steps up ~15% per day', () => {

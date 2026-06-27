@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Sparkline } from '@/components/charts/Sparkline';
@@ -8,6 +9,7 @@ import { TrendChart } from '@/components/charts/TrendChart';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import {
@@ -43,6 +45,7 @@ export default function Progress() {
   const markEggSeen = useSettings((s) => s.markEggSeen);
   const { nextGoal } = useSavingsGoals(data.saved);
   const purchased = useWishlist((s) => s.purchased);
+  const [confirmReplan, setConfirmReplan] = useState(false);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -73,17 +76,7 @@ export default function Progress() {
   };
 
   // Re-planning rewrites the schedule and can't be undone — confirm first (§9).
-  const onReplanPress = () => {
-    const isEase = replan.action === 'ease';
-    Alert.alert(
-      isEase ? t('progress.confirmEaseTitle') : t('progress.confirmAccelTitle'),
-      isEase ? t('progress.confirmEaseBody') : t('progress.confirmAccelBody'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        { text: t('common.confirm'), onPress: applyReplan },
-      ],
-    );
-  };
+  const isEase = replan.action === 'ease';
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
@@ -170,6 +163,17 @@ export default function Progress() {
                   </Text>
                 </View>
               ))}
+              {purchased.length > 3 ? (
+                <Pressable
+                  onPress={() => router.push('/wishlist')}
+                  accessibilityRole="button"
+                  className="mt-2 self-start"
+                >
+                  <Text className="text-xs font-semibold text-primary-600">
+                    {t('progress.seeAll')}
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
           ) : null}
           <View className="mt-4">
@@ -236,11 +240,30 @@ export default function Progress() {
                   : t('progress.accelCta')
               }
               variant="secondary"
-              onPress={onReplanPress}
+              onPress={() => setConfirmReplan(true)}
             />
           </Card>
         ) : null}
       </ScrollView>
+
+      <ConfirmModal
+        visible={confirmReplan}
+        title={
+          isEase
+            ? t('progress.confirmEaseTitle')
+            : t('progress.confirmAccelTitle')
+        }
+        message={
+          isEase ? t('progress.confirmEaseBody') : t('progress.confirmAccelBody')
+        }
+        confirmLabel={t('common.confirm')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          applyReplan();
+          setConfirmReplan(false);
+        }}
+        onCancel={() => setConfirmReplan(false)}
+      />
     </SafeAreaView>
   );
 }

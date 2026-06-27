@@ -32,9 +32,7 @@ export default function RootLayout() {
       applySavedTheme();
       applyLanguage(useSettings.getState().language);
       await useLogs.getState().init();
-      await useEconomy
-        .getState()
-        .accrueFromLogs(usePlan.getState().plan?.startDate ?? null);
+      await useEconomy.getState().accrueFromLogs(usePlan.getState().plan);
       await configureNotificationHandler();
       const s = useSettings.getState();
       await rescheduleTriggerNotifications(
@@ -67,7 +65,13 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: 'slide_from_right',
+              animationDuration: 260,
+            }}
+          >
             <Stack.Screen name="index" />
             <Stack.Screen name="(onboarding)" />
             <Stack.Screen name="(tabs)" />

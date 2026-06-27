@@ -18,7 +18,11 @@ export type TriggerCategory =
   | 'after_meals'
   | 'stress'
   | 'boredom'
-  | 'coffee';
+  | 'coffee'
+  | 'anger'
+  | 'sadness'
+  | 'waiting'
+  | 'reward';
 
 /** Signals collected during onboarding that drive track assignment (§6.1). */
 export interface ReadinessInputs {

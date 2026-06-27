@@ -8,7 +8,8 @@
     "confirm": "Confirmar",
     "cancel": "Cancelar",
     "optional": "Opcional",
-    "notMedicalAdvice": "Información general, no es consejo médico."
+    "notMedicalAdvice": "Información general, no es consejo médico.",
+    "ok": "OK"
   },
   "settings": {
     "title": "Ajustes",
@@ -114,7 +115,8 @@
       "chooseTrack": "¿Prefieres otro enfoque?",
       "confirm": "Empezar mi plan",
       "greeting": "Hola {{name}} — lo haremos juntas."
-    }
+    },
+    "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso."
   },
   "gender": {
     "female": "Mujer",
@@ -129,7 +131,11 @@
     "after_meals": "Después de comer",
     "stress": "Estrés",
     "boredom": "Aburrimiento",
-    "coffee": "Café"
+    "coffee": "Café",
+    "anger": "Enojo",
+    "sadness": "Tristeza",
+    "waiting": "Esperando",
+    "reward": "Recompensa"
   },
   "firstCig": {
     "lt5": "En 5 minutos",
@@ -164,7 +170,10 @@
     "savedSoFar": "Ahorrado hasta ahora",
     "nextMilestone": "Próximo hito de salud",
     "noPlan": "Aún no hay plan — termina la introducción para empezar.",
-    "ebooks": "📚 Lecturas gratis"
+    "ebooks": "📚 Lecturas gratis",
+    "remainingToday": "Te quedan hoy",
+    "overBy": "Te pasaste por {{count}} 💛",
+    "smokedOf": "{{count}} de {{allowance}} hoy"
   },
   "log": {
     "title": "Registrar",
@@ -184,7 +193,13 @@
     "customAgo": "O hace cuántos minutos",
     "minutes": "min",
     "intensityLabel": "¿Qué tan fuerte fue?",
-    "save": "Guardar"
+    "save": "Guardar",
+    "noteLabel": "¿Quieres compartir algo? (opcional)",
+    "notePlaceholder": "Lo que tengas en mente…",
+    "near2": "Te faltan 2 para tu límite de hoy ({{allowance}}). ¿Puedes parar aquí? Tú puedes 💚",
+    "near1": "Solo te queda 1 hoy de {{allowance}}. Estás cerquísima — respira, tú puedes 🌿",
+    "atQuota": "Ese es tu límite de hoy ({{allowance}}). Fumar más aleja un poco tu meta — pero hoy ya lo lograste 💚",
+    "overQuota": "Pasaste tu límite de hoy — está bien, no te castigues. Mañana es un nuevo comienzo 💛"
   },
   "progress": {
     "trend": "Tendencia de 7 días",
@@ -209,7 +224,8 @@
     "confirmEaseTitle": "¿Bajar el ritmo?",
     "confirmEaseBody": "Reconstruiremos tu plan a un ritmo más suave: tu meta diaria baja más lento y tu fecha sin fumar se mueve más adelante. No se puede deshacer.",
     "confirmAccelTitle": "¿Acelerar?",
-    "confirmAccelBody": "Reconstruiremos tu plan para terminar antes: tu meta diaria baja más rápido y tu fecha sin fumar se adelanta. No se puede deshacer."
+    "confirmAccelBody": "Reconstruiremos tu plan para terminar antes: tu meta diaria baja más rápido y tu fecha sin fumar se adelanta. No se puede deshacer.",
+    "seeAll": "Ver lista ›"
   },
   "goals": {
     "coffee": "un café",
@@ -222,7 +238,7 @@
     "title": "Lista de deseos",
     "subtitle": "Agrega cosas que te encantaría comprar. Cada una se llena conforme crecen tus ahorros por no fumar.",
     "itemName": "¿Qué quieres?",
-    "itemPlaceholder": "p. ej. un iPad, una chamarra, un antojo…",
+    "itemPlaceholder": "p. ej. ropa, un hoodie, un capricho, un viaje, solo ahorrar…",
     "itemPrice": "¿Cuánto cuesta?",
     "add": "Agregar a la lista",
     "empty": "Aún nada — agrega tu primera meta arriba.",
@@ -544,15 +560,55 @@
     },
     "distraction": {
       "intro": "Elige uno y hazlo ahora mismo:",
-      "more": "Muéstrame otros",
+      "more": "Muéstrame otras",
       "items": {
-        "water": "Bebe un vaso de agua, despacio.",
-        "walk": "Da una caminata de 2 minutos.",
-        "text": "Escríbele a alguien que quieres.",
-        "gum": "Masca chicle o lávate los dientes.",
-        "music": "Pon tu canción favorita.",
-        "stretch": "Ponte de pie y estírate."
-      }
+        "water": "Toma un vaso de agua",
+        "deepbreath": "Respira hondo 5 veces",
+        "walk": "Da un paseo corto",
+        "text": "Escríbele a alguien",
+        "gum": "Masca un chicle",
+        "music": "Pon tu canción favorita",
+        "stretch": "Estírate un minuto",
+        "pushups": "Haz 10 flexiones",
+        "coldface": "Échate agua fría en la cara",
+        "brushteeth": "Lávate los dientes",
+        "snack": "Come algo sano",
+        "tea": "Prepárate un té",
+        "mint": "Chupa una menta",
+        "shower": "Date una ducha rápida",
+        "call": "Llama a alguien que quieras",
+        "game": "Juega algo rápido en el cel",
+        "video": "Mira un video gracioso",
+        "meditate": "Medita 2 minutos",
+        "journal": "Escribe cómo te sientes",
+        "draw": "Dibuja algo",
+        "tidy": "Ordena algo pequeño",
+        "dishes": "Lava los platos",
+        "pet": "Juega con una mascota",
+        "plants": "Riega tus plantas",
+        "dance": "Baila una canción",
+        "sing": "Canta en voz alta",
+        "run": "Sal a correr un poco",
+        "jumpingjacks": "Haz 20 saltos de tijera",
+        "squats": "Haz 15 sentadillas",
+        "fidget": "Aprieta una pelota antiestrés",
+        "puzzle": "Resuelve un acertijo",
+        "read": "Lee unas páginas",
+        "podcast": "Escucha un podcast",
+        "cook": "Cocina o prepara algo",
+        "todo": "Haz una tarea pendiente",
+        "why": "Recuerda por qué lo dejas",
+        "treat": "Planea un premio para ti",
+        "savings": "Mira cuánto has ahorrado",
+        "futureself": "Imagina tu yo sin fumar",
+        "sunlight": "Sal a tomar sol",
+        "freshair": "Toma aire fresco",
+        "countdown": "Cuenta de 100 hacia atrás",
+        "ice": "Sostén un cubo de hielo",
+        "sour": "Come algo ácido",
+        "gratitude": "Nombra 3 cosas que agradeces"
+      },
+      "whatWorked": "Lo que te ha funcionado"
     },
     "resisted": "Lo resistí 💪"
   },

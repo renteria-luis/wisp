@@ -2,7 +2,14 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
@@ -10,9 +17,13 @@ import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
+import { allowanceForDay } from '@/engine/planEngine';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
+import { usePlan } from '@/store/usePlan';
+import { colors } from '@/theme/tokens';
 import type { TriggerCategory } from '@/types/domain';
+import { daysBetween, todayISO } from '@/utils/date';
 
 const CATEGORIES: TriggerCategory[] = [
   'work_break',
@@ -22,6 +33,10 @@ const CATEGORIES: TriggerCategory[] = [
   'stress',
   'boredom',
   'coffee',
+  'anger',
+  'sadness',
+  'waiting',
+  'reward',
 ];
 
 const AGO_OPTIONS = [0, 5, 10, 20, 60];
@@ -33,6 +48,8 @@ export default function Log() {
   const { t } = useTranslation();
   const logCigarette = useLogs((s) => s.logCigarette);
   const logResisted = useLogs((s) => s.logResistedCraving);
+  const plan = usePlan((s) => s.plan);
+  const todayCigarettes = useLogs((s) => s.todayCigarettes);
 
   const [mode, setMode] = useState<Mode>('smoked');
   const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
@@ -42,7 +59,24 @@ export default function Log() {
   const [gifted, setGifted] = useState(false);
   // How long ago it was smoked (minutes); 0 = now (the default).
   const [minutesAgo, setMinutesAgo] = useState(0);
+  const [note, setNote] = useState('');
+  const [quotaMsg, setQuotaMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // A warm, non-judgmental nudge as the day's allowance gets close / passes.
+  const quotaReminder = (): string | null => {
+    if (!plan) return null;
+    const allowance = allowanceForDay(
+      plan,
+      Math.max(0, daysBetween(plan.startDate, todayISO())),
+    );
+    const remaining = allowance - (todayCigarettes + 1);
+    if (remaining === 2) return t('log.near2', { allowance });
+    if (remaining === 1) return t('log.near1', { allowance });
+    if (remaining === 0) return t('log.atQuota', { allowance });
+    if (remaining < 0) return t('log.overQuota');
+    return null;
+  };
 
   const onSave = async () => {
     if (saving) return;
@@ -53,11 +87,18 @@ export default function Log() {
           trigger: trigger ?? undefined,
           shared,
           gifted,
+          note: note.trim() || undefined,
           timestamp:
             minutesAgo > 0
               ? new Date(Date.now() - minutesAgo * 60_000).toISOString()
               : undefined,
         });
+        const msg = quotaReminder();
+        if (msg) {
+          setQuotaMsg(msg);
+          setSaving(false);
+          return;
+        }
       } else {
         await logResisted({ trigger: trigger ?? undefined, intensity });
         await useEconomy
@@ -75,7 +116,7 @@ export default function Log() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row justify-end px-4 pt-2">
+      <View className="flex-row justify-end px-5 pt-4">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -188,6 +229,21 @@ export default function Log() {
                 />
               </View>
             </View>
+
+            <View>
+              <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
+                {t('log.noteLabel')}
+              </Text>
+              <View className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
+                <TextInput
+                  value={note}
+                  onChangeText={setNote}
+                  placeholder={t('log.notePlaceholder')}
+                  placeholderTextColor={colors.ink.mute}
+                  className="py-3 text-base text-ink dark:text-neutral-50"
+                />
+              </View>
+            </View>
           </>
         ) : null}
 
@@ -204,6 +260,34 @@ export default function Log() {
       <View className="px-6 pb-4">
         <Button label={t('log.save')} onPress={onSave} disabled={saving} />
       </View>
+
+      {quotaMsg ? (
+        <Modal
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            setQuotaMsg(null);
+            router.back();
+          }}
+        >
+          <View className="flex-1 items-center justify-center bg-black/40 px-6">
+            <View className="w-full rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900">
+              <Text className="text-base leading-6 text-ink dark:text-neutral-50">
+                {quotaMsg}
+              </Text>
+              <View className="mt-4">
+                <Button
+                  label={t('common.ok')}
+                  onPress={() => {
+                    setQuotaMsg(null);
+                    router.back();
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      ) : null}
     </SafeAreaView>
   );
 }

@@ -44,6 +44,10 @@ export default function Welcome() {
             autoCapitalize="words"
           />
         </View>
+
+        <Text className="mt-6 text-center text-xs leading-5 text-ink-mute dark:text-neutral-400">
+          {t('onboarding.sincere')}
+        </Text>
       </View>
 
       <View className="px-6 pb-4">

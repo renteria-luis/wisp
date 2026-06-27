@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 
 import { colors } from '@/theme/tokens';
@@ -26,6 +27,21 @@ export function NumberField({
   decimal = false,
   suffix,
 }: Props) {
+  // Keep a local text buffer so a decimal point (e.g. "9.") isn't swallowed
+  // while typing, while still syncing when `value` changes externally.
+  const [text, setText] = useState(value == null ? '' : String(value));
+  useEffect(() => {
+    if (parseNumber(text, decimal) !== value) {
+      setText(value == null ? '' : String(value));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const handle = (next: string) => {
+    setText(next);
+    onChange(parseNumber(next, decimal));
+  };
+
   return (
     <View>
       <Text className="mb-1 text-sm font-medium text-ink-soft dark:text-neutral-300">
@@ -33,8 +49,8 @@ export function NumberField({
       </Text>
       <View className="flex-row items-center rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
         <TextInput
-          value={value == null ? '' : String(value)}
-          onChangeText={(t) => onChange(parseNumber(t, decimal))}
+          value={text}
+          onChangeText={handle}
           keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
           placeholder={placeholder}
           placeholderTextColor={colors.ink.mute}

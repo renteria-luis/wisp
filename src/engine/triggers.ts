@@ -28,6 +28,11 @@ export const DEFAULT_WINDOWS: Record<TriggerCategory, TimeOfDay[]> = {
   stress: [{ hour: 15, minute: 0 }],
   boredom: [{ hour: 16, minute: 0 }],
   coffee: [{ hour: 9, minute: 0 }],
+  // Emotional / situational tags — logged for context, no fixed daily window.
+  anger: [],
+  sadness: [],
+  waiting: [],
+  reward: [],
 };
 
 /** Situational mode cadence: support pings for this long, this often. */
