@@ -8,6 +8,7 @@ import {
   milestoneTimeline,
   nextMilestone,
   reachedCount,
+  recoveryHoursFrom,
   totalSetbackHours,
 } from '../health';
 
@@ -89,5 +90,20 @@ describe('slip setback', () => {
     expect(totalSetbackHours([1, 2], [3, 3])).toBeCloseTo(
       daySetbackHours(1, 3) + daySetbackHours(2, 3),
     );
+  });
+});
+
+describe('recoveryHoursFrom', () => {
+  it('equals elapsed when there is no setback', () => {
+    expect(recoveryHoursFrom(100, 0)).toBe(100);
+  });
+
+  it('subtracts a small setback directly', () => {
+    expect(recoveryHoursFrom(100, 10)).toBe(90);
+  });
+
+  it('floors at zero and never goes negative', () => {
+    expect(recoveryHoursFrom(100, 999999)).toBe(0);
+    expect(recoveryHoursFrom(0, 50)).toBe(0);
   });
 });

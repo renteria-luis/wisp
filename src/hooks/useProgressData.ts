@@ -12,7 +12,7 @@ import {
   recommendReplan,
   type ReplanRecommendation,
 } from '@/engine/adherence';
-import { totalSetbackHours } from '@/engine/health';
+import { recoveryHoursFrom, totalSetbackHours } from '@/engine/health';
 import { cigarettesAvoided, moneySaved, savingsSeries } from '@/engine/savings';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
@@ -107,9 +107,9 @@ export function useProgressData(): ProgressData {
       ? new Date(lastCigaretteAt).getTime()
       : recoveryStartMs;
     const setbackHours = totalSetbackHours(actual, allowances);
-    const recoveryHours = Math.max(
-      0,
-      (Date.now() - recoveryStartMs) / 3_600_000 - setbackHours,
+    const recoveryHours = recoveryHoursFrom(
+      (Date.now() - recoveryStartMs) / 3_600_000,
+      setbackHours,
     );
     const trend = currentTrend(actual);
     const todayAllowance = allowances.length

@@ -12,6 +12,7 @@ import { nextMilestone } from '@/engine/health';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useProgressData } from '@/hooks/useProgressData';
 import { useSavingsGoals } from '@/hooks/useSavingsGoals';
+import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { daysBetween, formatMedium, todayISO } from '@/utils/date';
@@ -23,6 +24,7 @@ export default function Plan() {
   const currency = useSettings((s) => s.pricing.currency);
   const data = useProgressData();
   const { goals } = useSavingsGoals(data.saved);
+  const todayCigarettes = useLogs((s) => s.todayCigarettes);
 
   if (!plan) {
     return (
@@ -33,7 +35,17 @@ export default function Plan() {
   const isReduction = plan.track === 'gradual_reduction';
   const dayIndex = Math.max(0, daysBetween(plan.startDate, todayISO()));
   const upcoming = plan.allowances.slice(dayIndex, dayIndex + 7);
-  const journeyPct = Math.min(1, (dayIndex + 1) / plan.nDays);
+  const allowance = allowanceForDay(plan, dayIndex);
+  const remaining = allowance - todayCigarettes;
+  // Journey reflects actual reduction (7-day average vs baseline), not just the
+  // calendar — it only climbs as you genuinely cut down. Cold turkey is time-based.
+  const reductionPct =
+    plan.baseline > 0
+      ? Math.max(0, Math.min(1, (plan.baseline - data.trend) / plan.baseline))
+      : 0;
+  const journeyPct = isReduction
+    ? reductionPct
+    : Math.min(1, (dayIndex + 1) / plan.nDays);
   const next = nextMilestone(data.recoveryHours);
 
   return (
@@ -70,10 +82,20 @@ export default function Plan() {
               <View className="flex-row items-end justify-between">
                 <View>
                   <Text className="text-sm text-ink-soft dark:text-neutral-300">
-                    {t('plan.todayTarget')}
+                    {t('plan.remainingToday')}
                   </Text>
                   <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
-                    {allowanceForDay(plan, dayIndex)}
+                    {Math.max(0, remaining)}
+                  </Text>
+                  <Text
+                    className={`mt-0.5 text-xs ${remaining < 0 ? 'font-semibold text-accent-600 dark:text-accent-300' : 'text-ink-mute dark:text-neutral-400'}`}
+                  >
+                    {remaining < 0
+                      ? t('plan.overBy', { count: -remaining })
+                      : t('plan.smokedOf', {
+                          count: todayCigarettes,
+                          allowance,
+                        })}
                   </Text>
                 </View>
                 <Text className="text-sm text-ink-mute dark:text-neutral-400">

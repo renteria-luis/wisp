@@ -1,7 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  LayoutAnimation,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+} from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -13,11 +22,20 @@ import {
   milestoneTimeline,
   nextMilestone,
   reachedCount,
+  recoveryHoursFrom,
 } from '@/engine/health';
 import { colors } from '@/theme/tokens';
 import { formatCountDown, formatCountUp } from '@/utils/duration';
 
 const HOUR_MS = 3_600_000;
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 /** Re-renders once a second so the counters and countdown stay live. */
 function useNow(intervalMs = 1000): number {
@@ -88,10 +106,12 @@ function Node({ state }: { state: NodeState }) {
 function MilestoneRow({
   id,
   state,
+  isLast,
   onPress,
 }: {
   id: string;
   state: NodeState;
+  isLast: boolean;
   onPress: () => void;
 }) {
   const { t } = useTranslation();
@@ -100,12 +120,20 @@ function MilestoneRow({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className="flex-row gap-3 py-1"
+      className="flex-row gap-3"
     >
-      <View className="w-5 items-center pt-0.5">
-        <Node state={state} />
+      <View className="w-5 items-center">
+        <View className="pt-1">
+          <Node state={state} />
+        </View>
+        {!isLast ? (
+          <View
+            style={{ marginTop: 2 }}
+            className={`w-0.5 flex-1 ${state === 'reached' ? 'bg-primary-300 dark:bg-primary-700' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+          />
+        ) : null}
       </View>
-      <View className="flex-1">
+      <View className="flex-1 pb-2">
         <View className="flex-row items-center justify-between">
           <Text
             className={`text-sm font-semibold ${done ? 'text-ink dark:text-neutral-50' : 'text-ink-mute dark:text-neutral-500'}`}
@@ -128,6 +156,7 @@ function MilestoneRow({
 
 function PhaseCard({
   phaseId,
+  numeral,
   state,
   reachedInPhase,
   total,
@@ -137,6 +166,7 @@ function PhaseCard({
   children,
 }: {
   phaseId: string;
+  numeral: string;
   state: PhaseState;
   reachedInPhase: number;
   total: number;
@@ -146,7 +176,7 @@ function PhaseCard({
   children: ReactNode;
 }) {
   const { t } = useTranslation();
-  const name = t(`health.phases.${phaseId}.name`);
+  const name = `${numeral}. ${t(`health.phases.${phaseId}.name`)}`;
   const subtitle = t(`health.phases.${phaseId}.subtitle`);
 
   if (state === 'current') {
@@ -172,7 +202,7 @@ function PhaseCard({
         </Pressable>
         <View className="bg-neutral-0 px-4 py-3 dark:bg-neutral-900">
           {countdown}
-          {expanded ? <View className="mt-2 gap-1">{children}</View> : null}
+          {expanded ? <View className="mt-3">{children}</View> : null}
         </View>
       </View>
     );
@@ -210,7 +240,7 @@ function PhaseCard({
         </Text>
       </Pressable>
       {expanded ? (
-        <View className="gap-1 px-4 pb-3 pt-1">{children}</View>
+        <View className="px-4 pb-3 pt-2">{children}</View>
       ) : null}
     </View>
   );
@@ -281,9 +311,9 @@ export function HealthTimeline({
   const { t } = useTranslation();
   const now = useNow(1000);
 
-  const recoveryHours = Math.max(
-    0,
-    (now - recoveryStartMs) / HOUR_MS - setbackHours,
+  const recoveryHours = recoveryHoursFrom(
+    (now - recoveryStartMs) / HOUR_MS,
+    setbackHours,
   );
   const smokeFreeSeconds = Math.max(0, (now - smokeFreeSinceMs) / 1000);
   const timeline = milestoneTimeline(recoveryHours);
@@ -297,17 +327,16 @@ export function HealthTimeline({
     ? Math.max(0, (next.milestone.atHours - recoveryHours) * 3600)
     : 0;
 
-  const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set([phaseId]),
-  );
+  // By default only the CURRENT phase is open; manual toggles are remembered
+  // per phase. Deriving from `phaseId` avoids a stale set when recovery shifts.
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [detailId, setDetailId] = useState<string | null>(null);
-
-  // Keep the current phase open as it advances (without fighting manual toggles).
-  useEffect(() => {
-    setExpanded((prev) =>
-      prev.has(phaseId) ? prev : new Set(prev).add(phaseId),
-    );
-  }, [phaseId]);
+  const isExpanded = (id: string): boolean =>
+    id in overrides ? overrides[id]! : id === phaseId;
+  const toggle = (id: string): void => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setOverrides((o) => ({ ...o, [id]: !isExpanded(id) }));
+  };
 
   const detail = detailId
     ? HEALTH_MILESTONES.find((m) => m.id === detailId)
@@ -369,21 +398,15 @@ export function HealthTimeline({
           <PhaseCard
             key={phase.id}
             phaseId={phase.id}
+            numeral={ROMAN[i] ?? `${i + 1}`}
             state={state}
             reachedInPhase={reachedInPhase}
             total={phase.milestones.length}
-            expanded={expanded.has(phase.id)}
+            expanded={isExpanded(phase.id)}
             countdown={state === 'current' ? countdown : undefined}
-            onToggle={() =>
-              setExpanded((prev) => {
-                const set = new Set(prev);
-                if (set.has(phase.id)) set.delete(phase.id);
-                else set.add(phase.id);
-                return set;
-              })
-            }
+            onToggle={() => toggle(phase.id)}
           >
-            {phase.milestones.map((mst) => {
+            {phase.milestones.map((mst, idx, arr) => {
               const node: NodeState = reachedById.get(mst.id)?.reached
                 ? 'reached'
                 : mst.id === next?.milestone.id
@@ -394,6 +417,7 @@ export function HealthTimeline({
                   key={mst.id}
                   id={mst.id}
                   state={node}
+                  isLast={idx === arr.length - 1}
                   onPress={() => setDetailId(mst.id)}
                 />
               );

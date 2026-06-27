@@ -171,9 +171,19 @@ export function currentPhaseId(recoveryHours: number): string {
 // allowance hurts more. These are designed, tunable game constants — informed
 // by harm-reduction (more/over-quota smoking = bigger setback), NOT a clinical
 // formula. The smoke-free *timer* still resets to zero on every cigarette.
-export const SETBACK_BASE_HOURS = 6;
+export const SETBACK_BASE_HOURS = 4;
 export const SETBACK_GROWTH = 0.15;
 export const OVER_QUOTA_MULTIPLIER = 2;
+
+/** Recovery hours = time elapsed since plan start minus the full slip penalty
+ *  (floored at 0). Every cigarette visibly sets the bar back; abstaining grows
+ *  it back. A heavy day can sink it, but stopping climbs it again. */
+export function recoveryHoursFrom(
+  elapsedHours: number,
+  setbackHours: number,
+): number {
+  return Math.max(0, Math.max(0, elapsedHours) - Math.max(0, setbackHours));
+}
 
 /** Recovery-hours lost for `count` cigarettes on a day with `allowance`. */
 export function daySetbackHours(count: number, allowance: number): number {
