@@ -17,10 +17,12 @@ import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
+import { cigarettePenaltyHours } from '@/engine/health';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
+import { useRecovery } from '@/store/useRecovery';
 import { colors } from '@/theme/tokens';
 import type { TriggerCategory } from '@/types/domain';
 import { daysBetween, todayISO } from '@/utils/date';
@@ -93,6 +95,16 @@ export default function Log() {
               ? new Date(Date.now() - minutesAgo * 60_000).toISOString()
               : undefined,
         });
+        // Knock recovery back once (penalty scales with the day's quota).
+        if (plan) {
+          const allowance = allowanceForDay(
+            plan,
+            Math.max(0, daysBetween(plan.startDate, todayISO())),
+          );
+          useRecovery
+            .getState()
+            .penalize(cigarettePenaltyHours(todayCigarettes, allowance));
+        }
         const msg = quotaReminder();
         if (msg) {
           setQuotaMsg(msg);

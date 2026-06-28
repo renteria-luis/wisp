@@ -21,6 +21,7 @@ import {
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
+import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
 
 export default function RootLayout() {
@@ -32,7 +33,13 @@ export default function RootLayout() {
       applySavedTheme();
       applyLanguage(useSettings.getState().language);
       await useLogs.getState().init();
-      await useEconomy.getState().accrueFromLogs(usePlan.getState().plan);
+      const plan = usePlan.getState().plan;
+      if (plan) {
+        useRecovery
+          .getState()
+          .ensureAnchor(new Date(plan.startDate).getTime());
+      }
+      await useEconomy.getState().accrueFromLogs(plan);
       await configureNotificationHandler();
       const s = useSettings.getState();
       await rescheduleTriggerNotifications(

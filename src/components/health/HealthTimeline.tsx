@@ -19,15 +19,14 @@ import {
   HEALTH_PHASES,
   type HealthMilestone,
   currentPhaseId,
+  liveRecoveryHours,
   milestoneTimeline,
   nextMilestone,
   reachedCount,
-  recoveryHoursFrom,
 } from '@/engine/health';
 import { colors } from '@/theme/tokens';
 import { formatCountDown, formatCountUp } from '@/utils/duration';
 
-const HOUR_MS = 3_600_000;
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
 if (
@@ -294,8 +293,8 @@ function DetailModal({
 }
 
 type Props = {
-  recoveryStartMs: number;
-  setbackHours: number;
+  recoveryAnchorMs: number;
+  recoveryBaseHours: number;
   smokeFreeSinceMs: number;
   overQuota?: boolean;
 };
@@ -303,17 +302,18 @@ type Props = {
 /** The recovery hero: modular phase boxes that light up as recovery hours grow,
  *  a live smoke-free counter and a live countdown to the next milestone. */
 export function HealthTimeline({
-  recoveryStartMs,
-  setbackHours,
+  recoveryAnchorMs,
+  recoveryBaseHours,
   smokeFreeSinceMs,
   overQuota = false,
 }: Props) {
   const { t } = useTranslation();
   const now = useNow(1000);
 
-  const recoveryHours = recoveryHoursFrom(
-    (now - recoveryStartMs) / HOUR_MS,
-    setbackHours,
+  const recoveryHours = liveRecoveryHours(
+    recoveryBaseHours,
+    recoveryAnchorMs,
+    now,
   );
   const smokeFreeSeconds = Math.max(0, (now - smokeFreeSinceMs) / 1000);
   const timeline = milestoneTimeline(recoveryHours);

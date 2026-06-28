@@ -13,6 +13,7 @@ import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { useDistractions } from '@/store/useDistractions';
 import { usePlan } from '@/store/usePlan';
+import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
 import { useWishlist } from '@/store/useWishlist';
 import { todayISO } from '@/utils/date';
@@ -97,6 +98,7 @@ export async function wipeAppData(): Promise<void> {
   usePlan.getState().clearPlan();
   useWishlist.getState().reset();
   useDistractions.getState().reset();
+  useRecovery.getState().reset();
   useSettings.getState().reset();
   useSettings.getState().setOnboardingCompleted(false);
   await useLogs

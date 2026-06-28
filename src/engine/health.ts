@@ -165,45 +165,35 @@ export function currentPhaseId(recoveryHours: number): string {
   return HEALTH_PHASES[HEALTH_PHASES.length - 1]!.id;
 }
 
-// ── Slip penalty (PROJECT.md §6.3, kept non-punitive) ─────────────────────────
-// A cigarette never zeroes recovery; it nudges it back. Each cigarette in a day
-// hits a little harder than the last, and any cigarette above that day's
-// allowance hurts more. These are designed, tunable game constants — informed
-// by harm-reduction (more/over-quota smoking = bigger setback), NOT a clinical
-// formula. The smoke-free *timer* still resets to zero on every cigarette.
-export const SETBACK_BASE_HOURS = 4;
-export const SETBACK_GROWTH = 0.15;
-export const OVER_QUOTA_MULTIPLIER = 2;
+// ── Slip penalty & running recovery (PROJECT.md §6.3, non-punitive) ───────────
+// Recovery is a *running* value (stored as a base + a timestamp): it climbs in
+// real time and each cigarette knocks it back ONCE, then keeps climbing — it is
+// never frozen. The hit scales with the day's quota: a cigarette well within a
+// generous allowance barely dents it (10 a day → each ≈ 10% of the daily hit),
+// while going over the limit hurts more and escalates. Designed game constants.
+export const WITHIN_QUOTA_HOURS = 10;
+export const OVER_QUOTA_BASE_HOURS = 4;
+export const OVER_QUOTA_GROWTH = 0.2;
 
-/** Recovery hours = time elapsed since plan start minus the full slip penalty
- *  (floored at 0). Every cigarette visibly sets the bar back; abstaining grows
- *  it back. A heavy day can sink it, but stopping climbs it again. */
-export function recoveryHoursFrom(
-  elapsedHours: number,
-  setbackHours: number,
+/** Recovery hours lost for one cigarette, given how many were already smoked
+ *  today (`indexToday`, 0-based) and today's `allowance`. */
+export function cigarettePenaltyHours(
+  indexToday: number,
+  allowance: number,
 ): number {
-  return Math.max(0, Math.max(0, elapsedHours) - Math.max(0, setbackHours));
-}
-
-/** Recovery-hours lost for `count` cigarettes on a day with `allowance`. */
-export function daySetbackHours(count: number, allowance: number): number {
-  let total = 0;
   const limit = Math.max(0, allowance);
-  for (let i = 0; i < count; i++) {
-    const escalating = 1 + SETBACK_GROWTH * i;
-    const overQuota = i >= limit;
-    total += SETBACK_BASE_HOURS * escalating * (overQuota ? OVER_QUOTA_MULTIPLIER : 1);
+  if (limit > 0 && indexToday < limit) {
+    return WITHIN_QUOTA_HOURS / limit;
   }
-  return total;
+  const over = Math.max(0, indexToday - limit);
+  return OVER_QUOTA_BASE_HOURS * (1 + OVER_QUOTA_GROWTH * over);
 }
 
-/** Total recovery-hours lost across a daily series (aligned with allowances). */
-export function totalSetbackHours(
-  actualDaily: number[],
-  allowances: number[],
+/** Live recovery hours = stored base + time since the last update (floored 0). */
+export function liveRecoveryHours(
+  baseHours: number,
+  anchorMs: number,
+  nowMs: number,
 ): number {
-  return actualDaily.reduce(
-    (sum, count, i) => sum + daySetbackHours(count, allowances[i] ?? 0),
-    0,
-  );
+  return Math.max(0, baseHours + (nowMs - anchorMs) / 3_600_000);
 }

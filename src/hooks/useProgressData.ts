@@ -12,10 +12,11 @@ import {
   recommendReplan,
   type ReplanRecommendation,
 } from '@/engine/adherence';
-import { recoveryHoursFrom, totalSetbackHours } from '@/engine/health';
+import { liveRecoveryHours } from '@/engine/health';
 import { cigarettesAvoided, moneySaved, savingsSeries } from '@/engine/savings';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
+import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
 import { todayISO } from '@/utils/date';
 import { densifyDailyCounts } from '@/utils/series';
@@ -36,11 +37,11 @@ export interface ProgressData {
   savedSeries: number[];
   /** Anchor (ms) for the live smoke-free count-up: last cigarette, or plan start. */
   smokeFreeSinceMs: number;
-  /** Anchor (ms) for recovery progress (plan start). */
-  recoveryStartMs: number;
-  /** Recovery hours lost to slips so far (deterministic from the daily counts). */
-  setbackHours: number;
-  /** Snapshot recovery hours = elapsed since plan start − setbacks (≥ 0). */
+  /** Anchor (ms) for the running recovery value (last update). */
+  recoveryAnchorMs: number;
+  /** Recovery hours at the anchor; live value = base + time since anchor. */
+  recoveryBaseHours: number;
+  /** Snapshot of live recovery hours right now (≥ 0). */
   recoveryHours: number;
   /** True when the 7-day trend is above today's allowance (gentle setback). */
   overQuota: boolean;
@@ -53,6 +54,8 @@ export function useProgressData(): ProgressData {
   const pricing = useSettings((s) => s.pricing);
   // Today's count changes whenever a log is added — use it as a refetch trigger.
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const recAnchor = useRecovery((s) => s.anchorMs);
+  const recBase = useRecovery((s) => s.baseHours);
   const [actual, setActual] = useState<number[]>([]);
   // Paid-only daily counts (gifted excluded) — drive money saved / cigs avoided.
   const [paidActual, setPaidActual] = useState<number[]>([]);
@@ -100,16 +103,18 @@ export function useProgressData(): ProgressData {
   return useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];
     const baseline = plan?.baseline ?? 0;
-    const recoveryStartMs = plan
-      ? new Date(plan.startDate).getTime()
-      : Date.now();
+    const planStartMs = plan ? new Date(plan.startDate).getTime() : Date.now();
     const smokeFreeSinceMs = lastCigaretteAt
       ? new Date(lastCigaretteAt).getTime()
-      : recoveryStartMs;
-    const setbackHours = totalSetbackHours(actual, allowances);
-    const recoveryHours = recoveryHoursFrom(
-      (Date.now() - recoveryStartMs) / 3_600_000,
-      setbackHours,
+      : planStartMs;
+    // Running recovery: stored base + time since the anchor (falls back to plan
+    // start until the anchor is seeded on launch).
+    const recoveryAnchorMs = recAnchor ?? planStartMs;
+    const recoveryBaseHours = recBase;
+    const recoveryHours = liveRecoveryHours(
+      recoveryBaseHours,
+      recoveryAnchorMs,
+      Date.now(),
     );
     const trend = currentTrend(actual);
     const todayAllowance = allowances.length
@@ -138,8 +143,8 @@ export function useProgressData(): ProgressData {
         cigsPerPack: pricing.cigsPerPack,
       }),
       smokeFreeSinceMs,
-      recoveryStartMs,
-      setbackHours,
+      recoveryAnchorMs,
+      recoveryBaseHours,
       recoveryHours,
       overQuota: trend > todayAllowance + 0.001,
       recommendation: recommendReplan({ actual, allowances }),
@@ -149,6 +154,8 @@ export function useProgressData(): ProgressData {
     actual,
     paidActual,
     lastCigaretteAt,
+    recAnchor,
+    recBase,
     pricing.packPrice,
     pricing.cigsPerPack,
   ]);

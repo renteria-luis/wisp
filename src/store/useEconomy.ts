@@ -2,23 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import {
-  getDailyCigaretteCounts,
-  getLastCigaretteTimestamp,
-} from '@/data/repositories/cigaretteLog';
+import { getLastCigaretteTimestamp } from '@/data/repositories/cigaretteLog';
 import {
   addLedgerEntry,
   type LedgerReason,
 } from '@/data/repositories/economyLedger';
 import { accrueCoins, recoveryMultiplier } from '@/engine/economy';
-import {
-  reachedCount,
-  recoveryHoursFrom,
-  totalSetbackHours,
-} from '@/engine/health';
+import { liveRecoveryHours, reachedCount } from '@/engine/health';
+import { useRecovery } from '@/store/useRecovery';
 import type { Plan } from '@/types/domain';
-import { todayISO } from '@/utils/date';
-import { densifyDailyCounts } from '@/utils/series';
 
 const HOUR_MS = 3_600_000;
 
@@ -121,19 +113,12 @@ export const useEconomy = create<EconomyState>()(
           }
 
           // The further along the recovery milestones, the higher the rate.
-          let multiplier = 1;
-          if (plan) {
-            const today = todayISO();
-            const rows = await getDailyCigaretteCounts(plan.startDate, today);
-            const counts = densifyDailyCounts(rows, plan.startDate, today).map(
-              (d) => d.count,
-            );
-            const recoveryHours = recoveryHoursFrom(
-              (now - new Date(plan.startDate).getTime()) / HOUR_MS,
-              totalSetbackHours(counts, plan.allowances),
-            );
-            multiplier = recoveryMultiplier(reachedCount(recoveryHours));
-          }
+          const rec = useRecovery.getState();
+          const anchor =
+            rec.anchorMs ??
+            (plan ? new Date(plan.startDate).getTime() : now);
+          const recoveryHours = liveRecoveryHours(rec.baseHours, anchor, now);
+          const multiplier = recoveryMultiplier(reachedCount(recoveryHours));
 
           const streakStartHours = (accrueFromMs - streakStartMs) / HOUR_MS;
           const coins = Math.round(

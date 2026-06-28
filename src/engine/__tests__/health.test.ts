@@ -1,15 +1,15 @@
 import { describe, expect, it } from '@jest/globals';
 
 import {
+  cigarettePenaltyHours,
   currentPhaseId,
-  daySetbackHours,
   HEALTH_MILESTONES,
   HEALTH_PHASES,
+  liveRecoveryHours,
   milestoneTimeline,
   nextMilestone,
   reachedCount,
-  recoveryHoursFrom,
-  totalSetbackHours,
+  WITHIN_QUOTA_HOURS,
 } from '../health';
 
 describe('phases & milestones', () => {
@@ -75,35 +75,38 @@ describe('currentPhaseId', () => {
   });
 });
 
-describe('slip setback', () => {
-  it('is zero for a clean day and grows with cigarettes', () => {
-    expect(daySetbackHours(0, 3)).toBe(0);
-    expect(daySetbackHours(2, 3)).toBeGreaterThan(daySetbackHours(1, 3));
-  });
-
-  it('punishes over-quota cigarettes harder', () => {
-    // Same 4 cigarettes hurt more when the allowance is lower (more over quota).
-    expect(daySetbackHours(4, 3)).toBeGreaterThan(daySetbackHours(4, 10));
-  });
-
-  it('totals across days', () => {
-    expect(totalSetbackHours([1, 2], [3, 3])).toBeCloseTo(
-      daySetbackHours(1, 3) + daySetbackHours(2, 3),
+describe('cigarettePenaltyHours', () => {
+  it('scales within-quota cigarettes by the allowance', () => {
+    // Each in-quota cigarette costs WITHIN_QUOTA_HOURS / allowance.
+    expect(cigarettePenaltyHours(0, 10)).toBeCloseTo(WITHIN_QUOTA_HOURS / 10);
+    // 2 of 10 ≈ 20% of the full daily hit.
+    const two = cigarettePenaltyHours(0, 10) + cigarettePenaltyHours(1, 10);
+    expect(two).toBeCloseTo(0.2 * WITHIN_QUOTA_HOURS);
+    // Smaller quota → each in-quota cigarette hurts more.
+    expect(cigarettePenaltyHours(0, 3)).toBeGreaterThan(
+      cigarettePenaltyHours(0, 10),
     );
+  });
+
+  it('hurts more over quota and escalates', () => {
+    const firstOver = cigarettePenaltyHours(10, 10);
+    const secondOver = cigarettePenaltyHours(11, 10);
+    expect(firstOver).toBeGreaterThan(cigarettePenaltyHours(9, 10));
+    expect(secondOver).toBeGreaterThan(firstOver);
+  });
+
+  it('treats every cigarette as over quota on cold turkey (allowance 0)', () => {
+    expect(cigarettePenaltyHours(0, 0)).toBeGreaterThan(0);
   });
 });
 
-describe('recoveryHoursFrom', () => {
-  it('equals elapsed when there is no setback', () => {
-    expect(recoveryHoursFrom(100, 0)).toBe(100);
+describe('liveRecoveryHours', () => {
+  it('is base plus the time since the anchor', () => {
+    const now = 10 * 3_600_000; // 10h in ms
+    expect(liveRecoveryHours(2, 0, now)).toBeCloseTo(12);
   });
 
-  it('subtracts a small setback directly', () => {
-    expect(recoveryHoursFrom(100, 10)).toBe(90);
-  });
-
-  it('floors at zero and never goes negative', () => {
-    expect(recoveryHoursFrom(100, 999999)).toBe(0);
-    expect(recoveryHoursFrom(0, 50)).toBe(0);
+  it('floors at zero', () => {
+    expect(liveRecoveryHours(0, 1000, 0)).toBe(0);
   });
 });
