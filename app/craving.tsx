@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +10,7 @@ import { Distraction } from '@/components/craving/Distraction';
 import { Button } from '@/components/ui/Button';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
+import { useCelebration } from '@/store/useCelebration';
 import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
@@ -28,6 +28,7 @@ export default function Craving() {
   const [picked, setPicked] = useState<string | null>(null);
   const logResisted = useLogs((s) => s.logResistedCraving);
   const recordHelped = useDistractions((s) => s.recordHelped);
+  const celebrate = useCelebration((s) => s.celebrate);
 
   const onResisted = async () => {
     if (saving) return;
@@ -38,7 +39,7 @@ export default function Craving() {
       await useEconomy
         .getState()
         .award(BONUS_RESISTED_CRAVING, 'resisted_craving');
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      celebrate('💪', t('celebrate.resisted'));
       router.back();
     } catch {
       setSaving(false);
@@ -47,7 +48,7 @@ export default function Craving() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row justify-end px-5 pt-4">
+      <View className="flex-row justify-end px-6 pt-5">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -89,7 +90,7 @@ export default function Craving() {
         )}
       </ScrollView>
 
-      <View className="px-6 pb-4">
+      <View className="px-6 pb-6">
         <Button
           label={t('craving.resisted')}
           onPress={onResisted}

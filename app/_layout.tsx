@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { CelebrationOverlay } from '@/components/ui/CelebrationOverlay';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { applyLanguage } from '@/i18n';
 import { applySavedTheme } from '@/theme/appearance';
@@ -91,6 +92,7 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
             <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
           </Stack>
+          <CelebrationOverlay />
           <StatusBar style="auto" />
         </ThemeProvider>
       </SafeAreaProvider>

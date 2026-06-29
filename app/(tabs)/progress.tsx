@@ -23,7 +23,7 @@ import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { useWishlist } from '@/store/useWishlist';
-import { formatMedium, todayISO } from '@/utils/date';
+import { addDaysISO, formatMedium, todayISO } from '@/utils/date';
 
 function Stat({ value, label }: { value: number | string; label: string }) {
   return (
@@ -78,6 +78,14 @@ export default function Progress() {
   // Re-planning rewrites the schedule and can't be undone — confirm first (§9).
   const isEase = replan.action === 'ease';
 
+  // Last two weeks of the trend, with dates for the x-axis ends.
+  const trendActual = data.actual.slice(-14);
+  const trendAllow = data.allowances.slice(-14);
+  const chartStartLabel = formatMedium(
+    addDaysISO(todayISO(), -Math.max(0, trendActual.length - 1)),
+  );
+  const chartEndLabel = formatMedium(todayISO());
+
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
@@ -106,9 +114,11 @@ export default function Progress() {
           </View>
           <View className="mt-3">
             <TrendChart
-              actual={data.actual.slice(-14)}
-              allowances={data.allowances.slice(-14)}
+              actual={trendActual}
+              allowances={trendAllow}
               max={Math.max(plan.baseline, 1)}
+              startLabel={chartStartLabel}
+              endLabel={chartEndLabel}
             />
           </View>
         </Card>
@@ -139,7 +149,13 @@ export default function Progress() {
           </Text>
           {data.savedSeries.length > 1 ? (
             <View className="mt-3">
-              <Sparkline values={data.savedSeries} />
+              <Sparkline
+                values={data.savedSeries}
+                accessibilityLabel={t('progress.savedTrendA11y', {
+                  amount: data.saved.toFixed(2),
+                  currency,
+                })}
+              />
             </View>
           ) : null}
           {purchased.length > 0 ? (

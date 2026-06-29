@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +18,7 @@ import { Scale } from '@/components/ui/Scale';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
 import { cigarettePenaltyHours } from '@/engine/health';
 import { allowanceForDay } from '@/engine/planEngine';
+import { useCelebration } from '@/store/useCelebration';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
@@ -52,6 +52,7 @@ export default function Log() {
   const logResisted = useLogs((s) => s.logResistedCraving);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const celebrate = useCelebration((s) => s.celebrate);
 
   const [mode, setMode] = useState<Mode>('smoked');
   const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
@@ -116,9 +117,7 @@ export default function Log() {
         await useEconomy
           .getState()
           .award(BONUS_RESISTED_CRAVING, 'resisted_craving');
-        void Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
+        celebrate('💪', t('celebrate.resisted'));
       }
       router.back();
     } catch {
@@ -128,7 +127,7 @@ export default function Log() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row justify-end px-5 pt-4">
+      <View className="flex-row justify-end px-6 pt-5">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -269,7 +268,7 @@ export default function Log() {
         ) : null}
       </ScrollView>
 
-      <View className="px-6 pb-4">
+      <View className="px-6 pb-6">
         <Button label={t('log.save')} onPress={onSave} disabled={saving} />
       </View>
 
@@ -283,7 +282,7 @@ export default function Log() {
           }}
         >
           <View className="flex-1 items-center justify-center bg-black/40 px-6">
-            <View className="w-full rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900">
+            <View className="w-full rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
               <Text className="text-base leading-6 text-ink dark:text-neutral-50">
                 {quotaMsg}
               </Text>

@@ -225,7 +225,9 @@
     "confirmEaseBody": "Reconstruiremos tu plan a un ritmo más suave: tu meta diaria baja más lento y tu fecha sin fumar se mueve más adelante. No se puede deshacer.",
     "confirmAccelTitle": "¿Acelerar?",
     "confirmAccelBody": "Reconstruiremos tu plan para terminar antes: tu meta diaria baja más rápido y tu fecha sin fumar se adelanta. No se puede deshacer.",
-    "seeAll": "Ver lista ›"
+    "seeAll": "Ver lista ›",
+    "trendA11y": "Cigarrillos por día en los últimos {{days}} días. Más reciente: {{actual}}, objetivo {{target}}.",
+    "savedTrendA11y": "Tu ahorro va en aumento — {{amount}} {{currency}} hasta ahora."
   },
   "goals": {
     "coffee": "un café",
@@ -652,7 +654,8 @@
     "clearLogs": "Borrar registros",
     "reset": "Reiniciar",
     "rerunOnboarding": "Rehacer introducción",
-    "wipe": "Borrar todo"
+    "wipe": "Borrar todo",
+    "resetRecovery": "Reiniciar recuperación"
   },
   "screens": {
     "about": "Hecho con cariño, en tu dispositivo.",
@@ -690,5 +693,10 @@
         "desc": "La línea de tiempo de la OMS sobre cómo se recupera tu cuerpo al dejarlo."
       }
     }
+  },
+  "celebrate": {
+    "milestone": "¡Nuevo hito alcanzado: {{title}}!",
+    "bought": "¡Te diste el gusto: {{name}}!",
+    "resisted": "Antojo vencido. Tú puedes con esto."
   }
 }

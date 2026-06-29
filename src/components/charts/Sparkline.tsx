@@ -20,6 +20,8 @@ type Props = {
   values: number[];
   height?: number;
   color?: string;
+  /** Spoken description for screen readers (the chart itself is decorative). */
+  accessibilityLabel?: string;
 };
 
 const PAD = 3;
@@ -29,6 +31,7 @@ export function Sparkline({
   values,
   height = 44,
   color = colors.accent['500'],
+  accessibilityLabel,
 }: Props) {
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
@@ -69,7 +72,13 @@ export function Sparkline({
   }));
 
   return (
-    <View style={{ height }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
+    <View
+      style={{ height }}
+      onLayout={(e) => setW(e.nativeEvent.layout.width)}
+      accessible={!!accessibilityLabel}
+      accessibilityRole="image"
+      accessibilityLabel={accessibilityLabel}
+    >
       {w > 0 && n > 1 ? (
         <Svg width={w} height={height}>
           <Defs>

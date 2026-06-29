@@ -225,7 +225,9 @@
     "confirmEaseBody": "We'll rebuild your plan at a gentler pace: your daily targets drop more slowly and your smoke-free date moves later. This can't be undone.",
     "confirmAccelTitle": "Speed up?",
     "confirmAccelBody": "We'll rebuild your plan to finish sooner: your daily targets drop faster and your smoke-free date moves earlier. This can't be undone.",
-    "seeAll": "See all ›"
+    "seeAll": "See all ›",
+    "trendA11y": "Cigarettes per day over the last {{days}} days. Most recent: {{actual}}, target {{target}}.",
+    "savedTrendA11y": "Money saved is trending up — {{amount}} {{currency}} so far."
   },
   "goals": {
     "coffee": "a coffee",
@@ -652,7 +654,8 @@
     "clearLogs": "Clear all logs",
     "reset": "Reset",
     "rerunOnboarding": "Re-run onboarding",
-    "wipe": "Wipe everything"
+    "wipe": "Wipe everything",
+    "resetRecovery": "Reset recovery"
   },
   "screens": {
     "about": "Made with care, on your device.",
@@ -690,5 +693,10 @@
         "desc": "WHO’s timeline of how your body recovers after you quit."
       }
     }
+  },
+  "celebrate": {
+    "milestone": "New milestone reached: {{title}}!",
+    "bought": "You treated yourself to {{name}}!",
+    "resisted": "Craving beaten. You've got this."
   }
 }

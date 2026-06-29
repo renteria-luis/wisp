@@ -24,6 +24,8 @@ import {
   nextMilestone,
   reachedCount,
 } from '@/engine/health';
+import { useCelebration } from '@/store/useCelebration';
+import { useRecovery } from '@/store/useRecovery';
 import { colors } from '@/theme/tokens';
 import { formatCountDown, formatCountUp } from '@/utils/duration';
 
@@ -260,7 +262,7 @@ function DetailModal({
         onPress={onClose}
         className="flex-1 items-center justify-center bg-black/40 px-6"
       >
-        <View className="w-full rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900">
+        <View className="w-full rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
           <View className="flex-row items-baseline justify-between">
             <Text className="flex-1 pr-2 text-lg font-bold text-ink dark:text-neutral-50">
               {t(`health.milestones.${id}.title`)}
@@ -320,6 +322,30 @@ export function HealthTimeline({
   const reachedById = new Map(timeline.map((m) => [m.milestone.id, m]));
   const reached = reachedCount(recoveryHours);
   const total = HEALTH_MILESTONES.length;
+
+  // Celebrate each newly-reached milestone exactly once (a high-water mark in
+  // the recovery store; −1 means "first run" → seed silently, no celebration).
+  const seenMilestones = useRecovery((s) => s.seenMilestones);
+  const setSeenMilestones = useRecovery((s) => s.setSeenMilestones);
+  const celebrate = useCelebration((s) => s.celebrate);
+  useEffect(() => {
+    if (seenMilestones < 0) {
+      setSeenMilestones(reached);
+      return;
+    }
+    if (reached > seenMilestones) {
+      const justReached = HEALTH_MILESTONES[reached - 1];
+      if (justReached) {
+        celebrate(
+          '🎉',
+          t('celebrate.milestone', {
+            title: t(`health.milestones.${justReached.id}.title`),
+          }),
+        );
+      }
+      setSeenMilestones(reached);
+    }
+  }, [reached, seenMilestones, setSeenMilestones, celebrate, t]);
   const next = nextMilestone(recoveryHours);
   const phaseId = currentPhaseId(recoveryHours);
   const phaseIndex = HEALTH_PHASES.findIndex((p) => p.id === phaseId);

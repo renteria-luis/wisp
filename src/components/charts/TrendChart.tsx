@@ -30,6 +30,9 @@ type Props = {
   /** Upper bound for the y-axis (e.g. the baseline). */
   max?: number;
   height?: number;
+  /** Short date for the first/last point, shown under the x-axis. */
+  startLabel?: string;
+  endLabel?: string;
 };
 
 const PAD_X = 6;
@@ -41,7 +44,14 @@ const PAD_B = 10;
  * under the actual line, a dashed target line, and a draw-on stroke. Replaces
  * the Phase-3 placeholder bars.
  */
-export function TrendChart({ actual, allowances, max, height = 132 }: Props) {
+export function TrendChart({
+  actual,
+  allowances,
+  max,
+  height = 132,
+  startLabel,
+  endLabel,
+}: Props) {
   const { t } = useTranslation();
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
@@ -83,9 +93,18 @@ export function TrendChart({ actual, allowances, max, height = 132 }: Props) {
   }));
 
   const last = actualPts.at(-1);
+  const a11yLabel = t('progress.trendA11y', {
+    days: n,
+    actual: actual.at(-1) ?? 0,
+    target: Math.round(allowances.at(-1) ?? 0),
+  });
 
   return (
-    <View>
+    <View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={a11yLabel}
+    >
       <View
         style={{ height }}
         onLayout={(e) => setW(e.nativeEvent.layout.width)}
@@ -155,6 +174,17 @@ export function TrendChart({ actual, allowances, max, height = 132 }: Props) {
           </Svg>
         ) : null}
       </View>
+
+      {startLabel || endLabel ? (
+        <View className="mt-1 flex-row justify-between">
+          <Text className="text-[10px] text-ink-mute dark:text-neutral-400">
+            {startLabel ?? ''}
+          </Text>
+          <Text className="text-[10px] text-ink-mute dark:text-neutral-400">
+            {endLabel ?? ''}
+          </Text>
+        </View>
+      ) : null}
 
       <View className="mt-2 flex-row justify-center gap-5">
         <View className="flex-row items-center gap-1.5">

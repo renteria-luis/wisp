@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/Card';
 import { NumberField } from '@/components/ui/NumberField';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useProgressData } from '@/hooks/useProgressData';
+import { useCelebration } from '@/store/useCelebration';
 import { useSettings } from '@/store/useSettings';
 import { sortByPrice, useWishlist } from '@/store/useWishlist';
 import { colors } from '@/theme/tokens';
@@ -29,8 +30,14 @@ export default function Wishlist() {
   const add = useWishlist((s) => s.add);
   const remove = useWishlist((s) => s.remove);
   const markBought = useWishlist((s) => s.markBought);
+  const celebrate = useCelebration((s) => s.celebrate);
   const currency = useSettings((s) => s.pricing.currency);
   const { saved } = useProgressData();
+
+  const onBought = (id: string, itemName: string) => {
+    markBought(id);
+    celebrate('🎁', t('celebrate.bought', { name: itemName }));
+  };
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState<number | null>(null);
@@ -49,7 +56,7 @@ export default function Wishlist() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row items-center justify-between px-6 pb-3 pt-4">
+      <View className="flex-row items-center justify-between px-6 pb-3 pt-5">
         <Text className="text-xl font-bold text-ink dark:text-neutral-50">
           {t('wishlist.title')}
         </Text>
@@ -66,7 +73,7 @@ export default function Wishlist() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-4 px-5 pb-12 pt-2">
+      <ScrollView contentContainerClassName="gap-4 px-6 pb-12 pt-2">
         <Text className="text-sm leading-5 text-ink-soft dark:text-neutral-300">
           {t('wishlist.subtitle')}
         </Text>
@@ -166,7 +173,7 @@ export default function Wishlist() {
                   <View className="mt-3">
                     <Button
                       label={t('wishlist.bought')}
-                      onPress={() => markBought(item.id)}
+                      onPress={() => onBought(item.id, item.name)}
                     />
                   </View>
                 ) : null}

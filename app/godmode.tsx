@@ -16,6 +16,7 @@ import { clearAllCravingLogs } from '@/data/repositories/cravingLog';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
+import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
 import { wipeAppData } from '@/utils/appData';
 import { addDaysISO, daysBetween, todayISO } from '@/utils/date';
@@ -66,6 +67,13 @@ export default function GodMode() {
     await refreshToday();
   };
 
+  const resetRecovery = () => {
+    useRecovery.getState().reset();
+    if (plan) {
+      useRecovery.getState().ensureAnchor(new Date(plan.startDate).getTime());
+    }
+  };
+
   const wipeAll = async () => {
     await wipeAppData();
     router.replace('/welcome');
@@ -77,7 +85,7 @@ export default function GodMode() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row items-center justify-between px-4 pt-2">
+      <View className="flex-row items-center justify-between px-6 pt-4">
         <Text className="text-lg font-bold text-ink dark:text-neutral-50">
           {t('godmode.title')}
         </Text>
@@ -202,6 +210,11 @@ export default function GodMode() {
             {t('godmode.reset')}
           </Text>
           <View className="gap-2">
+            <Button
+              label={t('godmode.resetRecovery')}
+              variant="secondary"
+              onPress={resetRecovery}
+            />
             <Button
               label={t('godmode.rerunOnboarding')}
               variant="secondary"

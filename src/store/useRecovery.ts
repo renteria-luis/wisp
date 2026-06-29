@@ -9,10 +9,14 @@ interface RecoveryState {
   anchorMs: number | null;
   /** Recovery hours at `anchorMs`. Live value = base + time since anchor. */
   baseHours: number;
+  /** High-water mark of milestones already celebrated (−1 = uninitialized). */
+  seenMilestones: number;
   /** Seed the anchor (plan start) the first time only. */
   ensureAnchor: (planStartMs: number) => void;
   /** Knock recovery back by `hours` right now (a logged cigarette). */
   penalize: (hours: number) => void;
+  /** Record how many milestones the user has now seen celebrated. */
+  setSeenMilestones: (n: number) => void;
   reset: () => void;
 }
 
@@ -26,6 +30,7 @@ export const useRecovery = create<RecoveryState>()(
     (set, get) => ({
       anchorMs: null,
       baseHours: 0,
+      seenMilestones: -1,
       ensureAnchor: (planStartMs) => {
         if (get().anchorMs == null) {
           set({ anchorMs: planStartMs, baseHours: 0 });
@@ -37,7 +42,8 @@ export const useRecovery = create<RecoveryState>()(
         const live = liveRecoveryHours(get().baseHours, anchor, now);
         set({ baseHours: Math.max(0, live - Math.max(0, hours)), anchorMs: now });
       },
-      reset: () => set({ anchorMs: null, baseHours: 0 }),
+      setSeenMilestones: (n) => set({ seenMilestones: n }),
+      reset: () => set({ anchorMs: null, baseHours: 0, seenMilestones: -1 }),
     }),
     {
       name: 'wisp-recovery',
