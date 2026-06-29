@@ -176,7 +176,7 @@ export default function Settings() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <View className="flex-row items-center justify-between px-6 pb-3 pt-4">
+      <View className="flex-row items-center justify-between px-6 pb-3 pt-5">
         <Text className="text-xl font-bold text-ink dark:text-neutral-50">{t('settings.title')}</Text>
         <Pressable
           onPress={() => router.back()}
@@ -191,7 +191,7 @@ export default function Settings() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-6 px-5 pb-12 pt-2">
+      <ScrollView contentContainerClassName="gap-6 px-6 pb-12 pt-2">
         <Section title={t('settings.you')}>
           <TextField
             label={t('settings.yourName')}

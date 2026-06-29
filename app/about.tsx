@@ -13,7 +13,7 @@ export default function About() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
-      <View className="flex-row justify-end px-5 pt-4">
+      <View className="flex-row justify-end px-6 pt-5">
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"

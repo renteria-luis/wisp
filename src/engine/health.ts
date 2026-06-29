@@ -168,12 +168,19 @@ export function currentPhaseId(recoveryHours: number): string {
 // ── Slip penalty & running recovery (PROJECT.md §6.3, non-punitive) ───────────
 // Recovery is a *running* value (stored as a base + a timestamp): it climbs in
 // real time and each cigarette knocks it back ONCE, then keeps climbing — it is
-// never frozen. The hit scales with the day's quota: a cigarette well within a
-// generous allowance barely dents it (10 a day → each ≈ 10% of the daily hit),
-// while going over the limit hurts more and escalates. Designed game constants.
-export const WITHIN_QUOTA_HOURS = 10;
-export const OVER_QUOTA_BASE_HOURS = 4;
-export const OVER_QUOTA_GROWTH = 0.2;
+// never frozen. The hit is meant to be *clearly visible* yet fair: it scales
+// with the day's quota. A full day's quota is worth WITHIN_QUOTA_HOURS of
+// recovery, so each in-quota cigarette costs WITHIN_QUOTA_HOURS / allowance —
+// e.g. with a quota of 10 that is ~4h each (and 2 of 10 ≈ 20% of the day's
+// budget). Going over the line always hurts more than an in-quota one and
+// escalates with every extra cigarette. Designed game constants.
+export const WITHIN_QUOTA_HOURS = 40;
+/** Recovery hours a single cigarette costs on cold turkey (no allowance). */
+export const COLD_TURKEY_HOURS = 8;
+/** First over-quota cigarette costs this multiple of an in-quota one… */
+export const OVER_QUOTA_MULT = 1.5;
+/** …and each further cigarette past the limit escalates by this much. */
+export const OVER_QUOTA_GROWTH = 0.5;
 
 /** Recovery hours lost for one cigarette, given how many were already smoked
  *  today (`indexToday`, 0-based) and today's `allowance`. */
@@ -182,11 +189,16 @@ export function cigarettePenaltyHours(
   allowance: number,
 ): number {
   const limit = Math.max(0, allowance);
-  if (limit > 0 && indexToday < limit) {
-    return WITHIN_QUOTA_HOURS / limit;
+  // Cold turkey: there is no allowance, so every cigarette is a real slip and
+  // each one in the same day stings a little more than the last.
+  if (limit <= 0) {
+    return COLD_TURKEY_HOURS * (1 + OVER_QUOTA_GROWTH * Math.max(0, indexToday));
   }
-  const over = Math.max(0, indexToday - limit);
-  return OVER_QUOTA_BASE_HOURS * (1 + OVER_QUOTA_GROWTH * over);
+  const unit = WITHIN_QUOTA_HOURS / limit;
+  if (indexToday < limit) return unit;
+  // Over quota: at least OVER_QUOTA_MULT× an in-quota cigarette, escalating.
+  const over = indexToday - limit; // 0 for the first cigarette past the limit
+  return unit * (OVER_QUOTA_MULT + OVER_QUOTA_GROWTH * over);
 }
 
 /** Live recovery hours = stored base + time since the last update (floored 0). */

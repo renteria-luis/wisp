@@ -79,6 +79,8 @@ describe('cigarettePenaltyHours', () => {
   it('scales within-quota cigarettes by the allowance', () => {
     // Each in-quota cigarette costs WITHIN_QUOTA_HOURS / allowance.
     expect(cigarettePenaltyHours(0, 10)).toBeCloseTo(WITHIN_QUOTA_HOURS / 10);
+    // A quota of 10 → a clearly visible ~4h per cigarette.
+    expect(cigarettePenaltyHours(0, 10)).toBeCloseTo(4);
     // 2 of 10 ≈ 20% of the full daily hit.
     const two = cigarettePenaltyHours(0, 10) + cigarettePenaltyHours(1, 10);
     expect(two).toBeCloseTo(0.2 * WITHIN_QUOTA_HOURS);
@@ -89,14 +91,19 @@ describe('cigarettePenaltyHours', () => {
   });
 
   it('hurts more over quota and escalates', () => {
+    const inQuota = cigarettePenaltyHours(9, 10);
     const firstOver = cigarettePenaltyHours(10, 10);
     const secondOver = cigarettePenaltyHours(11, 10);
-    expect(firstOver).toBeGreaterThan(cigarettePenaltyHours(9, 10));
+    // The first cigarette past the limit always costs more than an in-quota one.
+    expect(firstOver).toBeGreaterThan(inQuota);
     expect(secondOver).toBeGreaterThan(firstOver);
   });
 
-  it('treats every cigarette as over quota on cold turkey (allowance 0)', () => {
+  it('treats every cigarette as a slip on cold turkey (allowance 0), escalating', () => {
     expect(cigarettePenaltyHours(0, 0)).toBeGreaterThan(0);
+    expect(cigarettePenaltyHours(1, 0)).toBeGreaterThan(
+      cigarettePenaltyHours(0, 0),
+    );
   });
 });
 

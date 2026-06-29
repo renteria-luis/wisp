@@ -36,7 +36,7 @@ export function ConfirmModal({
         {/* Inner Pressable swallows taps so they don't close via the backdrop. */}
         <Pressable
           onPress={() => {}}
-          className="w-full rounded-2xl bg-neutral-0 p-5 dark:bg-neutral-900"
+          className="w-full rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900"
         >
           <Text className="text-lg font-bold text-ink dark:text-neutral-50">
             {title}

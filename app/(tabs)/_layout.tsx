@@ -11,6 +11,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // A soft cross-fade + slide between tabs so switching feels smooth.
+        animation: 'shift',
         tabBarActiveTintColor: colors.primary['600'],
         tabBarInactiveTintColor: colors.ink.mute,
       }}
