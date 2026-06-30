@@ -44,6 +44,8 @@ export default function Home() {
   const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
 
+  // Explains what "I'm out / drinking" does, shown when it's activated/tapped.
+  const [supportInfo, setSupportInfo] = useState(false);
   // Easter egg: long-press the companion 5× within 3s for a heart burst (§11).
   const [burst, setBurst] = useState(false);
   const [eggVisible, setEggVisible] = useState(false);
@@ -78,13 +80,18 @@ export default function Home() {
     new Date(situationalUntil).getTime() > Date.now();
 
   const onSituational = async () => {
-    if (situationalActive) return;
+    // Already on → just re-explain what it's doing.
+    if (situationalActive) {
+      setSupportInfo(true);
+      return;
+    }
     if (!notificationsEnabled) {
       setNotificationsEnabled(await requestNotificationPermission());
     }
     await startSituationalSupport();
     setSituationalUntil(new Date(Date.now() + SITUATIONAL_MS).toISOString());
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setSupportInfo(true);
   };
 
   let status: string | null = null;
@@ -188,6 +195,26 @@ export default function Home() {
           </Pressable>
         </View>
       </View>
+
+      {supportInfo ? (
+        <Pressable
+          onPress={() => setSupportInfo(false)}
+          accessibilityRole="button"
+          className="absolute inset-0 items-center justify-center bg-black/30 px-8"
+        >
+          <View className="w-full max-w-sm rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
+            <Text className="text-center text-lg font-bold text-ink dark:text-neutral-50">
+              {t('home.situationalInfoTitle')}
+            </Text>
+            <Text className="mt-2 text-center text-sm leading-6 text-ink-soft dark:text-neutral-300">
+              {t('home.situationalInfoBody')}
+            </Text>
+            <Text className="mt-4 text-center text-sm font-semibold text-primary-600">
+              {t('common.ok')}
+            </Text>
+          </View>
+        </Pressable>
+      ) : null}
 
       <HeartBurst visible={burst} onDone={() => setBurst(false)} />
       {eggVisible ? (

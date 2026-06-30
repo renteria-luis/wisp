@@ -72,7 +72,9 @@
     "cravingAction": "Tengo un antojo",
     "situationalStart": "Estoy fuera / bebiendo 🍸",
     "situationalActive": "Apoyo extra activado 💚",
-    "checkInAction": "Registro"
+    "checkInAction": "Registro",
+    "situationalInfoTitle": "Modo apoyo activado 💚",
+    "situationalInfoBody": "Saliste a tomar o estás en un momento difícil? El alcohol es uno de los mayores disparadores para fumar, así que durante las próximas 3 horas te enviaré algunos recordatorios de aliento (si tienes las notificaciones activas). Toca cualquiera —o el botón de antojo— para respirar y dejar pasar las ganas. Tú puedes."
   },
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",

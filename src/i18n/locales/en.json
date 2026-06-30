@@ -72,7 +72,9 @@
     "cravingAction": "I'm having a craving",
     "situationalStart": "I'm out / drinking 🍸",
     "situationalActive": "Extra support is on 💚",
-    "checkInAction": "Check-in"
+    "checkInAction": "Check-in",
+    "situationalInfoTitle": "Support mode is on 💚",
+    "situationalInfoBody": "Drinking or in a tricky spot? Alcohol is one of the biggest smoking triggers, so for the next 3 hours I'll send you a few gentle nudges (if notifications are on). Tap one — or the craving button — to breathe through the urge. You've got this."
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",
