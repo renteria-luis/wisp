@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
-import { Modal, Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -67,6 +67,10 @@ function ConfettiPiece({
  * Global celebration overlay: a tasteful, auto-dismissing burst for the app's
  * little wins (a new health milestone, a wishlist treat, beating a craving).
  * Mounted once in the root layout; driven by `useCelebration`.
+ *
+ * It is a plain absolutely-positioned view (NOT a Modal) with
+ * `pointerEvents="none"`, so it can never intercept touches or interfere with
+ * the navigator / react-native-screens — it just paints on top for ~2s.
  */
 export function CelebrationOverlay() {
   const current = useCelebration((s) => s.current);
@@ -110,42 +114,41 @@ export function CelebrationOverlay() {
   if (!current) return null;
 
   return (
-    <Modal transparent visible animationType="fade" onRequestClose={dismiss}>
-      <Pressable style={styles.backdrop} onPress={dismiss}>
-        <Animated.View style={[styles.cardWrap, cardStyle]}>
-          {!reduced
-            ? CONFETTI.map((e, i) => (
-                <ConfettiPiece
-                  key={i}
-                  emoji={e}
-                  x={20 + i * 32}
-                  delay={i * 80}
-                  play={!!current}
-                />
-              ))
-            : null}
-          <LinearGradient
-            colors={[colors.accent['400'], colors.accent['600']]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.card}
-          >
-            <Text style={styles.emoji}>{current.emoji}</Text>
-            <Text style={styles.message}>{current.message}</Text>
-          </LinearGradient>
-        </Animated.View>
-      </Pressable>
-    </Modal>
+    <View style={styles.overlay} pointerEvents="none">
+      <Animated.View style={[styles.cardWrap, cardStyle]}>
+        {!reduced
+          ? CONFETTI.map((e, i) => (
+              <ConfettiPiece
+                key={i}
+                emoji={e}
+                x={20 + i * 32}
+                delay={i * 80}
+                play={!!current}
+              />
+            ))
+          : null}
+        <LinearGradient
+          colors={[colors.accent['400'], colors.accent['600']]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.card}
+        >
+          <Text style={styles.emoji}>{current.emoji}</Text>
+          <Text style={styles.message}>{current.message}</Text>
+        </LinearGradient>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.25)',
     paddingHorizontal: 32,
+    zIndex: 9999,
+    elevation: 9999,
   },
   cardWrap: { width: '100%', maxWidth: 320 },
   card: {
