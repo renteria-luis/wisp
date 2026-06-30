@@ -6,50 +6,111 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CelebrationOverlay } from '@/components/ui/CelebrationOverlay';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { applyLanguage } from '@/i18n';
-import { applySavedTheme } from '@/theme/appearance';
 import {
   configureNotificationHandler,
   rescheduleTriggerNotifications,
 } from '@/notifications/scheduler';
+import { useCompanion } from '@/store/useCompanion';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
+import { useVitalityStore } from '@/store/useVitalityStore';
+import { useWishlist } from '@/store/useWishlist';
+import { applySavedTheme } from '@/theme/appearance';
+
+// Keep the native splash up until the first frame can show real data instead of
+// store defaults (the "everything flashes from 0 for a second" problem).
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+type Hydratable = {
+  persist: {
+    hasHydrated: () => boolean;
+    onFinishHydration: (cb: () => void) => () => void;
+  };
+};
+
+/** Resolves once a persisted Zustand store has finished loading from disk. */
+function whenHydrated(store: Hydratable): Promise<void> {
+  if (store.persist.hasHydrated()) return Promise.resolve();
+  return new Promise((resolve) => {
+    const unsub = store.persist.onFinishHydration(() => {
+      unsub();
+      resolve();
+    });
+  });
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    // Safety net: never keep the splash up longer than this, even if a load stalls.
+    const safety = setTimeout(() => {
+      if (!cancelled) setReady(true);
+    }, 4000);
+
     void (async () => {
-      applySavedTheme();
-      applyLanguage(useSettings.getState().language);
-      await useLogs.getState().init();
-      const plan = usePlan.getState().plan;
-      if (plan) {
-        useRecovery
-          .getState()
-          .ensureAnchor(new Date(plan.startDate).getTime());
+      try {
+        // 1. Wait for persisted stores to load from disk (plan, settings, …).
+        await Promise.all([
+          whenHydrated(useSettings),
+          whenHydrated(usePlan),
+          whenHydrated(useEconomy),
+          whenHydrated(useCompanion),
+          whenHydrated(useRecovery),
+          whenHydrated(useWishlist),
+        ]);
+        // 2. Apply saved appearance + language before the first frame.
+        applySavedTheme();
+        applyLanguage(useSettings.getState().language);
+        // 3. Load today's counts from SQLite.
+        await useLogs.getState().init();
+        // 4. Seed recovery, accrue coins, precompute the companion's vitality.
+        const plan = usePlan.getState().plan;
+        if (plan) {
+          useRecovery.getState().ensureAnchor(new Date(plan.startDate).getTime());
+        }
+        await useEconomy.getState().accrueFromLogs(plan);
+        await useVitalityStore.getState().recompute(plan);
+        // 5. Notifications (best effort, never blocks the reveal).
+        await configureNotificationHandler();
+        const s = useSettings.getState();
+        await rescheduleTriggerNotifications(
+          s.triggers,
+          s.quietHours,
+          s.notificationsEnabled,
+        );
+      } catch {
+        /* best effort — reveal the app regardless */
+      } finally {
+        if (!cancelled) setReady(true);
       }
-      await useEconomy.getState().accrueFromLogs(plan);
-      await configureNotificationHandler();
-      const s = useSettings.getState();
-      await rescheduleTriggerNotifications(
-        s.triggers,
-        s.quietHours,
-        s.notificationsEnabled,
-      );
     })();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(safety);
+    };
   }, []);
+
+  // Hide the splash the moment everything above is loaded.
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
 
   useEffect(() => {
     let sub: { remove: () => void } | undefined;
@@ -66,6 +127,10 @@ export default function RootLayout() {
     })();
     return () => sub?.remove();
   }, [router]);
+
+  // While not ready the native splash covers the screen, so render nothing —
+  // this avoids mounting the app with default data and flashing it.
+  if (!ready) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
