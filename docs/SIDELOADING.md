@@ -112,9 +112,19 @@ nothing is lost — reopen SideStore on any Wi-Fi to refresh.
 
 ## Troubleshooting
 
+- **The build failed — find out *which* step.** In the failed run, open the job
+  and look for the **red step** (its name tells you the stage: prebuild / pods /
+  build / package). The workflow runs every shell step with `set -x`, and on
+  failure it uploads an **`xcodebuild-log`** artifact with the full compiler
+  output. Grab that (or expand the red step) and read the last ~30 lines — that's
+  the real error. (`exit code 66` from `xcodebuild` usually means it couldn't
+  find the scheme/workspace; the build step prints `xcodebuild -list` to show the
+  real names.)
 - **Workflow fails at `xcodebuild`** — usually an Xcode/SDK mismatch. The workflow
   already pins `latest-stable`; if Apple ships a breaking Xcode, pin a known-good
   version in `setup-xcode` (e.g. `xcode-version: '16.2'`).
+- **`pod install` errors** — re-run; if it persists, change it to
+  `pod install --repo-update` (refreshes the CocoaPods index).
 - **`pod install` can't resolve a pod** — re-run; if it persists, change the step
   to `pod install --repo-update` (slower but refreshes the CocoaPods index).
 - **Prebuild complains about a missing icon/asset** — harmless warnings are fine;

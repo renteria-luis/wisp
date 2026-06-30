@@ -5,8 +5,8 @@ name: iOS unsigned IPA (sideload)
 # and no Mac required — the build runs on a GitHub-hosted macOS runner.
 #
 # Manual trigger only (workflow_dispatch) so it never burns CI minutes on push.
-# Run it from the GitHub UI → Actions → "iOS unsigned IPA (sideload)" → Run
-# workflow, then download the "wisp-unsigned-ipa" artifact when it finishes.
+# Run it from GitHub → Actions → "iOS unsigned IPA (sideload)" → Run workflow,
+# then download the "wisp-unsigned-ipa" artifact when it finishes.
 #
 # Full how-to + SideStore setup: docs/SIDELOADING.md
 
@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 50
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # RN 0.81 / Expo SDK 54 needs a recent Xcode (16+).
       - name: Select latest stable Xcode
@@ -29,10 +29,19 @@ jobs:
           xcode-version: latest-stable
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
+
+      - name: Toolchain versions (diagnostics)
+        run: |
+          set -x
+          sw_vers
+          xcodebuild -version
+          node -v
+          npm -v
+          pod --version || true
 
       - name: Install JS dependencies
         run: npm ci
@@ -42,20 +51,25 @@ jobs:
         run: npx expo prebuild --platform ios --no-install
         env:
           EXPO_NO_TELEMETRY: '1'
+          CI: '1'
 
       - name: Install CocoaPods
         working-directory: ios
-        run: pod install
-
-      # Plain `build` (not `archive`) with signing disabled → a bare .app we can
-      # package ourselves. The workspace/scheme are auto-detected so this keeps
-      # working even if the app is ever renamed.
-      - name: Build (Release, no code signing)
         run: |
-          set -eo pipefail
-          WORKSPACE=$(ls ios/*.xcworkspace | head -n 1)
-          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
-          echo "Workspace: $WORKSPACE | Scheme: $SCHEME"
+          set -exo pipefail
+          pod install
+
+      # Plain `build` (not `archive`) with signing fully disabled → a bare .app
+      # we package ourselves. Scheme/workspace are derived from the generated
+      # .xcodeproj so a rename can't break it; `-list` is printed for debugging.
+      - name: Build (Release, unsigned)
+        run: |
+          set -exo pipefail
+          PROJ=$(ls -d ios/*.xcodeproj | head -n 1)
+          SCHEME=$(basename "$PROJ" .xcodeproj)
+          WORKSPACE="ios/${SCHEME}.xcworkspace"
+          echo "Project=$PROJ Scheme=$SCHEME Workspace=$WORKSPACE"
+          xcodebuild -list -workspace "$WORKSPACE" || true
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
@@ -66,13 +80,14 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            build
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee xcodebuild.log
 
       # An .ipa is just a zip with the .app inside a top-level Payload/ folder.
       - name: Package unsigned .ipa
         run: |
-          set -eo pipefail
+          set -exo pipefail
           APP=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -n 1)
           echo "App bundle: $APP"
           rm -rf Payload Wisp-unsigned.ipa
@@ -88,3 +103,13 @@ jobs:
           path: Wisp-unsigned.ipa
           if-no-files-found: error
           retention-days: 30
+
+      # If anything failed, keep the xcodebuild log so we can see the real error.
+      - name: Upload build log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: xcodebuild.log
+          if-no-files-found: ignore
+          retention-days: 7
