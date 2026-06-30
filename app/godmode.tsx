@@ -56,8 +56,9 @@ export default function GodMode() {
   };
 
   const addCig = async (daysAgo: number) => {
+    // Local noon (no Z) so the row buckets to `date` regardless of timezone.
     const date = addDaysISO(todayISO(), -daysAgo);
-    await addCigarette({ timestamp: `${date}T12:00:00.000Z` });
+    await addCigarette({ timestamp: `${date}T12:00:00.000` });
     await refreshToday();
   };
 

@@ -1,5 +1,6 @@
 /** Craving log repository (PROJECT.md §16). Thin SQLite I/O. */
 import type { TriggerCategory } from '@/types/domain';
+import { nowISO } from '@/utils/date';
 
 import { getDb } from '../db';
 
@@ -22,7 +23,7 @@ export async function addCraving(input: {
   const db = await getDb();
   await db.runAsync(
     'INSERT INTO craving_log (timestamp, resisted, trigger_category, intensity, note) VALUES (?, ?, ?, ?, ?)',
-    input.timestamp ?? new Date().toISOString(),
+    input.timestamp ?? nowISO(),
     input.resisted ? 1 : 0,
     input.trigger ?? null,
     input.intensity ?? null,

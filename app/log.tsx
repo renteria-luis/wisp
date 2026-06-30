@@ -25,7 +25,7 @@ import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { colors } from '@/theme/tokens';
 import type { TriggerCategory } from '@/types/domain';
-import { daysBetween, todayISO } from '@/utils/date';
+import { daysBetween, nowISO, todayISO } from '@/utils/date';
 
 const CATEGORIES: TriggerCategory[] = [
   'work_break',
@@ -93,7 +93,7 @@ export default function Log() {
           note: note.trim() || undefined,
           timestamp:
             minutesAgo > 0
-              ? new Date(Date.now() - minutesAgo * 60_000).toISOString()
+              ? nowISO(new Date(Date.now() - minutesAgo * 60_000))
               : undefined,
         });
         // Knock recovery back once (penalty scales with the day's quota).

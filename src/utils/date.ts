@@ -10,6 +10,18 @@ export function todayISO(now: Date = new Date()): string {
   return format(now, ISO_DATE);
 }
 
+/**
+ * Local wall-clock timestamp (NO timezone suffix) whose first 10 chars equal
+ * `todayISO()`. Persisted log rows use this so day-bucketing
+ * (`substr(timestamp, 1, 10)`) lines up with the user's calendar day instead of
+ * UTC. With a plain `new Date().toISOString()` (UTC), an evening cigarette in a
+ * UTC-behind timezone (e.g. Peru/Canada) lands on "tomorrow" and never counts
+ * toward today — the "logged cigarette doesn't add up" bug.
+ */
+export function nowISO(now: Date = new Date()): string {
+  return format(now, "yyyy-MM-dd'T'HH:mm:ss.SSS");
+}
+
 export function toISODate(date: Date): string {
   return format(date, ISO_DATE);
 }

@@ -14,7 +14,7 @@ import {
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import type { VitalityState } from '@/types/domain';
-import { daysBetween, todayISO } from '@/utils/date';
+import { daysBetween, nowISO, todayISO } from '@/utils/date';
 
 const HOUR_MS = 3_600_000;
 
@@ -36,9 +36,9 @@ export function useVitality(): Vitality {
     let cancelled = false;
     async function load(): Promise<Vitality> {
       const now = Date.now();
-      const windowStartISO = new Date(
-        now - VITALITY_WINDOW_HOURS * HOUR_MS,
-      ).toISOString();
+      // Local-naive so it compares correctly against the local-naive timestamps
+      // stored on each row (see nowISO).
+      const windowStartISO = nowISO(new Date(now - VITALITY_WINDOW_HOURS * HOUR_MS));
       const [recentCigarettes, lastCig] = await Promise.all([
         healthWeightedCountSince(windowStartISO),
         getLastCigaretteTimestamp(),

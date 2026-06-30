@@ -1,5 +1,6 @@
 /** Cigarette log repository (PROJECT.md §16). Thin SQLite I/O. */
 import type { TriggerCategory } from '@/types/domain';
+import { nowISO } from '@/utils/date';
 import type { DailyCount } from '@/utils/series';
 
 import { getDb } from '../db';
@@ -23,7 +24,7 @@ export async function addCigarette(input?: {
   const db = await getDb();
   await db.runAsync(
     'INSERT INTO cigarette_log (timestamp, trigger_category, note, shared, gifted) VALUES (?, ?, ?, ?, ?)',
-    input?.timestamp ?? new Date().toISOString(),
+    input?.timestamp ?? nowISO(),
     input?.trigger ?? null,
     input?.note ?? null,
     input?.shared ? 1 : 0,
