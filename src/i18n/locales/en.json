@@ -175,7 +175,8 @@
     "ebooks": "📚 Free reads",
     "remainingToday": "You have left today",
     "overBy": "Over by {{count}} 💛",
-    "smokedOf": "{{count}} of {{allowance}} today"
+    "smokedOf": "{{count}} of {{allowance}} today",
+    "tapForInfo": "tap for info"
   },
   "log": {
     "title": "Log",

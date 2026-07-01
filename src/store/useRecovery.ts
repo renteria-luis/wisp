@@ -15,6 +15,8 @@ interface RecoveryState {
   ensureAnchor: (planStartMs: number) => void;
   /** Knock recovery back by `hours` right now (a logged cigarette). */
   penalize: (hours: number) => void;
+  /** Dev/God-mode: move recovery forward by `days` (may be negative). */
+  advance: (days: number) => void;
   /** Record how many milestones the user has now seen celebrated. */
   setSeenMilestones: (n: number) => void;
   reset: () => void;
@@ -42,6 +44,12 @@ export const useRecovery = create<RecoveryState>()(
         const live = liveRecoveryHours(get().baseHours, anchor, now);
         set({ baseHours: Math.max(0, live - Math.max(0, hours)), anchorMs: now });
       },
+      // Advancing forward `days` = moving the anchor into the past so the live
+      // value (base + now − anchor) grows by that many days.
+      advance: (days) =>
+        set((s) => ({
+          anchorMs: (s.anchorMs ?? Date.now()) - days * 86_400_000,
+        })),
       setSeenMilestones: (n) => set({ seenMilestones: n }),
       reset: () => set({ anchorMs: null, baseHours: 0, seenMilestones: -1 }),
     }),

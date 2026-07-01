@@ -1,14 +1,16 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { MilestoneDetailModal } from '@/components/health/MilestoneDetailModal';
 import { AllowanceBars } from '@/components/ui/AllowanceBars';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PlaceholderScreen } from '@/components/ui/PlaceholderScreen';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { nextMilestone } from '@/engine/health';
+import { HEALTH_MILESTONES, nextMilestone } from '@/engine/health';
 import { allowanceForDay } from '@/engine/planEngine';
 import { useProgressData } from '@/hooks/useProgressData';
 import { useSavingsGoals } from '@/hooks/useSavingsGoals';
@@ -25,6 +27,7 @@ export default function Plan() {
   const data = useProgressData();
   const { goals } = useSavingsGoals(data.saved);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   if (!plan) {
     return (
@@ -37,16 +40,14 @@ export default function Plan() {
   const upcoming = plan.allowances.slice(dayIndex, dayIndex + 7);
   const allowance = allowanceForDay(plan, dayIndex);
   const remaining = allowance - todayCigarettes;
-  // Journey reflects actual reduction (7-day average vs baseline), not just the
-  // calendar — it only climbs as you genuinely cut down. Cold turkey is time-based.
-  const reductionPct =
-    plan.baseline > 0
-      ? Math.max(0, Math.min(1, (plan.baseline - data.trend) / plan.baseline))
-      : 0;
-  const journeyPct = isReduction
-    ? reductionPct
-    : Math.min(1, (dayIndex + 1) / plan.nDays);
+  // Journey = how far through the plan by the calendar, so it matches the
+  // "day X of Y" label and never retreats. Whether you're actually cutting down
+  // lives on the Progress tab (trend, streak, win days) + the recovery timeline.
+  const journeyPct = Math.min(1, (dayIndex + 1) / plan.nDays);
   const next = nextMilestone(data.recoveryHours);
+  const detail = detailId
+    ? HEALTH_MILESTONES.find((m) => m.id === detailId)
+    : null;
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
@@ -161,20 +162,30 @@ export default function Plan() {
           </Pressable>
         </Card>
 
-        {/* Next recovery milestone */}
+        {/* Next recovery milestone — tap to see the details/citation. */}
         {next ? (
-          <Card>
-            <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
-              {t('plan.nextMilestone')}
-            </Text>
-            <Text className="mt-1 text-base font-semibold text-ink dark:text-neutral-50">
-              {t(`health.milestones.${next.milestone.id}.title`)}
-            </Text>
-            <Text className="mb-3 mt-0.5 text-xs leading-4 text-ink-soft dark:text-neutral-300">
-              {t(`health.milestones.${next.milestone.id}.body`)}
-            </Text>
-            <ProgressBar progress={next.progress} />
-          </Card>
+          <Pressable
+            onPress={() => setDetailId(next.milestone.id)}
+            accessibilityRole="button"
+          >
+            <Card>
+              <View className="flex-row items-center justify-between">
+                <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
+                  {t('plan.nextMilestone')}
+                </Text>
+                <Text className="text-xs text-ink-mute dark:text-neutral-400">
+                  {t('plan.tapForInfo')}
+                </Text>
+              </View>
+              <Text className="mt-1 text-base font-semibold text-ink dark:text-neutral-50">
+                {t(`health.milestones.${next.milestone.id}.title`)}
+              </Text>
+              <Text className="mb-3 mt-0.5 text-xs leading-4 text-ink-soft dark:text-neutral-300">
+                {t(`health.milestones.${next.milestone.id}.body`)}
+              </Text>
+              <ProgressBar progress={next.progress} />
+            </Card>
+          </Pressable>
         ) : null}
 
         <Button
@@ -183,6 +194,13 @@ export default function Plan() {
           onPress={() => router.push('/ebooks')}
         />
       </ScrollView>
+
+      {detail ? (
+        <MilestoneDetailModal
+          milestone={detail}
+          onClose={() => setDetailId(null)}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

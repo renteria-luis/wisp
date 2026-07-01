@@ -11,15 +11,22 @@ import { NumberField } from '@/components/ui/NumberField';
 import {
   addCigarette,
   clearAllCigaretteLogs,
+  shiftCigaretteDates,
 } from '@/data/repositories/cigaretteLog';
-import { clearAllCravingLogs } from '@/data/repositories/cravingLog';
+import {
+  clearAllCravingLogs,
+  shiftCravingDates,
+} from '@/data/repositories/cravingLog';
+import { cigarettePenaltyHours } from '@/engine/health';
+import { allowanceForDay } from '@/engine/planEngine';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
+import { useVitalityStore } from '@/store/useVitalityStore';
 import { wipeAppData } from '@/utils/appData';
-import { addDaysISO, daysBetween, todayISO } from '@/utils/date';
+import { addDaysISO, daysBetween, nowISO, todayISO } from '@/utils/date';
 
 function Row({ children }: { children: ReactNode }) {
   return <View className="flex-row gap-2">{children}</View>;
@@ -46,20 +53,43 @@ export default function GodMode() {
 
   if (!__DEV__) return <Redirect href="/space" />;
 
-  const shiftDays = (delta: number) => {
+  // Simulate `delta` days passing: move the plan window, shift existing logs
+  // (so today's count resets and history is preserved) and advance recovery so
+  // the Progress tab / milestones actually move.
+  const advanceDay = async (delta: number) => {
     if (!plan) return;
     setPlan({
       ...plan,
       startDate: addDaysISO(plan.startDate, -delta),
       targetDate: addDaysISO(plan.targetDate, -delta),
     });
+    await shiftCigaretteDates(-delta);
+    await shiftCravingDates(-delta);
+    useRecovery.getState().advance(delta);
+    await refreshToday();
+    await useVitalityStore.getState().recompute(usePlan.getState().plan);
   };
 
   const addCig = async (daysAgo: number) => {
-    // Local noon (no Z) so the row buckets to `date` regardless of timezone.
-    const date = addDaysISO(todayISO(), -daysAgo);
-    await addCigarette({ timestamp: `${date}T12:00:00.000` });
+    if (daysAgo === 0) {
+      // Behave like a real "smoked now" log: resets smoke-free + dents recovery.
+      await addCigarette({ timestamp: nowISO() });
+      if (plan) {
+        const allowance = allowanceForDay(
+          plan,
+          Math.max(0, daysBetween(plan.startDate, todayISO())),
+        );
+        useRecovery
+          .getState()
+          .penalize(cigarettePenaltyHours(todayCigs, allowance));
+      }
+    } else {
+      // Backfill a past day (local noon) for building history — no recovery hit.
+      const date = addDaysISO(todayISO(), -daysAgo);
+      await addCigarette({ timestamp: `${date}T12:00:00.000` });
+    }
     await refreshToday();
+    await useVitalityStore.getState().recompute(usePlan.getState().plan);
   };
 
   const clearLogs = async () => {
@@ -161,14 +191,14 @@ export default function GodMode() {
               <Button
                 label={t('godmode.dayMinus')}
                 variant="secondary"
-                onPress={() => shiftDays(-1)}
+                onPress={() => void advanceDay(-1)}
               />
             </View>
             <View className="flex-1">
               <Button
                 label={t('godmode.dayPlus')}
                 variant="secondary"
-                onPress={() => shiftDays(1)}
+                onPress={() => void advanceDay(1)}
               />
             </View>
           </Row>

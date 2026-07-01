@@ -22,6 +22,11 @@ export function nowISO(now: Date = new Date()): string {
   return format(now, "yyyy-MM-dd'T'HH:mm:ss.SSS");
 }
 
+/** Shift a stored local-naive timestamp by whole days, keeping the same format. */
+export function shiftLocalISO(iso: string, deltaDays: number): string {
+  return nowISO(new Date(new Date(iso).getTime() + deltaDays * 86_400_000));
+}
+
 export function toISODate(date: Date): string {
   return format(date, ISO_DATE);
 }

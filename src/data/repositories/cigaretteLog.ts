@@ -1,6 +1,6 @@
 /** Cigarette log repository (PROJECT.md §16). Thin SQLite I/O. */
 import type { TriggerCategory } from '@/types/domain';
-import { nowISO } from '@/utils/date';
+import { nowISO, shiftLocalISO } from '@/utils/date';
 import type { DailyCount } from '@/utils/series';
 
 import { getDb } from '../db';
@@ -112,4 +112,19 @@ export async function healthWeightedCountSince(
 export async function clearAllCigaretteLogs(): Promise<void> {
   const db = await getDb();
   await db.runAsync('DELETE FROM cigarette_log');
+}
+
+/** Dev/God-mode: shift every cigarette timestamp by whole days (time travel). */
+export async function shiftCigaretteDates(deltaDays: number): Promise<void> {
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ id: number; timestamp: string }>(
+    'SELECT id, timestamp FROM cigarette_log',
+  );
+  for (const r of rows) {
+    await db.runAsync(
+      'UPDATE cigarette_log SET timestamp = ? WHERE id = ?',
+      shiftLocalISO(r.timestamp, deltaDays),
+      r.id,
+    );
+  }
 }

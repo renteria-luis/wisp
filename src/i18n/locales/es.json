@@ -175,7 +175,8 @@
     "ebooks": "📚 Lecturas gratis",
     "remainingToday": "Te quedan hoy",
     "overBy": "Te pasaste por {{count}} 💛",
-    "smokedOf": "{{count}} de {{allowance}} hoy"
+    "smokedOf": "{{count}} de {{allowance}} hoy",
+    "tapForInfo": "toca para info"
   },
   "log": {
     "title": "Registrar",

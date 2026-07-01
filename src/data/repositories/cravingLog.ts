@@ -1,6 +1,6 @@
 /** Craving log repository (PROJECT.md §16). Thin SQLite I/O. */
 import type { TriggerCategory } from '@/types/domain';
-import { nowISO } from '@/utils/date';
+import { nowISO, shiftLocalISO } from '@/utils/date';
 
 import { getDb } from '../db';
 
@@ -44,4 +44,19 @@ export async function countResistedOnDate(dateISO: string): Promise<number> {
 export async function clearAllCravingLogs(): Promise<void> {
   const db = await getDb();
   await db.runAsync('DELETE FROM craving_log');
+}
+
+/** Dev/God-mode: shift every craving timestamp by whole days (time travel). */
+export async function shiftCravingDates(deltaDays: number): Promise<void> {
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ id: number; timestamp: string }>(
+    'SELECT id, timestamp FROM craving_log',
+  );
+  for (const r of rows) {
+    await db.runAsync(
+      'UPDATE craving_log SET timestamp = ? WHERE id = ?',
+      shiftLocalISO(r.timestamp, deltaDays),
+      r.id,
+    );
+  }
 }
