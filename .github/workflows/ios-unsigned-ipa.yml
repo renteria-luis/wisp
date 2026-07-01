@@ -97,7 +97,7 @@ jobs:
           ls -lh Wisp-unsigned.ipa
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wisp-unsigned-ipa
           path: Wisp-unsigned.ipa
@@ -107,7 +107,7 @@ jobs:
       # If anything failed, keep the xcodebuild log so we can see the real error.
       - name: Upload build log (on failure)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: xcodebuild-log
           path: xcodebuild.log
