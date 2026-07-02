@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { NumberField } from '@/components/ui/NumberField';
 import {
   addCigarette,
@@ -116,6 +117,7 @@ export default function GodMode() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
+      <KeyboardAvoider>
       <View className="flex-row items-center justify-between px-6 pt-4">
         <Text className="text-lg font-bold text-ink dark:text-neutral-50">
           {t('godmode.title')}
@@ -127,7 +129,11 @@ export default function GodMode() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-3">
+      <ScrollView
+        contentContainerClassName="gap-4 px-6 pb-10 pt-3"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <Text className="text-xs text-ink-mute dark:text-neutral-400">
           {t('godmode.subtitle')}
         </Text>
@@ -262,6 +268,7 @@ export default function GodMode() {
           </View>
         </Card>
       </ScrollView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

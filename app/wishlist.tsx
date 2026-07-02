@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { NumberField } from '@/components/ui/NumberField';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useProgressData } from '@/hooks/useProgressData';
@@ -56,6 +57,7 @@ export default function Wishlist() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
+      <KeyboardAvoider>
       <View className="flex-row items-center justify-between px-6 pb-3 pt-5">
         <Text className="text-xl font-bold text-ink dark:text-neutral-50">
           {t('wishlist.title')}
@@ -73,7 +75,11 @@ export default function Wishlist() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-4 px-6 pb-12 pt-2">
+      <ScrollView
+        contentContainerClassName="gap-4 px-6 pb-12 pt-2"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <Text className="text-sm leading-5 text-ink-soft dark:text-neutral-300">
           {t('wishlist.subtitle')}
         </Text>
@@ -205,6 +211,7 @@ export default function Wishlist() {
           </>
         ) : null}
       </ScrollView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

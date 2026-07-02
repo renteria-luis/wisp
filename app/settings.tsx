@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { applyLanguage, type SupportedLanguage } from '@/i18n';
@@ -178,6 +179,7 @@ export default function Settings() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
+      <KeyboardAvoider>
       <View className="flex-row items-center justify-between px-6 pb-3 pt-5">
         <Text className="text-xl font-bold text-ink dark:text-neutral-50">{t('settings.title')}</Text>
         <Pressable
@@ -193,7 +195,11 @@ export default function Settings() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-6 px-6 pb-12 pt-2">
+      <ScrollView
+        contentContainerClassName="gap-6 px-6 pb-12 pt-2"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <Section title={t('settings.you')}>
           <TextField
             label={t('settings.yourName')}
@@ -343,6 +349,7 @@ export default function Settings() {
           </Text>
         </Pressable>
       </ScrollView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
@@ -127,6 +128,7 @@ export default function Log() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
+      <KeyboardAvoider>
       <View className="flex-row justify-end px-6 pt-5">
         <Pressable
           onPress={() => router.back()}
@@ -141,7 +143,11 @@ export default function Log() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-6 px-6 pb-6 pt-2">
+      <ScrollView
+        contentContainerClassName="gap-6 px-6 pb-6 pt-2"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <Text className="text-2xl font-bold text-ink dark:text-neutral-50">{t('log.title')}</Text>
 
         <View className="flex-row gap-2">
@@ -271,6 +277,7 @@ export default function Log() {
       <View className="px-6 pb-6">
         <Button label={t('log.save')} onPress={onSave} disabled={saving} />
       </View>
+      </KeyboardAvoider>
 
       {quotaMsg ? (
         <Modal

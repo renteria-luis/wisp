@@ -4,6 +4,7 @@ import { Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useOnboarding } from '@/store/useOnboarding';
 import { colors } from '@/theme/tokens';
@@ -17,6 +18,7 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top', 'bottom']}>
+      <KeyboardAvoider>
       <View className="flex-row justify-end px-5 pt-1">
         <ThemeToggle />
       </View>
@@ -61,6 +63,7 @@ export default function Welcome() {
           disabled={name.trim() === ''}
         />
       </View>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

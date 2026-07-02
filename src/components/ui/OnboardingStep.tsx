@@ -5,6 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from './Button';
+import { KeyboardAvoider } from './KeyboardAvoider';
 import { ProgressDots } from './ProgressDots';
 
 type Props = {
@@ -39,9 +40,11 @@ export function OnboardingStep({
       className="flex-1 bg-cream dark:bg-neutral-950"
       edges={['top', 'bottom']}
     >
+      <KeyboardAvoider>
       <ScrollView
         contentContainerClassName="grow px-6 pb-6 pt-4"
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <ProgressDots index={stepIndex} total={totalSteps} />
         <Text className="mt-6 text-2xl font-bold text-ink dark:text-neutral-50">
@@ -73,6 +76,7 @@ export function OnboardingStep({
           />
         </View>
       </View>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }
