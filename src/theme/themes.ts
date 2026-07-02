@@ -71,14 +71,32 @@ function hexToRgb(hex: string): string {
   ].join(' ');
 }
 
-/** CSS-variable overrides for the Pink theme (fed to NativeWind's `vars()`). */
-export function pinkVarsInput(): Record<string, string> {
+type VarSource = {
+  primary: Record<string, string>;
+  secondary: Record<string, string>;
+  accent: Record<string, string>;
+  cream: string;
+};
+
+function varsInput(source: VarSource): Record<string, string> {
   const out: Record<string, string> = {};
   for (const fam of ['primary', 'secondary', 'accent'] as const) {
-    for (const [shade, hex] of Object.entries(PINK_PALETTE[fam])) {
+    for (const [shade, hex] of Object.entries(source[fam])) {
       out[`--color-${fam}-${shade}`] = hexToRgb(hex);
     }
   }
-  out['--color-cream'] = hexToRgb(PINK_PALETTE.cream);
+  out['--color-cream'] = hexToRgb(source.cream);
   return out;
+}
+
+/** CSS-variable values for the Pink theme (fed to NativeWind's `vars()`). */
+export function pinkVarsInput(): Record<string, string> {
+  return varsInput(PINK_PALETTE);
+}
+
+/** The default (light/dark) values — applied so the variable scope is ALWAYS
+ *  present, so toggling to/from Pink only changes values and never inserts or
+ *  removes a context provider (which would remount the navigator and crash). */
+export function defaultVarsInput(): Record<string, string> {
+  return varsInput(palette);
 }

@@ -30,10 +30,13 @@ import { useSettings } from '@/store/useSettings';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { useWishlist } from '@/store/useWishlist';
 import { applySavedTheme } from '@/theme/appearance';
-import { pinkVarsInput } from '@/theme/themes';
+import { defaultVarsInput, pinkVarsInput } from '@/theme/themes';
 
-// Root-level CSS-variable overrides that turn the whole class-based palette pink.
+// The class-palette variable scope is applied ALWAYS (default values normally,
+// pink values for the Pink theme) so switching only changes values — never
+// inserts/removes the scope, which would remount the navigator and crash.
 const PINK_VARS = vars(pinkVarsInput());
+const LIGHT_VARS = vars(defaultVarsInput());
 
 // Keep the native splash up until the first frame can show real data instead of
 // store defaults (the "everything flashes from 0 for a second" problem).
@@ -141,7 +144,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={[{ flex: 1 }, theme === 'pink' ? PINK_VARS : null]}>
+      <View style={[{ flex: 1 }, theme === 'pink' ? PINK_VARS : LIGHT_VARS]}>
         <SafeAreaProvider>
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}

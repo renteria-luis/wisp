@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   cancelAnimation,
   Easing,
@@ -94,7 +95,7 @@ export function SpriteCompanion({
             if (!alive) return;
             setBlinking(false);
             schedule();
-          }, 150);
+          }, 500);
         },
         1200 + Math.random() * 10000,
       );
@@ -158,7 +159,9 @@ export function SpriteCompanion({
         <Image
           source={sprite}
           style={{ width: size, height: size }}
-          resizeMode="contain"
+          contentFit="contain"
+          transition={0}
+          cachePolicy="memory-disk"
         />
         {wornAcc.map((a) => {
           const s = size * a.scale;
@@ -166,7 +169,9 @@ export function SpriteCompanion({
             <Image
               key={a.id}
               source={a.art}
-              resizeMode="contain"
+              contentFit="contain"
+              transition={0}
+              cachePolicy="memory-disk"
               style={{
                 position: 'absolute',
                 width: s,
