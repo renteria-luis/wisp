@@ -7,7 +7,7 @@ import { OnboardingStep } from '@/components/ui/OnboardingStep';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { useOnboarding } from '@/store/useOnboarding';
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'MXN', 'CAD'];
+const CURRENCIES = ['CAD', 'PEN', 'USD'];
 
 export default function Consumption() {
   const router = useRouter();

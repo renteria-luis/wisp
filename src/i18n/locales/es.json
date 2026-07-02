@@ -253,7 +253,8 @@
     "note": "Nota (opcional)",
     "notePlaceholder": "Por qué te importa…",
     "bought": "Lo compré 🎁",
-    "treatedTitle": "Gustos que me di"
+    "treatedTitle": "Gustos que me di",
+    "added": "{{name}} añadido a tu lista"
   },
   "health": {
     "title": "Tu recuperación",

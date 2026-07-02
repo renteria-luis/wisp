@@ -166,7 +166,7 @@ export default function RootLayout() {
                 // Half-sheet so the Home companion stays visible behind it and
                 // can coach the user; draggable up via the grabber if needed.
                 presentation: 'formSheet',
-                sheetAllowedDetents: [0.5, 0.95],
+                sheetAllowedDetents: [0.58, 0.95],
                 sheetInitialDetentIndex: 0,
                 sheetGrabberVisible: true,
                 sheetCornerRadius: 22,

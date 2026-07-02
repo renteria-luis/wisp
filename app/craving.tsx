@@ -95,7 +95,11 @@ export default function Craving() {
         ) : tool === 'wait' ? (
           <CravingTimer />
         ) : (
-          <Distraction selected={picked} onSelect={setPicked} />
+          <Distraction
+            selected={picked}
+            onSelect={setPicked}
+            onResisted={onResisted}
+          />
         )}
       </ScrollView>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 
 import { colors } from '@/theme/tokens';
 
@@ -10,6 +10,9 @@ type Props = {
   placeholder?: string;
   decimal?: boolean;
   suffix?: string;
+  /** Show an "OK" button that dismisses the keyboard (for fields on non-scrolling
+   *  screens where the button shouldn't shift the layout). */
+  showDone?: boolean;
 };
 
 function parseNumber(text: string, decimal: boolean): number | null {
@@ -26,6 +29,7 @@ export function NumberField({
   placeholder,
   decimal = false,
   suffix,
+  showDone = false,
 }: Props) {
   // Keep a local text buffer so a decimal point (e.g. "9.") isn't swallowed
   // while typing, while still syncing when `value` changes externally.
@@ -54,12 +58,24 @@ export function NumberField({
           keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
           placeholder={placeholder}
           placeholderTextColor={colors.ink.mute}
-          className="flex-1 py-3 text-base text-ink dark:text-neutral-50"
+          textAlignVertical="center"
+          style={{ height: 46 }}
+          className="flex-1 text-base text-ink dark:text-neutral-50"
         />
         {suffix ? (
           <Text className="pl-2 text-sm text-ink-mute dark:text-neutral-400">
             {suffix}
           </Text>
+        ) : null}
+        {showDone ? (
+          <Pressable
+            onPress={() => Keyboard.dismiss()}
+            accessibilityRole="button"
+            hitSlop={8}
+            className="pl-3"
+          >
+            <Text className="text-sm font-semibold text-primary-600">OK</Text>
+          </Pressable>
         ) : null}
       </View>
     </View>

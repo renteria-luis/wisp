@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Keyboard,
   Pressable,
   ScrollView,
   Text,
@@ -49,7 +50,10 @@ export default function Wishlist() {
 
   const onAdd = () => {
     if (!canAdd || price == null) return;
+    const added = name.trim();
     add(name, price, note);
+    Keyboard.dismiss();
+    celebrate('🎁', t('wishlist.added', { name: added }));
     setName('');
     setPrice(null);
     setNote('');

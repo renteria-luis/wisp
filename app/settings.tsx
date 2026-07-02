@@ -31,7 +31,7 @@ import type { Gender } from '@/types/domain';
 import { exportAppData, wipeAppData } from '@/utils/appData';
 
 const GENDERS: Gender[] = ['female', 'male', 'nonbinary', 'prefer_not'];
-const CURRENCIES = ['USD', 'CAD', 'PEN'];
+const CURRENCIES = ['CAD', 'PEN', 'USD'];
 const LANGS: { value: SupportedLanguage | null; key: string }[] = [
   { value: null, key: 'auto' },
   { value: 'en', key: 'en' },

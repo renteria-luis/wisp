@@ -253,7 +253,8 @@
     "note": "Note (optional)",
     "notePlaceholder": "Why it matters to you…",
     "bought": "I bought it 🎁",
-    "treatedTitle": "Things I treated myself to"
+    "treatedTitle": "Things I treated myself to",
+    "added": "{{name}} added to your wishlist"
   },
   "health": {
     "title": "Your recovery",

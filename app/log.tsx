@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Keyboard,
   Modal,
   Pressable,
   ScrollView,
@@ -12,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
-import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { Scale } from '@/components/ui/Scale';
@@ -128,7 +128,6 @@ export default function Log() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950">
-      <KeyboardAvoider>
       <View className="flex-row justify-end px-6 pt-5">
         <Pressable
           onPress={() => router.back()}
@@ -243,6 +242,7 @@ export default function Log() {
                   value={minutesAgo || null}
                   onChange={(v) => setMinutesAgo(v ?? 0)}
                   suffix={t('log.minutes')}
+                  showDone
                 />
               </View>
             </View>
@@ -251,14 +251,24 @@ export default function Log() {
               <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
                 {t('log.noteLabel')}
               </Text>
-              <View className="rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
+              <View className="flex-row items-center rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
                 <TextInput
                   value={note}
                   onChangeText={setNote}
                   placeholder={t('log.notePlaceholder')}
                   placeholderTextColor={colors.ink.mute}
-                  className="py-3 text-base text-ink dark:text-neutral-50"
+                  className="flex-1 py-3 text-base text-ink dark:text-neutral-50"
                 />
+                <Pressable
+                  onPress={() => Keyboard.dismiss()}
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  className="pl-3"
+                >
+                  <Text className="text-sm font-semibold text-primary-600">
+                    OK
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </>
@@ -277,7 +287,6 @@ export default function Log() {
       <View className="px-6 pb-6">
         <Button label={t('log.save')} onPress={onSave} disabled={saving} />
       </View>
-      </KeyboardAvoider>
 
       {quotaMsg ? (
         <Modal
