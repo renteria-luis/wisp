@@ -4,6 +4,7 @@ import { Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useOnboarding } from '@/store/useOnboarding';
 import { colors } from '@/theme/tokens';
 
@@ -16,6 +17,9 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top', 'bottom']}>
+      <View className="flex-row justify-end px-5 pt-1">
+        <ThemeToggle />
+      </View>
       <View className="flex-1 justify-center px-6">
         <View className="mb-10 items-center">
           <View className="h-28 w-28 items-center justify-center rounded-full bg-primary-100">

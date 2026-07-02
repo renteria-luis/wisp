@@ -1,11 +1,12 @@
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
   CHARACTER_SPRITES,
   SPRITE_CHARACTER_IDS,
@@ -15,7 +16,9 @@ import {
 import { SpriteCompanion } from '@/components/companion/SpriteCompanion';
 import { Button } from '@/components/ui/Button';
 import { HeartBurst } from '@/components/ui/HeartBurst';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import type { QuotaBand } from '@/content/companionLines';
+import { useCompanionLine } from '@/hooks/useCompanionLine';
 import { allowanceForDay } from '@/engine/planEngine';
 import {
   requestNotificationPermission,
@@ -26,7 +29,6 @@ import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
-import { applyTheme } from '@/theme/appearance';
 import { daysBetween, todayISO } from '@/utils/date';
 
 const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
@@ -41,12 +43,10 @@ export default function Home() {
   const setSituationalUntil = useSettings((s) => s.setSituationalUntil);
   const notificationsEnabled = useSettings((s) => s.notificationsEnabled);
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
-  const themePref = useSettings((s) => s.theme);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const equipped = useCompanion((s) => s.equipped);
   const setCharacter = useCompanion((s) => s.setCharacter);
-  const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
 
   // Tap the companion to pick which of the four creatures to show.
@@ -71,12 +71,6 @@ export default function Home() {
     }
   };
 
-  // Optional special-date greeting (inert unless personal.specialDate is set).
-  const subtitle =
-    personal.specialDate === todayISO().slice(5)
-      ? personal.easterEggs.specialDateGreeting
-      : t('home.subtitle', { companion: companionName });
-
   // The companion looks sad once the day's smoking passes half the quota (any
   // cigarette on cold turkey). Character rotates daily unless one is equipped.
   const dayIndex = plan
@@ -90,6 +84,43 @@ export default function Home() {
   const spriteCharacter = hasSprite(equipped.character)
     ? equipped.character!
     : characterForToday();
+
+  // What the companion "says": by quota band, night, or a once-a-day morning
+  // greeting (a craving context takes over inside the hook).
+  const hour = new Date().getHours();
+  const night = hour >= 23 || hour < 6;
+  const quotaPct =
+    allowanceToday > 0
+      ? todayCigarettes / allowanceToday
+      : todayCigarettes > 0
+        ? 1
+        : 0;
+  const band: QuotaBand =
+    quotaPct <= 0.3
+      ? 'low'
+      : quotaPct <= 0.6
+        ? 'mid'
+        : quotaPct <= 0.9
+          ? 'high'
+          : 'over';
+  const [morningActive, setMorningActive] = useState(
+    () =>
+      hour >= 5 &&
+      hour < 12 &&
+      useSettings.getState().lastMorningGreet !== todayISO(),
+  );
+  useEffect(() => {
+    if (!morningActive) return;
+    useSettings.getState().setLastMorningGreet(todayISO());
+    const id = setTimeout(() => setMorningActive(false), 30_000);
+    return () => clearTimeout(id);
+  }, [morningActive]);
+  const companionLine = useCompanionLine({
+    band,
+    night,
+    morning: morningActive,
+    name,
+  });
 
   const situationalActive =
     situationalUntil != null &&
@@ -129,25 +160,7 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <View className="flex-row items-center justify-end gap-1 px-5 pt-1">
-        <Pressable
-          onPress={() =>
-            applyTheme(
-              themePref === 'light'
-                ? 'dark'
-                : themePref === 'dark'
-                  ? 'pink'
-                  : 'light',
-            )
-          }
-          accessibilityRole="button"
-          accessibilityLabel="theme"
-          hitSlop={8}
-          className="px-2 py-1"
-        >
-          <Text className="text-xl">
-            {themePref === 'pink' ? '💗' : scheme === 'dark' ? '🌙' : '☀️'}
-          </Text>
-        </Pressable>
+        <ThemeToggle />
         <Pressable
           onPress={() => router.push('/settings')}
           accessibilityRole="button"
@@ -159,22 +172,18 @@ export default function Home() {
         </Pressable>
       </View>
       <View className="flex-1 items-center justify-center px-6">
-        <Pressable
-          onPress={() => setPickerOpen(true)}
-          onLongPress={onCompanionLongPress}
-          delayLongPress={300}
-          accessibilityRole="image"
-          accessibilityLabel={companionName}
-        >
-          <SpriteCompanion character={spriteCharacter} sad={companionSad} />
-        </Pressable>
-
-        <Text className="mt-8 text-3xl font-bold text-ink dark:text-neutral-50">
-          {t('home.greeting', { name })}
-        </Text>
-        <Text className="mt-3 text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
-          {subtitle}
-        </Text>
+        <SpeechBubble text={companionLine} />
+        <View className="mt-2">
+          <Pressable
+            onPress={() => setPickerOpen(true)}
+            onLongPress={onCompanionLongPress}
+            delayLongPress={300}
+            accessibilityRole="image"
+            accessibilityLabel={companionName}
+          >
+            <SpriteCompanion character={spriteCharacter} sad={companionSad} />
+          </Pressable>
+        </View>
 
         {status ? (
           <View className="mt-8 rounded-full bg-primary-100 px-5 py-2">

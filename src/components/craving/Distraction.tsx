@@ -5,7 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { pickRandom } from '@/content/distractions';
 import { topHelped, useDistractions } from '@/store/useDistractions';
 
-const SHOWN = 5;
+const SHOWN = 4;
 
 type Props = {
   /** The distraction the user picked to try (highlighted). */

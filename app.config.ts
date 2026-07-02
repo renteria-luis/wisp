@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: BUNDLE_ID,
-    icon: './assets/expo.icon',
+    // Uses the top-level `icon` (the bunny) — no Icon Composer override.
   },
   android: {
     package: BUNDLE_ID,

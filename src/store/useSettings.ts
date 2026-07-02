@@ -35,6 +35,8 @@ interface SettingsState {
   seenEggs: string[];
   /** Appearance preference; `system` follows the device. */
   theme: 'system' | 'light' | 'dark' | 'pink';
+  /** ISO date the morning greeting was last shown (so it shows once a day). */
+  lastMorningGreet: string | null;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -49,6 +51,7 @@ interface SettingsState {
   setSituationalUntil: (iso: string | null) => void;
   markEggSeen: (id: string) => void;
   setTheme: (theme: 'system' | 'light' | 'dark' | 'pink') => void;
+  setLastMorningGreet: (iso: string | null) => void;
   reset: () => void;
 }
 
@@ -70,6 +73,7 @@ const initialState = {
   situationalUntil: null as string | null,
   seenEggs: [] as string[],
   theme: 'system' as 'system' | 'light' | 'dark' | 'pink',
+  lastMorningGreet: null as string | null,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -94,6 +98,7 @@ export const useSettings = create<SettingsState>()(
       markEggSeen: (id) =>
         set((s) => (s.seenEggs.includes(id) ? s : { seenEggs: [...s.seenEggs, id] })),
       setTheme: (theme) => set({ theme }),
+      setLastMorningGreet: (lastMorningGreet) => set({ lastMorningGreet }),
       reset: () => set({ ...initialState }),
     }),
     {

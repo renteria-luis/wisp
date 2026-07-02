@@ -160,7 +160,18 @@ export default function RootLayout() {
             <Stack.Screen name="(onboarding)" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="log" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="craving" options={{ presentation: 'modal' }} />
+            <Stack.Screen
+              name="craving"
+              options={{
+                // Half-sheet so the Home companion stays visible behind it and
+                // can coach the user; draggable up via the grabber if needed.
+                presentation: 'formSheet',
+                sheetAllowedDetents: [0.5, 0.95],
+                sheetInitialDetentIndex: 0,
+                sheetGrabberVisible: true,
+                sheetCornerRadius: 22,
+              }}
+            />
             <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
             <Stack.Screen name="wishlist" options={{ presentation: 'modal' }} />
             <Stack.Screen name="ebooks" options={{ presentation: 'modal' }} />

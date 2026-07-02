@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { BONUS_RESISTED_CRAVING } from '@/engine/economy';
 import { useCelebration } from '@/store/useCelebration';
+import { useCoach } from '@/store/useCoach';
 import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
@@ -29,6 +30,14 @@ export default function Craving() {
   const logResisted = useLogs((s) => s.logResistedCraving);
   const recordHelped = useDistractions((s) => s.recordHelped);
   const celebrate = useCelebration((s) => s.celebrate);
+  const setCoach = useCoach((s) => s.setContext);
+
+  // Tell the Home companion (visible behind this half-sheet) which tool is open
+  // so it can coach with contextual lines; clear it when the sheet closes.
+  useEffect(() => {
+    setCoach(tool);
+  }, [tool, setCoach]);
+  useEffect(() => () => setCoach(null), [setCoach]);
 
   const onResisted = async () => {
     if (saving) return;
