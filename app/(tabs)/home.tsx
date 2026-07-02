@@ -2,10 +2,12 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
+  CHARACTER_SPRITES,
+  SPRITE_CHARACTER_IDS,
   characterForToday,
   hasSprite,
 } from '@/components/companion/sprites';
@@ -38,12 +40,16 @@ export default function Home() {
   const setSituationalUntil = useSettings((s) => s.setSituationalUntil);
   const notificationsEnabled = useSettings((s) => s.notificationsEnabled);
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
+  const themePref = useSettings((s) => s.theme);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const equipped = useCompanion((s) => s.equipped);
+  const setCharacter = useCompanion((s) => s.setCharacter);
   const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
 
+  // Tap the companion to pick which of the four creatures to show.
+  const [pickerOpen, setPickerOpen] = useState(false);
   // Explains what "I'm out / drinking" does, shown when it's activated/tapped.
   const [supportInfo, setSupportInfo] = useState(false);
   // Easter egg: long-press the companion 5× within 3s for a heart burst (§11).
@@ -123,13 +129,23 @@ export default function Home() {
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <View className="flex-row items-center justify-end gap-1 px-5 pt-1">
         <Pressable
-          onPress={() => applyTheme(scheme === 'dark' ? 'light' : 'dark')}
+          onPress={() =>
+            applyTheme(
+              themePref === 'light'
+                ? 'dark'
+                : themePref === 'dark'
+                  ? 'pink'
+                  : 'light',
+            )
+          }
           accessibilityRole="button"
           accessibilityLabel="theme"
           hitSlop={8}
           className="px-2 py-1"
         >
-          <Text className="text-xl">{scheme === 'dark' ? '☀️' : '🌙'}</Text>
+          <Text className="text-xl">
+            {themePref === 'pink' ? '💗' : scheme === 'dark' ? '🌙' : '☀️'}
+          </Text>
         </Pressable>
         <Pressable
           onPress={() => router.push('/settings')}
@@ -143,6 +159,7 @@ export default function Home() {
       </View>
       <View className="flex-1 items-center justify-center px-6">
         <Pressable
+          onPress={() => setPickerOpen(true)}
           onLongPress={onCompanionLongPress}
           delayLongPress={300}
           accessibilityRole="image"
@@ -198,6 +215,47 @@ export default function Home() {
           </Pressable>
         </View>
       </View>
+
+      {pickerOpen ? (
+        <Pressable
+          onPress={() => setPickerOpen(false)}
+          accessibilityRole="button"
+          className="absolute inset-0 items-center justify-center bg-black/30 px-8"
+        >
+          <View className="w-full max-w-sm rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
+            <Text className="mb-4 text-center text-lg font-bold text-ink dark:text-neutral-50">
+              {t('home.pickCompanion')}
+            </Text>
+            <View className="flex-row flex-wrap justify-center gap-3">
+              {SPRITE_CHARACTER_IDS.map((id) => {
+                const active = spriteCharacter === id;
+                return (
+                  <Pressable
+                    key={id}
+                    onPress={() => {
+                      setCharacter(id);
+                      setPickerOpen(false);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    className={`items-center rounded-2xl border p-2 ${
+                      active
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900'
+                        : 'border-neutral-200 dark:border-neutral-800'
+                    }`}
+                  >
+                    <Image
+                      source={CHARACTER_SPRITES[id]!.base}
+                      style={{ width: 66, height: 66 }}
+                      resizeMode="contain"
+                    />
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        </Pressable>
+      ) : null}
 
       {supportInfo ? (
         <Pressable

@@ -74,9 +74,12 @@ export function SpriteCompanion({
     return () => cancelAnimation(bob);
   }, [reduced, night, bob]);
 
-  // Occasional blink — only while awake and not sad (the eyes are open then).
+  // Random blinks while awake and not sad (eyes open then). Kept independent of
+  // "reduce motion" (it's an eye flutter, not vestibular motion) and the gap is
+  // capped so there's always at least one blink every ~12s (≤15s guaranteed);
+  // back-to-back blinks are fine.
   useEffect(() => {
-    if (reduced || night || sad) {
+    if (night || sad) {
       setBlinking(false);
       return;
     }
@@ -93,7 +96,7 @@ export function SpriteCompanion({
             schedule();
           }, 150);
         },
-        2500 + Math.random() * 3500,
+        1200 + Math.random() * 10000,
       );
     };
     schedule();
@@ -101,7 +104,7 @@ export function SpriteCompanion({
       alive = false;
       clearTimeout(timer);
     };
-  }, [reduced, night, sad]);
+  }, [night, sad]);
 
   // Priority: asleep (night) → sad → mid-blink → awake & content.
   const sprite = night

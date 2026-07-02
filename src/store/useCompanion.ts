@@ -20,6 +20,8 @@ interface CompanionState {
   add: (id: string) => void;
   equip: (cosmetic: Cosmetic) => void;
   setWorn: (worn: string[]) => void;
+  /** Directly set the equipped character (used by the Home sprite picker). */
+  setCharacter: (id: string) => void;
   reset: () => void;
 }
 
@@ -44,6 +46,8 @@ export const useCompanion = create<CompanionState>()(
           equipped: { ...s.equipped, [cosmetic.type]: cosmetic.id },
         })),
       setWorn: (worn) => set({ worn }),
+      setCharacter: (id) =>
+        set((s) => ({ equipped: { ...s.equipped, character: id } })),
       reset: () => set({ ...initial }),
     }),
     {
