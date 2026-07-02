@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Theme-swappable colour tokens (light/dark keep these defaults; the Pink theme
+ * overrides them at the root via vars() — see app/_layout.tsx). Values are the
+ * palette.json colours as "R G B" so Tailwind's rgb(var(--x) / <alpha>) works. */
+@layer base {
+  :root {
+    --color-primary-50: 236 253 245;
+    --color-primary-100: 209 250 229;
+    --color-primary-200: 167 243 208;
+    --color-primary-300: 110 231 183;
+    --color-primary-400: 52 211 153;
+    --color-primary-500: 16 185 129;
+    --color-primary-600: 5 150 105;
+    --color-primary-700: 4 120 87;
+    --color-primary-800: 6 95 70;
+    --color-primary-900: 6 78 59;
+    --color-secondary-50: 241 238 254;
+    --color-secondary-100: 229 224 253;
+    --color-secondary-200: 205 195 251;
+    --color-secondary-300: 173 155 247;
+    --color-secondary-400: 143 116 240;
+    --color-secondary-500: 124 83 232;
+    --color-secondary-600: 107 63 212;
+    --color-secondary-700: 90 49 176;
+    --color-secondary-800: 74 43 143;
+    --color-secondary-900: 62 40 115;
+    --color-accent-50: 255 243 237;
+    --color-accent-100: 255 227 212;
+    --color-accent-200: 255 195 168;
+    --color-accent-300: 255 157 114;
+    --color-accent-400: 255 122 69;
+    --color-accent-500: 251 93 36;
+    --color-accent-600: 234 69 21;
+    --color-accent-700: 193 53 17;
+    --color-accent-800: 153 44 21;
+    --color-accent-900: 124 40 23;
+    --color-cream: 251 247 240;
+  }
+}

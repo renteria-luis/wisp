@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 
@@ -25,6 +25,7 @@ const labelColor: Record<Variant, string> = {
 };
 
 export function Button({ label, onPress, variant = 'primary', disabled }: Props) {
+  const colors = useThemeColors();
   return (
     <Pressable
       onPress={onPress}

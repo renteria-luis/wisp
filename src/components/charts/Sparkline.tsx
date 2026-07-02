@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 import { buildLine, type Point } from './path';
 
@@ -30,9 +30,11 @@ const PAD = 3;
 export function Sparkline({
   values,
   height = 44,
-  color = colors.accent['500'],
+  color,
   accessibilityLabel,
 }: Props) {
+  const themed = useThemeColors();
+  const strokeColor = color ?? themed.accent['500'];
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
   const draw = useSharedValue(reduced ? 1 : 0);
@@ -83,15 +85,15 @@ export function Sparkline({
         <Svg width={w} height={height}>
           <Defs>
             <LinearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={color} stopOpacity={0.22} />
-              <Stop offset="1" stopColor={color} stopOpacity={0.02} />
+              <Stop offset="0" stopColor={strokeColor} stopOpacity={0.22} />
+              <Stop offset="1" stopColor={strokeColor} stopOpacity={0.02} />
             </LinearGradient>
           </Defs>
           <Path d={areaD} fill="url(#sparkFill)" />
           <AnimatedPath
             animatedProps={lineProps}
             d={d}
-            stroke={color}
+            stroke={strokeColor}
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"

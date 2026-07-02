@@ -8,12 +8,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 const HEARTS = 12;
 const DURATION = 1500;
 
 function Heart({ index, reduced }: { index: number; reduced: boolean }) {
+  const colors = useThemeColors();
   const p = useSharedValue(0);
   useEffect(() => {
     p.value = reduced

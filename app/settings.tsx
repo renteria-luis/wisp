@@ -25,6 +25,7 @@ import {
 import { useSettings } from '@/store/useSettings';
 import { applyTheme, type ThemePref } from '@/theme/appearance';
 import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 import type { Gender } from '@/types/domain';
 import { exportAppData, wipeAppData } from '@/utils/appData';
 
@@ -35,7 +36,7 @@ const LANGS: { value: SupportedLanguage | null; key: string }[] = [
   { value: 'en', key: 'en' },
   { value: 'es', key: 'es' },
 ];
-const THEMES: ThemePref[] = ['system', 'light', 'dark'];
+const THEMES: ThemePref[] = ['system', 'light', 'dark', 'pink'];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -123,6 +124,7 @@ export default function Settings() {
   const { t } = useTranslation();
   const router = useRouter();
   const s = useSettings();
+  const c = useThemeColors();
   const [busy, setBusy] = useState(false);
 
   const quiet = s.quietHours ?? {
@@ -272,7 +274,7 @@ export default function Settings() {
             <Switch
               value={s.notificationsEnabled}
               onValueChange={onToggleNotifications}
-              trackColor={{ true: colors.primary['400'] }}
+              trackColor={{ true: c.primary['400'] }}
             />
           </View>
           <Text className="text-xs text-ink-mute dark:text-neutral-400">{t('settings.quietHours')}</Text>

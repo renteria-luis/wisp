@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 type Props = {
   /** 0..1 fill fraction. */
@@ -13,6 +13,7 @@ type Props = {
 
 /** A rounded progress bar with a vivid gradient fill (flex-based, no measuring). */
 export function ProgressBar({ progress, height = 8, gradient }: Props) {
+  const colors = useThemeColors();
   const p = Math.max(0, Math.min(1, progress));
   const stops = gradient ?? [colors.primary['400'], colors.secondary['500']];
   return (

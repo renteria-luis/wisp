@@ -13,7 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCelebration } from '@/store/useCelebration';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 const CONFETTI = ['✨', '⭐', '💫', '🎊', '🌟', '✨'];
 const HOLD_MS = 1900;
@@ -76,6 +76,7 @@ export function CelebrationOverlay() {
   const current = useCelebration((s) => s.current);
   const dismiss = useCelebration((s) => s.dismiss);
   const reduced = useReducedMotion();
+  const colors = useThemeColors();
   const scale = useSharedValue(0.6);
   const opacity = useSharedValue(0);
 

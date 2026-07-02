@@ -34,7 +34,7 @@ interface SettingsState {
   /** Ids of one-time easter eggs already revealed (so they don't repeat). */
   seenEggs: string[];
   /** Appearance preference; `system` follows the device. */
-  theme: 'system' | 'light' | 'dark';
+  theme: 'system' | 'light' | 'dark' | 'pink';
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -48,7 +48,7 @@ interface SettingsState {
   setNotificationsEnabled: (enabled: boolean) => void;
   setSituationalUntil: (iso: string | null) => void;
   markEggSeen: (id: string) => void;
-  setTheme: (theme: 'system' | 'light' | 'dark') => void;
+  setTheme: (theme: 'system' | 'light' | 'dark' | 'pink') => void;
   reset: () => void;
 }
 
@@ -69,7 +69,7 @@ const initialState = {
   notificationsEnabled: false,
   situationalUntil: null as string | null,
   seenEggs: [] as string[],
-  theme: 'system' as 'system' | 'light' | 'dark',
+  theme: 'system' as 'system' | 'light' | 'dark' | 'pink',
 };
 
 export const useSettings = create<SettingsState>()(

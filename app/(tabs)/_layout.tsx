@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 /** Space is disabled for now — shown but locked (a little padlock, dimmed). */
 function LockedSpaceIcon({ size }: { size: number }) {
@@ -19,12 +20,13 @@ function LockedSpaceIcon({ size }: { size: number }) {
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const c = useThemeColors();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary['600'],
+        tabBarActiveTintColor: c.primary['600'],
         tabBarInactiveTintColor: colors.ink.mute,
       }}
     >

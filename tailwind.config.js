@@ -6,6 +6,17 @@
  */
 const palette = require('./src/theme/palette.json');
 
+// primary/secondary/accent/cream are driven by CSS variables (defaults in
+// src/global.css) so the Pink theme can override them at runtime via vars();
+// light/dark keep the palette defaults. neutral/ink/etc. stay static.
+const varScale = (name) =>
+  Object.fromEntries(
+    Object.keys(palette[name]).map((shade) => [
+      shade,
+      `rgb(var(--color-${name}-${shade}) / <alpha-value>)`,
+    ]),
+  );
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
@@ -14,12 +25,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: palette.primary,
-        secondary: palette.secondary,
-        accent: palette.accent,
+        primary: varScale('primary'),
+        secondary: varScale('secondary'),
+        accent: varScale('accent'),
         neutral: palette.neutral,
         ink: palette.ink,
-        cream: palette.cream,
+        cream: 'rgb(var(--color-cream) / <alpha-value>)',
         vitality: palette.vitality,
         feedback: palette.feedback,
       },

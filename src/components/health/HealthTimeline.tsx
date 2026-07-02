@@ -26,6 +26,7 @@ import {
 import { useCelebration } from '@/store/useCelebration';
 import { useRecovery } from '@/store/useRecovery';
 import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 import { formatCountDown, formatCountUp } from '@/utils/duration';
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -66,6 +67,7 @@ function Check({ color = colors.neutral['0'] }: { color?: string }) {
 }
 
 function Node({ state }: { state: NodeState }) {
+  const c = useThemeColors();
   return (
     <View className="h-5 w-5 items-center justify-center">
       <View
@@ -77,13 +79,13 @@ function Node({ state }: { state: NodeState }) {
           justifyContent: 'center',
           backgroundColor:
             state === 'reached'
-              ? colors.primary['500']
+              ? c.primary['500']
               : state === 'current'
-                ? colors.neutral['0']
-                : colors.neutral['100'],
+                ? c.neutral['0']
+                : c.neutral['100'],
           borderWidth: state === 'reached' ? 0 : 2,
           borderColor:
-            state === 'current' ? colors.accent['500'] : colors.neutral['300'],
+            state === 'current' ? c.accent['500'] : c.neutral['300'],
         }}
       >
         {state === 'reached' ? (
@@ -94,7 +96,7 @@ function Node({ state }: { state: NodeState }) {
               height: 6,
               width: 6,
               borderRadius: 999,
-              backgroundColor: colors.accent['500'],
+              backgroundColor: c.accent['500'],
             }}
           />
         ) : null}
@@ -176,6 +178,7 @@ function PhaseCard({
   children: ReactNode;
 }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   const name = `${numeral}. ${t(`health.phases.${phaseId}.name`)}`;
   const subtitle = t(`health.phases.${phaseId}.subtitle`);
 
@@ -186,7 +189,7 @@ function PhaseCard({
         <Pressable onPress={onToggle} accessibilityRole="button">
           <View className="overflow-hidden px-4 py-3">
             <LinearGradient
-              colors={[colors.accent['400'], colors.accent['600']]}
+              colors={[c.accent['400'], c.accent['600']]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFill}

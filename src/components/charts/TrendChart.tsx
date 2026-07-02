@@ -16,7 +16,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 import { buildLine, type Point } from './path';
 
@@ -53,6 +53,7 @@ export function TrendChart({
   endLabel,
 }: Props) {
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
   const draw = useSharedValue(reduced ? 1 : 0);

@@ -41,7 +41,8 @@
     "theme": {
       "system": "Automático",
       "light": "Claro",
-      "dark": "Oscuro"
+      "dark": "Oscuro",
+      "pink": "Rosa 💗"
     },
     "data": "Datos",
     "dataNote": "Todo se queda en tu teléfono. Exporta una copia o bórralo todo.",
@@ -74,7 +75,8 @@
     "situationalActive": "Apoyo extra activado 💚",
     "checkInAction": "Registro",
     "situationalInfoTitle": "Modo apoyo activado 💚",
-    "situationalInfoBody": "Saliste a tomar o estás en un momento difícil? El alcohol es uno de los mayores disparadores para fumar, así que durante las próximas 3 horas te enviaré algunos recordatorios de aliento (si tienes las notificaciones activas). Toca cualquiera —o el botón de antojo— para respirar y dejar pasar las ganas. Tú puedes."
+    "situationalInfoBody": "Saliste a tomar o estás en un momento difícil? El alcohol es uno de los mayores disparadores para fumar, así que durante las próximas 3 horas te enviaré algunos recordatorios de aliento (si tienes las notificaciones activas). Toca cualquiera —o el botón de antojo— para respirar y dejar pasar las ganas. Tú puedes.",
+    "pickCompanion": "Elige tu compañero"
   },
   "onboarding": {
     "welcomeTitle": "Bienvenida a Wisp",

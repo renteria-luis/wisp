@@ -41,7 +41,8 @@
     "theme": {
       "system": "Automatic",
       "light": "Light",
-      "dark": "Dark"
+      "dark": "Dark",
+      "pink": "Pink 💗"
     },
     "data": "Data",
     "dataNote": "Everything stays on your phone. Export a copy or erase it all.",
@@ -74,7 +75,8 @@
     "situationalActive": "Extra support is on 💚",
     "checkInAction": "Check-in",
     "situationalInfoTitle": "Support mode is on 💚",
-    "situationalInfoBody": "Drinking or in a tricky spot? Alcohol is one of the biggest smoking triggers, so for the next 3 hours I'll send you a few gentle nudges (if notifications are on). Tap one — or the craving button — to breathe through the urge. You've got this."
+    "situationalInfoBody": "Drinking or in a tricky spot? Alcohol is one of the biggest smoking triggers, so for the next 3 hours I'll send you a few gentle nudges (if notifications are on). Tap one — or the craving button — to breathe through the urge. You've got this.",
+    "pickCompanion": "Choose your companion"
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Wisp",

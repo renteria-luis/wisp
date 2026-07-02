@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/useThemeColors';
 
 const DURATION_SEC = 180; // "this craving passes in ~3 minutes"
 const R = 80;
@@ -13,6 +13,7 @@ const CIRCUMFERENCE = 2 * Math.PI * R;
 /** A 3-minute "this will pass" countdown with a progress ring. */
 export function CravingTimer() {
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const [remaining, setRemaining] = useState(DURATION_SEC);
 
   useEffect(() => {

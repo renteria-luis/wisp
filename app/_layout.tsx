@@ -8,7 +8,9 @@ import {
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { vars } from 'nativewind';
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -28,6 +30,10 @@ import { useSettings } from '@/store/useSettings';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { useWishlist } from '@/store/useWishlist';
 import { applySavedTheme } from '@/theme/appearance';
+import { pinkVarsInput } from '@/theme/themes';
+
+// Root-level CSS-variable overrides that turn the whole class-based palette pink.
+const PINK_VARS = vars(pinkVarsInput());
 
 // Keep the native splash up until the first frame can show real data instead of
 // store defaults (the "everything flashes from 0 for a second" problem).
@@ -54,6 +60,7 @@ function whenHydrated(store: Hydratable): Promise<void> {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const theme = useSettings((s) => s.theme);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -134,7 +141,8 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+      <View style={[{ flex: 1 }, theme === 'pink' ? PINK_VARS : null]}>
+        <SafeAreaProvider>
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
@@ -160,7 +168,8 @@ export default function RootLayout() {
           <CelebrationOverlay />
           <StatusBar style="auto" />
         </ThemeProvider>
-      </SafeAreaProvider>
+        </SafeAreaProvider>
+      </View>
     </GestureHandlerRootView>
   );
 }
