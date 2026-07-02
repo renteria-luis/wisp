@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import Animated, {
   cancelAnimation,
   Easing,
@@ -10,39 +10,54 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import type { VitalityState } from '@/types/domain';
-
 import { CHARACTER_SPRITES, SPRITE_ACCESSORIES } from './sprites';
 
 type Props = {
-  band: VitalityState;
   character?: string;
+  /** True when the day's smoking has crossed half the quota → sad face. */
+  sad?: boolean;
   /** Equipped accessory ids. */
   worn?: string[];
   size?: number;
 };
 
-/** Idle bob period per band — livelier when radiant, sluggish when exhausted. */
-const BOB_DURATION: Record<VitalityState, number> = {
-  radiant: 1500,
-  okay: 2100,
-  tired: 2900,
-  exhausted: 3800,
-};
+/** True between 11pm and 6am (local) — the companion sleeps (eyes closed). */
+function useIsNight(): boolean {
+  const isNightNow = (): boolean => {
+    const h = new Date().getHours();
+    return h >= 23 || h < 6;
+  };
+  const [night, setNight] = useState(isNightNow);
+  useEffect(() => {
+    const id = setInterval(() => setNight(isNightNow()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return night;
+}
 
-/** Illustrated companion: a vitality-driven sprite that breathes, blinks, and
- *  wears equipped accessories. Falls back to the cat if the character is unknown. */
+/**
+ * Illustrated companion: a kawaii creature that breathes, blinks, sleeps at
+ * night, and looks sad when the day's smoking passes half the quota. A soft,
+ * reactive ground shadow keeps it feeling planted (it shrinks/fades as the
+ * creature bobs up). Falls back to the cat for an unknown character.
+ *
+ * Source images can be any square resolution — they're drawn into a fixed box
+ * with `resizeMode="contain"`, and accessories use fractional coordinates, so
+ * mixing 1024²/1600²/2048² art "just works".
+ */
 export function SpriteCompanion({
-  band,
   character = 'cat',
+  sad = false,
   worn = [],
   size = 220,
 }: Props) {
   const reduced = useReducedMotion();
   const set = CHARACTER_SPRITES[character] ?? CHARACTER_SPRITES.cat!;
-  const bob = useSharedValue(0);
+  const night = useIsNight();
   const [blinking, setBlinking] = useState(false);
+  const bob = useSharedValue(0);
 
+  // Gentle breathing bob — slower and calmer while asleep.
   useEffect(() => {
     if (reduced) {
       bob.value = 0;
@@ -50,19 +65,18 @@ export function SpriteCompanion({
     }
     bob.value = withRepeat(
       withTiming(1, {
-        duration: BOB_DURATION[band],
+        duration: night ? 4200 : 2200,
         easing: Easing.inOut(Easing.ease),
       }),
       -1,
       true,
     );
     return () => cancelAnimation(bob);
-  }, [band, reduced, bob]);
+  }, [reduced, night, bob]);
 
-  // Occasional blink — only when the eyes are open (okay / radiant).
+  // Occasional blink — only while awake and not sad (the eyes are open then).
   useEffect(() => {
-    const canBlink = !reduced && !!set.blink && (band === 'okay' || band === 'radiant');
-    if (!canBlink) {
+    if (reduced || night || sad) {
       setBlinking(false);
       return;
     }
@@ -77,7 +91,7 @@ export function SpriteCompanion({
             if (!alive) return;
             setBlinking(false);
             schedule();
-          }, 130);
+          }, 150);
         },
         2500 + Math.random() * 3500,
       );
@@ -87,45 +101,80 @@ export function SpriteCompanion({
       alive = false;
       clearTimeout(timer);
     };
-  }, [band, reduced, set.blink]);
+  }, [reduced, night, sad]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -bob.value * 6 }, { scale: 1 + bob.value * 0.012 }],
+  // Priority: asleep (night) → sad → mid-blink → awake & content.
+  const sprite = night
+    ? set.closed
+    : sad
+      ? set.sad
+      : blinking
+        ? set.closed
+        : set.base;
+
+  const bodyStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: -bob.value * (size * 0.03) },
+      { scale: 1 + bob.value * 0.01 },
+    ],
+  }));
+  // The shadow shrinks and fades a touch as the creature lifts off the ground.
+  const shadowStyle = useAnimatedStyle(() => ({
+    opacity: 0.18 - bob.value * 0.06,
+    transform: [{ scaleX: 1 - bob.value * 0.12 }],
   }));
 
-  const sprite = blinking && set.blink ? set.blink : set.base[band];
   const wornAcc = SPRITE_ACCESSORIES.filter((a) => worn.includes(a.id)).sort(
     (a, b) => a.z - b.z,
   );
 
+  const label = `companion-${character}-${night ? 'sleeping' : sad ? 'sad' : 'happy'}`;
+
   return (
-    <Animated.View
-      style={[{ width: size, height: size }, animatedStyle]}
-      accessibilityRole="image"
-      accessibilityLabel={`companion-${band}`}
-    >
-      <Image
-        source={sprite}
-        style={{ width: size, height: size }}
-        resizeMode="contain"
+    <View style={{ width: size, height: size }}>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            bottom: size * 0.055,
+            left: size * 0.27,
+            width: size * 0.46,
+            height: size * 0.07,
+            borderRadius: 999,
+            backgroundColor: '#000000',
+          },
+          shadowStyle,
+        ]}
       />
-      {wornAcc.map((a) => {
-        const s = size * a.scale;
-        return (
-          <Image
-            key={a.id}
-            source={a.art}
-            resizeMode="contain"
-            style={{
-              position: 'absolute',
-              width: s,
-              height: s,
-              left: a.x * size - s / 2,
-              top: a.y * size - s / 2,
-            }}
-          />
-        );
-      })}
-    </Animated.View>
+      <Animated.View
+        style={[{ width: size, height: size }, bodyStyle]}
+        accessibilityRole="image"
+        accessibilityLabel={label}
+      >
+        <Image
+          source={sprite}
+          style={{ width: size, height: size }}
+          resizeMode="contain"
+        />
+        {wornAcc.map((a) => {
+          const s = size * a.scale;
+          return (
+            <Image
+              key={a.id}
+              source={a.art}
+              resizeMode="contain"
+              style={{
+                position: 'absolute',
+                width: s,
+                height: s,
+                left: a.x * size - s / 2,
+                top: a.y * size - s / 2,
+              }}
+            />
+          );
+        })}
+      </Animated.View>
+    </View>
   );
 }

@@ -5,13 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Companion } from '@/components/companion/Companion';
+import {
+  characterForToday,
+  hasSprite,
+} from '@/components/companion/sprites';
+import { SpriteCompanion } from '@/components/companion/SpriteCompanion';
 import { Button } from '@/components/ui/Button';
 import { HeartBurst } from '@/components/ui/HeartBurst';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { cosmeticById } from '@/engine/cosmetics';
 import { allowanceForDay } from '@/engine/planEngine';
-import { useVitality } from '@/hooks/useVitality';
 import {
   requestNotificationPermission,
   startSituationalSupport,
@@ -22,7 +24,6 @@ import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { applyTheme } from '@/theme/appearance';
-import { colors } from '@/theme/tokens';
 import { daysBetween, todayISO } from '@/utils/date';
 
 const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
@@ -39,7 +40,6 @@ export default function Home() {
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
-  const { score, band } = useVitality();
   const equipped = useCompanion((s) => s.equipped);
   const scheme = useColorScheme();
   const name = userName || personal.dedicateeName;
@@ -70,10 +70,19 @@ export default function Home() {
       ? personal.easterEggs.specialDateGreeting
       : t('home.subtitle', { companion: companionName });
 
-  const companionColor =
-    cosmeticById(equipped.companion_color ?? '')?.swatch ??
-    colors.primary['400'];
-  const accessoryColor = cosmeticById(equipped.accessory ?? '')?.swatch;
+  // The companion looks sad once the day's smoking passes half the quota (any
+  // cigarette on cold turkey). Character rotates daily unless one is equipped.
+  const dayIndex = plan
+    ? Math.max(0, daysBetween(plan.startDate, todayISO()))
+    : 0;
+  const allowanceToday = plan ? allowanceForDay(plan, dayIndex) : 0;
+  const companionSad =
+    allowanceToday > 0
+      ? todayCigarettes >= allowanceToday / 2
+      : todayCigarettes > 0;
+  const spriteCharacter = hasSprite(equipped.character)
+    ? equipped.character!
+    : characterForToday();
 
   const situationalActive =
     situationalUntil != null &&
@@ -139,13 +148,7 @@ export default function Home() {
           accessibilityRole="image"
           accessibilityLabel={companionName}
         >
-          <Companion
-            vitality={score}
-            band={band}
-            color={companionColor}
-            accessoryColor={accessoryColor}
-            character={equipped.character}
-          />
+          <SpriteCompanion character={spriteCharacter} sad={companionSad} />
         </Pressable>
 
         <Text className="mt-8 text-3xl font-bold text-ink dark:text-neutral-50">

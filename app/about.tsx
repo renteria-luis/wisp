@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +11,20 @@ const VERSION = '1.0.0';
 export default function About() {
   const router = useRouter();
   const { t } = useTranslation();
+
+  // Hidden God-mode trigger (dev builds only): 7 quick taps on the heart.
+  const godTaps = useRef(0);
+  const godTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onHeartTap = () => {
+    if (!__DEV__) return;
+    godTaps.current += 1;
+    if (godTimer.current) clearTimeout(godTimer.current);
+    godTimer.current = setTimeout(() => (godTaps.current = 0), 1500);
+    if (godTaps.current >= 7) {
+      godTaps.current = 0;
+      router.push('/godmode');
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -36,7 +51,14 @@ export default function About() {
         </Text>
 
         <View className="mt-10 items-center">
-          <Text className="text-2xl text-accent-500">♥</Text>
+          <Pressable
+            onPress={onHeartTap}
+            accessibilityRole="button"
+            accessibilityLabel="♥"
+            hitSlop={14}
+          >
+            <Text className="text-2xl text-accent-500">♥</Text>
+          </Pressable>
           <Text className="mt-2 text-center text-base font-medium text-ink">
             {personal.dedicationLine}
           </Text>
