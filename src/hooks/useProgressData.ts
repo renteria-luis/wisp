@@ -103,19 +103,20 @@ export function useProgressData(): ProgressData {
   return useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];
     const baseline = plan?.baseline ?? 0;
-    const planStartMs = plan ? new Date(plan.startDate).getTime() : Date.now();
-    const smokeFreeSinceMs = lastCigaretteAt
-      ? new Date(lastCigaretteAt).getTime()
-      : planStartMs;
-    // Running recovery: stored base + time since the anchor (falls back to plan
-    // start until the anchor is seeded on launch).
-    const recoveryAnchorMs = recAnchor ?? planStartMs;
+    // Running recovery: stored base + time since the anchor. The anchor is
+    // seeded to "now" on first launch (recovery starts at 0), so a brand-new
+    // account shows 0 — not a head start from the plan's UTC-parsed calendar date.
+    const recoveryAnchorMs = recAnchor ?? Date.now();
     const recoveryBaseHours = recBase;
     const recoveryHours = liveRecoveryHours(
       recoveryBaseHours,
       recoveryAnchorMs,
       Date.now(),
     );
+    // Smoke-free since the last cigarette, or the journey anchor if none logged.
+    const smokeFreeSinceMs = lastCigaretteAt
+      ? new Date(lastCigaretteAt).getTime()
+      : recoveryAnchorMs;
     const trend = currentTrend(actual);
     const todayAllowance = allowances.length
       ? (allowances[allowances.length - 1] ?? 0)

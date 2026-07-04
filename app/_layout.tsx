@@ -92,7 +92,7 @@ export default function RootLayout() {
         // 4. Seed recovery, accrue coins, precompute the companion's vitality.
         const plan = usePlan.getState().plan;
         if (plan) {
-          useRecovery.getState().ensureAnchor(new Date(plan.startDate).getTime());
+          useRecovery.getState().ensureAnchor();
         }
         await useEconomy.getState().accrueFromLogs(plan);
         await useVitalityStore.getState().recompute(plan);

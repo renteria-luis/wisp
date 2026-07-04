@@ -94,14 +94,17 @@ export const useEconomy = create<EconomyState>()(
         return amount;
       },
 
-      accrueFromLogs: async (plan) => {
+      accrueFromLogs: async (_plan) => {
         try {
           const now = Date.now();
-          const planStartISO = plan?.startDate ?? null;
           const lastCig = await getLastCigaretteTimestamp();
-          const streakStartISO =
-            lastCig ?? planStartISO ?? new Date(now).toISOString();
-          const streakStartMs = new Date(streakStartISO).getTime();
+          const rec = useRecovery.getState();
+          // Streak/base-rate anchor: the last cigarette, or the journey anchor
+          // (seeded to "now" on first launch) if none logged — never the plan's
+          // calendar date parsed as UTC midnight, which gave a fresh account a
+          // multi-hour head start of coins.
+          const anchor = rec.anchorMs ?? now;
+          const streakStartMs = lastCig ? new Date(lastCig).getTime() : anchor;
           const last = get().lastAccrualAt;
           const lastMs = last ? new Date(last).getTime() : streakStartMs;
           const accrueFromMs = Math.max(lastMs, streakStartMs);
@@ -113,10 +116,6 @@ export const useEconomy = create<EconomyState>()(
           }
 
           // The further along the recovery milestones, the higher the rate.
-          const rec = useRecovery.getState();
-          const anchor =
-            rec.anchorMs ??
-            (plan ? new Date(plan.startDate).getTime() : now);
           const recoveryHours = liveRecoveryHours(rec.baseHours, anchor, now);
           const multiplier = recoveryMultiplier(reachedCount(recoveryHours));
 

@@ -11,8 +11,10 @@ interface RecoveryState {
   baseHours: number;
   /** High-water mark of milestones already celebrated (−1 = uninitialized). */
   seenMilestones: number;
-  /** Seed the anchor (plan start) the first time only. */
-  ensureAnchor: (planStartMs: number) => void;
+  /** Seed the anchor to NOW the first time only (recovery starts at 0 and
+   *  climbs). Must be the real instant — NOT the plan's calendar date, which
+   *  parsed as UTC midnight gave new accounts a many-hour head start. */
+  ensureAnchor: () => void;
   /** Knock recovery back by `hours` right now (a logged cigarette). */
   penalize: (hours: number) => void;
   /** Dev/God-mode: move recovery forward by `days` (may be negative). */
@@ -33,9 +35,9 @@ export const useRecovery = create<RecoveryState>()(
       anchorMs: null,
       baseHours: 0,
       seenMilestones: -1,
-      ensureAnchor: (planStartMs) => {
+      ensureAnchor: () => {
         if (get().anchorMs == null) {
-          set({ anchorMs: planStartMs, baseHours: 0 });
+          set({ anchorMs: Date.now(), baseHours: 0 });
         }
       },
       penalize: (hours) => {

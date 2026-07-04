@@ -102,7 +102,7 @@ export default function GodMode() {
   const resetRecovery = () => {
     useRecovery.getState().reset();
     if (plan) {
-      useRecovery.getState().ensureAnchor(new Date(plan.startDate).getTime());
+      useRecovery.getState().ensureAnchor();
     }
   };
 
