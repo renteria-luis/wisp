@@ -120,7 +120,8 @@
       "confirm": "Empezar mi plan",
       "greeting": "Hola {{name}} — lo haremos juntas."
     },
-    "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso."
+    "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso.",
+    "secretUnlocked": "Secret desbloqueado — solo para ti"
   },
   "gender": {
     "female": "Mujer",

@@ -120,7 +120,8 @@
       "confirm": "Start my plan",
       "greeting": "Hi {{name}} — we'll do this together."
     },
-    "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress."
+    "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress.",
+    "secretUnlocked": "Secret unlocked — just for you"
   },
   "gender": {
     "female": "Female",

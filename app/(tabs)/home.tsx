@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SecretCompanion } from '@/components/companion/SecretCompanion';
 import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
   CHARACTER_SPRITES,
@@ -49,6 +50,9 @@ export default function Home() {
   const setCharacter = useCompanion((s) => s.setCharacter);
   const name = userName || personal.dedicateeName;
 
+  // Secret Secret companion (unlocked in onboarding) replaces the creatures.
+  const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
+  const [secretTrigger, setSecretTrigger] = useState(0);
   // Tap the companion to pick which of the four creatures to show.
   const [pickerOpen, setPickerOpen] = useState(false);
   // Explains what "I'm out / drinking" does, shown when it's activated/tapped.
@@ -175,13 +179,21 @@ export default function Home() {
         <SpeechBubble text={companionLine} />
         <View className="mt-2">
           <Pressable
-            onPress={() => setPickerOpen(true)}
+            onPress={() =>
+              secretCompanionUnlocked
+                ? setSecretTrigger((n) => n + 1)
+                : setPickerOpen(true)
+            }
             onLongPress={onCompanionLongPress}
             delayLongPress={300}
             accessibilityRole="image"
             accessibilityLabel={companionName}
           >
-            <SpriteCompanion character={spriteCharacter} sad={companionSad} />
+            {secretCompanionUnlocked ? (
+              <SecretCompanion actionTrigger={secretTrigger} />
+            ) : (
+              <SpriteCompanion character={spriteCharacter} sad={companionSad} />
+            )}
           </Pressable>
         </View>
 

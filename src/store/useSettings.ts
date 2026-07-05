@@ -37,6 +37,8 @@ interface SettingsState {
   theme: 'system' | 'light' | 'dark' | 'pink';
   /** ISO date the morning greeting was last shown (so it shows once a day). */
   lastMorningGreet: string | null;
+  /** Secret Secret companion, unlocked via a hidden tap in onboarding. */
+  secretCompanionUnlocked: boolean;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -52,6 +54,7 @@ interface SettingsState {
   markEggSeen: (id: string) => void;
   setTheme: (theme: 'system' | 'light' | 'dark' | 'pink') => void;
   setLastMorningGreet: (iso: string | null) => void;
+  setSecretCompanionUnlocked: (unlocked: boolean) => void;
   reset: () => void;
 }
 
@@ -74,6 +77,7 @@ const initialState = {
   seenEggs: [] as string[],
   theme: 'system' as 'system' | 'light' | 'dark' | 'pink',
   lastMorningGreet: null as string | null,
+  secretCompanionUnlocked: false,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -99,6 +103,8 @@ export const useSettings = create<SettingsState>()(
         set((s) => (s.seenEggs.includes(id) ? s : { seenEggs: [...s.seenEggs, id] })),
       setTheme: (theme) => set({ theme }),
       setLastMorningGreet: (lastMorningGreet) => set({ lastMorningGreet }),
+      setSecretCompanionUnlocked: (secretCompanionUnlocked) =>
+        set({ secretCompanionUnlocked }),
       reset: () => set({ ...initialState }),
     }),
     {
