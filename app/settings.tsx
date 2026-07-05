@@ -28,7 +28,7 @@ import { applyTheme, type ThemePref } from '@/theme/appearance';
 import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
 import type { Gender } from '@/types/domain';
-import { exportAppData, wipeAppData } from '@/utils/appData';
+import { exportAppData, importAppData, wipeAppData } from '@/utils/appData';
 
 const GENDERS: Gender[] = ['female', 'male', 'nonbinary', 'prefer_not'];
 const CURRENCIES = ['CAD', 'PEN', 'USD'];
@@ -161,6 +161,28 @@ export default function Settings() {
     setBusy(false);
     if (result === 'unavailable') Alert.alert(t('settings.exportUnavailable'));
     else if (result === 'error') Alert.alert(t('settings.exportError'));
+  };
+
+  const onImport = () => {
+    Alert.alert(t('settings.importTitle'), t('settings.importBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('settings.importConfirm'),
+        onPress: async () => {
+          setBusy(true);
+          const result = await importAppData();
+          setBusy(false);
+          if (result === 'imported') {
+            Alert.alert(t('settings.importDone'));
+            router.replace('/home');
+          } else if (result === 'invalid') {
+            Alert.alert(t('settings.importInvalid'));
+          } else if (result === 'error') {
+            Alert.alert(t('settings.importError'));
+          }
+        },
+      },
+    ]);
   };
 
   const onReset = () => {
@@ -330,6 +352,12 @@ export default function Settings() {
             label={busy ? t('settings.exporting') : t('settings.export')}
             variant="secondary"
             onPress={onExport}
+            disabled={busy}
+          />
+          <Button
+            label={busy ? t('settings.importing') : t('settings.import')}
+            variant="secondary"
+            onPress={onImport}
             disabled={busy}
           />
           <Button

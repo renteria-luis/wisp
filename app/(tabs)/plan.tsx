@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SecretPlanPeek } from '@/components/companion/SecretPlanPeek';
 import { MilestoneDetailModal } from '@/components/health/MilestoneDetailModal';
 import { AllowanceBars } from '@/components/ui/AllowanceBars';
 import { Button } from '@/components/ui/Button';
@@ -51,7 +52,7 @@ export default function Plan() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
-      <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
+      <ScrollView contentContainerClassName="gap-4 px-6 pb-0 pt-4">
         <View>
           <Text className="text-sm font-medium text-ink-mute dark:text-neutral-400">
             {t('tabs.plan')}
@@ -193,6 +194,10 @@ export default function Plan() {
           variant="secondary"
           onPress={() => router.push('/ebooks')}
         />
+
+        {/* Last item: at the bottom of the scroll its face meets the tab bar;
+            scrolling up carries it away so it never covers the button. */}
+        <SecretPlanPeek />
       </ScrollView>
 
       {detail ? (
