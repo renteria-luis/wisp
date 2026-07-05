@@ -190,7 +190,10 @@ export default function Home() {
             accessibilityLabel={companionName}
           >
             {secretCompanionUnlocked ? (
-              <SecretCompanion actionTrigger={secretTrigger} />
+              <SecretCompanion
+                actionTrigger={secretTrigger}
+                sad={companionSad}
+              />
             ) : (
               <SpriteCompanion character={spriteCharacter} sad={companionSad} />
             )}
