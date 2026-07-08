@@ -6,6 +6,7 @@ import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { CheckDraw } from '@/components/ui/CheckDraw';
 import { getCheckIn, upsertCheckIn } from '@/data/repositories/checkIn';
 import { BONUS_CHECK_IN } from '@/engine/economy';
 import { useEconomy } from '@/store/useEconomy';
@@ -26,6 +27,7 @@ export default function CheckIn() {
   const [mood, setMood] = useState<number | null>(null);
   const [already, setAlready] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +56,8 @@ export default function CheckIn() {
       } else {
         void Haptics.selectionAsync();
       }
-      router.back();
+      setDone(true);
+      setTimeout(() => router.back(), 850);
     } catch {
       setSaving(false);
     }
@@ -100,11 +103,11 @@ export default function CheckIn() {
           ))}
         </View>
 
-        <Text className="mt-8 text-center text-sm text-ink-mute dark:text-neutral-400">
-          {already
-            ? t('checkin.alreadyToday')
-            : t('checkin.reward', { count: BONUS_CHECK_IN })}
-        </Text>
+        {already ? (
+          <Text className="mt-8 text-center text-sm text-ink-mute dark:text-neutral-400">
+            {t('checkin.alreadyToday')}
+          </Text>
+        ) : null}
       </View>
 
       <View className="px-6 pb-6">
@@ -114,6 +117,12 @@ export default function CheckIn() {
           disabled={mood == null || saving}
         />
       </View>
+
+      {done ? (
+        <View className="absolute inset-0 items-center justify-center bg-cream/90 dark:bg-neutral-950/90">
+          <CheckDraw />
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }

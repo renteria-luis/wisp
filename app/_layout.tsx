@@ -1,6 +1,13 @@
 import '../src/global.css';
 
 import {
+  Changa_400Regular,
+  Changa_500Medium,
+  Changa_600SemiBold,
+  Changa_700Bold,
+  useFonts,
+} from '@expo-google-fonts/changa';
+import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
@@ -30,7 +37,10 @@ import { useSettings } from '@/store/useSettings';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { useWishlist } from '@/store/useWishlist';
 import { applySavedTheme } from '@/theme/appearance';
+import { applyFontDefault } from '@/theme/fontDefault';
 import { defaultVarsInput, pinkVarsInput } from '@/theme/themes';
+
+applyFontDefault();
 
 // The class-palette variable scope is applied ALWAYS (default values normally,
 // pink values for the Pink theme) so switching only changes values — never
@@ -65,6 +75,12 @@ export default function RootLayout() {
   const router = useRouter();
   const theme = useSettings((s) => s.theme);
   const [ready, setReady] = useState(false);
+  const [fontsLoaded] = useFonts({
+    Changa_400Regular,
+    Changa_500Medium,
+    Changa_600SemiBold,
+    Changa_700Bold,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -117,10 +133,10 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Hide the splash the moment everything above is loaded.
+  // Hide the splash the moment everything above (and the font) is loaded.
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => {});
-  }, [ready]);
+    if (ready && fontsLoaded) SplashScreen.hideAsync().catch(() => {});
+  }, [ready, fontsLoaded]);
 
   useEffect(() => {
     let sub: { remove: () => void } | undefined;
@@ -140,7 +156,7 @@ export default function RootLayout() {
 
   // While not ready the native splash covers the screen, so render nothing —
   // this avoids mounting the app with default data and flashing it.
-  if (!ready) return null;
+  if (!ready || !fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -166,7 +182,7 @@ export default function RootLayout() {
                 // Half-sheet so the Home companion stays visible behind it and
                 // can coach the user; draggable up via the grabber if needed.
                 presentation: 'formSheet',
-                sheetAllowedDetents: [0.58, 0.95],
+                sheetAllowedDetents: [0.63, 0.95],
                 sheetInitialDetentIndex: 0,
                 sheetGrabberVisible: true,
                 sheetCornerRadius: 22,

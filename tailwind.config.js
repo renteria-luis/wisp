@@ -42,8 +42,8 @@ module.exports = {
         '2xl': '32px',
       },
       fontFamily: {
-        sans: ['System'],
-        rounded: ['System'],
+        sans: ['Changa_400Regular', 'System'],
+        rounded: ['Changa_600SemiBold', 'System'],
       },
     },
   },

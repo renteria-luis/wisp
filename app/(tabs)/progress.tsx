@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Gift } from 'phosphor-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -208,15 +209,14 @@ export default function Progress() {
                 </View>
               </>
             ) : null}
-            <Pressable
-              onPress={() => router.push('/wishlist')}
-              accessibilityRole="button"
-              className="mt-3 self-start"
-            >
-              <Text className="text-sm font-semibold text-primary-600">
-                {t('progress.wishlistLink')}
-              </Text>
-            </Pressable>
+            <View className="mt-4 flex-row">
+              <Button
+                label={t('progress.wishlistLink')}
+                size="sm"
+                icon={<Gift size={16} color="#ffffff" weight="duotone" />}
+                onPress={() => router.push('/wishlist')}
+              />
+            </View>
           </View>
         </Card>
 

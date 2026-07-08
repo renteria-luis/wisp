@@ -188,6 +188,7 @@
     "remainingToday": "Te quedan hoy",
     "overBy": "Te pasaste por {{count}} 💛",
     "smokedOf": "{{count}} de {{allowance}} hoy",
+    "todayShort": "hoy",
     "tapForInfo": "toca para info"
   },
   "log": {
@@ -628,18 +629,25 @@
       },
       "whatWorked": "Lo que te ha funcionado"
     },
-    "resisted": "Lo resistí 💪"
+    "resisted": "Lo resistí 💪",
+    "resistBreath": "Bien hecho — suelta el aire 💚"
   },
   "notifications": {
     "triggerTitle": "Un saludito 🫧",
     "triggerBody": "Suele ser un momento de cigarro. ¿Probamos 2 minutos juntas en su lugar?",
     "situationalTitle": "Aquí estoy",
-    "situationalBody": "¿Momento difícil? Toca para respirar o un temporizador de antojo."
+    "situationalBody": "¿Momento difícil? Toca para respirar o un temporizador de antojo.",
+    "nudgeTitle": "Wisp 💛",
+    "nudgeBody1": "Solo paso a saludar — ¿cómo vas? 💛",
+    "nudgeBody2": "Una respiración y un momento para ti. Tú puedes.",
+    "nudgeBody3": "Aquí estoy si aparece un antojo — tócame cuando quieras.",
+    "logNudgeBody": "Si hoy hubo un desliz, puedes registrarlo — sin culpa, solo para que tu progreso sea real 💛",
+    "milestoneTitle": "¡Nuevo hito! 🎉",
+    "milestoneBody": "Tu cuerpo acaba de alcanzar: {{title}} 💚"
   },
   "checkin": {
     "title": "¿Cómo te sientes?",
     "subtitle": "Un momento para ti. No hay respuestas incorrectas.",
-    "reward": "Regístrate para ganar {{count}} monedas hoy",
     "alreadyToday": "Ya te registraste hoy 💛",
     "save": "Guardar"
   },
@@ -647,6 +655,11 @@
     "version": "Versión {{version}}",
     "privacy": "Tus datos nunca salen de tu teléfono. Sin cuenta, sin nube, sin rastreo.",
     "madeBy": "Hecho por {{name}}"
+  },
+  "egg": {
+    "title": "Easter egg",
+    "secretOn": "Modo Secret activado",
+    "secretOff": "Modo normal activado"
   },
   "godmode": {
     "title": "Modo Dios 🔧",

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Gift } from 'phosphor-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -89,16 +90,32 @@ export default function Plan() {
                   <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
                     {Math.max(0, remaining)}
                   </Text>
-                  <Text
-                    className={`mt-0.5 text-xs ${remaining < 0 ? 'font-semibold text-accent-600 dark:text-accent-300' : 'text-ink-mute dark:text-neutral-400'}`}
-                  >
-                    {remaining < 0
-                      ? t('plan.overBy', { count: -remaining })
-                      : t('plan.smokedOf', {
-                          count: todayCigarettes,
-                          allowance,
-                        })}
-                  </Text>
+                  {remaining < 0 ? (
+                    <Text className="mt-0.5 text-xs font-semibold text-accent-600 dark:text-accent-300">
+                      {t('plan.overBy', { count: -remaining })}
+                    </Text>
+                  ) : (
+                    <View className="mt-1.5 flex-row items-baseline">
+                      <Text
+                        className="text-primary-600 dark:text-primary-300"
+                        style={{ fontFamily: 'Changa_700Bold', fontSize: 18 }}
+                      >
+                        {todayCigarettes}
+                      </Text>
+                      <Text className="mx-1 text-sm text-ink-mute dark:text-neutral-500">
+                        /
+                      </Text>
+                      <Text
+                        className="text-ink-soft dark:text-neutral-300"
+                        style={{ fontFamily: 'Changa_600SemiBold', fontSize: 18 }}
+                      >
+                        {allowance}
+                      </Text>
+                      <Text className="ml-2 text-[10px] uppercase tracking-[2px] text-ink-mute dark:text-neutral-500">
+                        {t('plan.todayShort')}
+                      </Text>
+                    </View>
+                  )}
                 </View>
                 <Text className="text-sm text-ink-mute dark:text-neutral-400">
                   {t('plan.targetDate')}: {formatMedium(plan.targetDate)}
@@ -152,15 +169,14 @@ export default function Plan() {
               </View>
             </View>
           ))}
-          <Pressable
-            onPress={() => router.push('/wishlist')}
-            accessibilityRole="button"
-            className="mt-3 self-start"
-          >
-            <Text className="text-sm font-semibold text-primary-600">
-              {t('progress.wishlistLink')}
-            </Text>
-          </Pressable>
+          <View className="mt-4 flex-row">
+            <Button
+              label={t('progress.wishlistLink')}
+              size="sm"
+              icon={<Gift size={16} color="#ffffff" weight="duotone" />}
+              onPress={() => router.push('/wishlist')}
+            />
+          </View>
         </Card>
 
         {/* Next recovery milestone — tap to see the details/citation. */}

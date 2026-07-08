@@ -188,6 +188,7 @@
     "remainingToday": "You have left today",
     "overBy": "Over by {{count}} 💛",
     "smokedOf": "{{count}} of {{allowance}} today",
+    "todayShort": "today",
     "tapForInfo": "tap for info"
   },
   "log": {
@@ -628,18 +629,25 @@
       },
       "whatWorked": "What's worked for you"
     },
-    "resisted": "I resisted 💪"
+    "resisted": "I resisted 💪",
+    "resistBreath": "Nicely done — breathe out 💚"
   },
   "notifications": {
     "triggerTitle": "A gentle check-in 🫧",
     "triggerBody": "This is a usual moment for a cigarette. Want to try 2 minutes with me instead?",
     "situationalTitle": "I'm right here",
-    "situationalBody": "Tricky moment? Tap for a quick breath or a craving timer."
+    "situationalBody": "Tricky moment? Tap for a quick breath or a craving timer.",
+    "nudgeTitle": "Wisp 💛",
+    "nudgeBody1": "Just popping in — how are you doing? 💛",
+    "nudgeBody2": "A breath and a moment for you. You've got this.",
+    "nudgeBody3": "Here if a craving shows up — tap me anytime.",
+    "logNudgeBody": "If today had a slip, you can log it — no judgment, it just keeps your progress honest 💛",
+    "milestoneTitle": "New milestone! 🎉",
+    "milestoneBody": "Your body just reached: {{title}} 💚"
   },
   "checkin": {
     "title": "How are you feeling?",
     "subtitle": "A moment for you. There are no wrong answers.",
-    "reward": "Check in to earn {{count}} coins today",
     "alreadyToday": "You already checked in today 💛",
     "save": "Save"
   },
@@ -647,6 +655,11 @@
     "version": "Version {{version}}",
     "privacy": "Your data never leaves your phone. No account, no cloud, no tracking.",
     "madeBy": "Made by {{name}}"
+  },
+  "egg": {
+    "title": "Easter egg",
+    "secretOn": "Secret mode on",
+    "secretOff": "Normal mode on"
   },
   "godmode": {
     "title": "God Mode 🔧",

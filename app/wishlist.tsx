@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { WavingBuddy } from '@/components/companion/WavingBuddy';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
@@ -134,9 +135,12 @@ export default function Wishlist() {
         </Card>
 
         {sorted.length === 0 ? (
-          <Text className="mt-2 text-center text-sm text-ink-mute dark:text-neutral-400">
-            {t('wishlist.empty')}
-          </Text>
+          <View className="mt-6 items-center">
+            <WavingBuddy />
+            <Text className="mt-3 text-center text-sm text-ink-mute dark:text-neutral-400">
+              {t('wishlist.empty')}
+            </Text>
+          </View>
         ) : (
           sorted.map((item) => {
             const pct = item.price > 0 ? Math.min(1, saved / item.price) : 1;
