@@ -23,8 +23,10 @@ import {
   nextMilestone,
   reachedCount,
 } from '@/engine/health';
+import { notifyMilestoneReached } from '@/notifications/scheduler';
 import { useCelebration } from '@/store/useCelebration';
 import { useRecovery } from '@/store/useRecovery';
+import { useSettings } from '@/store/useSettings';
 import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
 import { formatCountDown, formatCountUp } from '@/utils/duration';
@@ -291,12 +293,11 @@ export function HealthTimeline({
     if (reached > seenMilestones) {
       const justReached = HEALTH_MILESTONES[reached - 1];
       if (justReached) {
-        celebrate(
-          '🎉',
-          t('celebrate.milestone', {
-            title: t(`health.milestones.${justReached.id}.title`),
-          }),
-        );
+        const title = t(`health.milestones.${justReached.id}.title`);
+        celebrate('💚', t('celebrate.milestone', { title }));
+        if (useSettings.getState().notificationsEnabled) {
+          void notifyMilestoneReached(title);
+        }
       }
       setSeenMilestones(reached);
     }

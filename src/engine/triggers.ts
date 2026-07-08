@@ -74,6 +74,22 @@ export function buildTriggerWindows(
   return out.sort((a, b) => minutesOfDay(a) - minutesOfDay(b));
 }
 
+/**
+ * Gentle daily nudge times: about one every ~3h across waking hours, minus
+ * quiet hours, with varied minutes so it never feels robotic. Far less
+ * aggressive than one ping per trigger window (which stacked up per category).
+ */
+export function dailyNudgeWindows(quiet: QuietHours | null): TimeOfDay[] {
+  const base: TimeOfDay[] = [
+    { hour: 9, minute: 20 },
+    { hour: 12, minute: 40 },
+    { hour: 15, minute: 30 },
+    { hour: 18, minute: 50 },
+    { hour: 21, minute: 15 },
+  ];
+  return base.filter((t) => !isWithinQuietHours(t, quiet));
+}
+
 /** Minutes-from-now at which to send situational support pings. */
 export function situationalOffsets(
   hours = SITUATIONAL_HOURS,

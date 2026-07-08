@@ -6,11 +6,12 @@
  * pulls the native module (keeps web prerender + tests clean). Only LOCAL
  * notifications are used — they work in Expo Go on iOS.
  */
-import { buildTriggerWindows, situationalOffsets } from '@/engine/triggers';
+import { dailyNudgeWindows, situationalOffsets } from '@/engine/triggers';
 import i18n from '@/i18n';
 import type { QuietHours, TriggerCategory } from '@/types/domain';
 
 const CRAVING_URL = '/craving';
+const LOG_URL = '/log';
 
 async function getNotifications() {
   return import('expo-notifications');
@@ -45,9 +46,15 @@ export async function requestNotificationPermission(): Promise<boolean> {
   }
 }
 
-/** Cancel and (re)schedule the daily trigger nudges from the user's categories. */
+/**
+ * Cancel and (re)schedule the daily nudges — deliberately sparse: ~one every
+ * ~3h across the day (minus quiet hours), with rotating gentle copy. The last
+ * (evening) slot softly invites logging a slip; kept low-key on purpose so a
+ * reminder never nags someone into smoking. Trigger categories are no longer
+ * used to fan out extra pings.
+ */
 export async function rescheduleTriggerNotifications(
-  categories: TriggerCategory[],
+  _categories: TriggerCategory[],
   quiet: QuietHours | null,
   enabled: boolean,
 ): Promise<void> {
@@ -55,12 +62,17 @@ export async function rescheduleTriggerNotifications(
     const N = await getNotifications();
     await N.cancelAllScheduledNotificationsAsync();
     if (!enabled) return;
-    for (const w of buildTriggerWindows(categories, quiet)) {
+    const windows = dailyNudgeWindows(quiet);
+    for (let i = 0; i < windows.length; i++) {
+      const w = windows[i]!;
+      const isLogReminder = windows.length > 1 && i === windows.length - 1;
       await N.scheduleNotificationAsync({
         content: {
-          title: i18n.t('notifications.triggerTitle'),
-          body: i18n.t('notifications.triggerBody'),
-          data: { url: CRAVING_URL },
+          title: i18n.t('notifications.nudgeTitle'),
+          body: isLogReminder
+            ? i18n.t('notifications.logNudgeBody')
+            : i18n.t(`notifications.nudgeBody${(i % 3) + 1}`),
+          data: { url: isLogReminder ? LOG_URL : CRAVING_URL },
         },
         trigger: {
           type: N.SchedulableTriggerInputTypes.DAILY,
@@ -69,6 +81,22 @@ export async function rescheduleTriggerNotifications(
         },
       });
     }
+  } catch {
+    /* notifications unavailable */
+  }
+}
+
+/** Fire an immediate local notification celebrating a newly-reached milestone. */
+export async function notifyMilestoneReached(title: string): Promise<void> {
+  try {
+    const N = await getNotifications();
+    await N.scheduleNotificationAsync({
+      content: {
+        title: i18n.t('notifications.milestoneTitle'),
+        body: i18n.t('notifications.milestoneBody', { title }),
+      },
+      trigger: null, // present right away
+    });
   } catch {
     /* notifications unavailable */
   }
