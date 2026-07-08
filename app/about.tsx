@@ -1,29 +1,64 @@
 import { useRouter } from 'expo-router';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { personal } from '@/personal/personal.config';
+import { useCelebration } from '@/store/useCelebration';
+import { useSettings } from '@/store/useSettings';
+import { colors } from '@/theme/tokens';
 
 const VERSION = '1.0.0';
 
 export default function About() {
   const router = useRouter();
   const { t } = useTranslation();
+  const celebrate = useCelebration((s) => s.celebrate);
 
-  // Hidden God-mode trigger (dev builds only): 7 quick taps on the heart.
-  const godTaps = useRef(0);
-  const godTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Hidden easter egg: 7 quick taps on the heart open a 4-digit code prompt.
+  const taps = useRef(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [code, setCode] = useState('');
+
   const onHeartTap = () => {
-    if (!__DEV__) return;
-    godTaps.current += 1;
-    if (godTimer.current) clearTimeout(godTimer.current);
-    godTimer.current = setTimeout(() => (godTaps.current = 0), 1500);
-    if (godTaps.current >= 7) {
-      godTaps.current = 0;
-      router.push('/godmode');
+    taps.current += 1;
+    if (tapTimer.current) clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(() => (taps.current = 0), 1500);
+    if (taps.current >= 7) {
+      taps.current = 0;
+      setCode('');
+      setCodeOpen(true);
     }
+  };
+
+  const closeCode = () => {
+    setCodeOpen(false);
+    setCode('');
+  };
+
+  const submitCode = () => {
+    const c = code.trim();
+    closeCode();
+    if (c === '3019') {
+      // Activate God mode.
+      router.push('/godmode');
+    } else if (c === '5131') {
+      // Toggle Secret (Secret) mode ↔ normal, with a self-fading popup.
+      const next = !useSettings.getState().secretCompanionUnlocked;
+      useSettings.getState().setSecretCompanionUnlocked(next);
+      celebrate(next ? '🍮' : '🐰', t(next ? 'egg.secretOn' : 'egg.secretOff'));
+    }
+    // Any other code: silently closed.
   };
 
   return (
@@ -75,6 +110,47 @@ export default function About() {
       <Text className="px-8 pb-6 text-center text-xs text-ink-mute">
         {t('common.notMedicalAdvice')}
       </Text>
+
+      <Modal
+        visible={codeOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={closeCode}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          className="flex-1 items-center justify-center bg-black/40 px-10"
+        >
+          <View className="w-full max-w-[320px] rounded-2xl bg-neutral-0 p-5">
+            <Text className="text-center text-lg font-bold text-ink">
+              {t('egg.title')}
+            </Text>
+            <TextInput
+              value={code}
+              onChangeText={(v) => setCode(v.replace(/[^0-9]/g, '').slice(0, 4))}
+              keyboardType="number-pad"
+              maxLength={4}
+              autoFocus
+              placeholder="••••"
+              placeholderTextColor={colors.ink.mute}
+              onSubmitEditing={submitCode}
+              className="mt-4 rounded-xl border border-neutral-200 px-4 py-3 text-center text-2xl tracking-[8px] text-ink"
+            />
+            <View className="mt-5 flex-row justify-end gap-6">
+              <Pressable onPress={closeCode} accessibilityRole="button" hitSlop={8}>
+                <Text className="text-base font-medium text-ink-mute">
+                  {t('common.cancel')}
+                </Text>
+              </Pressable>
+              <Pressable onPress={submitCode} accessibilityRole="button" hitSlop={8}>
+                <Text className="text-base font-semibold text-primary-600">
+                  {t('common.ok')}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }

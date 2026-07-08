@@ -1,4 +1,4 @@
-import { Redirect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,8 +34,8 @@ function Row({ children }: { children: ReactNode }) {
 }
 
 /**
- * God Mode — a __DEV__-only panel to edit live state for testing/debugging.
- * Reached via 7 quick taps on the Space coin balance. Not shipped to production.
+ * God Mode — a panel to edit live state for testing/debugging. Reached from
+ * About via 7 quick taps on the heart, then the code 3019 (works in prod too).
  */
 export default function GodMode() {
   const router = useRouter();
@@ -51,8 +51,6 @@ export default function GodMode() {
   const setOnboardingCompleted = useSettings((s) => s.setOnboardingCompleted);
 
   const [coinInput, setCoinInput] = useState<number | null>(balance);
-
-  if (!__DEV__) return <Redirect href="/space" />;
 
   // Simulate `delta` days passing: move the plan window, shift existing logs
   // (so today's count resets and history is preserved) and advance recovery so

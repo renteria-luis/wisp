@@ -98,6 +98,21 @@ export const PP_ACTIONS = {
       ['base', 1],
     ],
   },
+  // Same as cookieStand but PP stays seated at the end instead of standing up.
+  cookieStandStay: {
+    end: 'sit',
+    steps: [
+      ['sit', 300],
+      ['cookie1', 380],
+      ['cookie2', 300],
+      ['cookie1', 300],
+      ['cookie2', 300],
+      ['cookie1', 300],
+      ['cookie2', 300],
+      ['cookie1', 260],
+      ['sit', 1],
+    ],
+  },
   // Nibble the cookie while already seated (stays seated).
   cookieSit: {
     end: 'sit',

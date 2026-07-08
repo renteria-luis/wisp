@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { cravingLift } from '@/components/companion/cravingLift';
 import { SecretCompanion } from '@/components/companion/SecretCompanion';
 import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
@@ -46,6 +48,7 @@ export default function Home() {
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
   const plan = usePlan((s) => s.plan);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const lastCigaretteAt = useLogs((s) => s.lastCigaretteAt);
   const equipped = useCompanion((s) => s.equipped);
   const setCharacter = useCompanion((s) => s.setCharacter);
   const name = userName || personal.dedicateeName;
@@ -53,6 +56,12 @@ export default function Home() {
   // Secret Secret companion (unlocked in onboarding) replaces the creatures.
   const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
   const [secretTrigger, setSecretTrigger] = useState(0);
+  const [secretWake, setSecretWake] = useState(0);
+  // PP smoothly lifts up while the craving sheet is open (driven by that
+  // screen's mount/unmount via the shared `cravingLift` value).
+  const liftStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: cravingLift.value * -90 }],
+  }));
   // Tap the companion to pick which of the four creatures to show.
   const [pickerOpen, setPickerOpen] = useState(false);
   // Explains what "I'm out / drinking" does, shown when it's activated/tapped.
@@ -75,16 +84,27 @@ export default function Home() {
     }
   };
 
-  // The companion looks sad once the day's smoking passes half the quota (any
-  // cigarette on cold turkey). Character rotates daily unless one is equipped.
+  // The companion turns sad after smoking ~40% of the day's quota (any
+  // cigarette on cold turkey) — but only for 3h since the last cigarette. Smoke
+  // again and it re-sads for another 3h. A slow tick re-evaluates that window
+  // while the screen stays open. Character rotates daily unless one is equipped.
+  const [sadTick, setSadTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setSadTick(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const SAD_WINDOW_MS = 3 * 60 * 60 * 1000;
   const dayIndex = plan
     ? Math.max(0, daysBetween(plan.startDate, todayISO()))
     : 0;
   const allowanceToday = plan ? allowanceForDay(plan, dayIndex) : 0;
-  const companionSad =
+  const overQuota =
     allowanceToday > 0
-      ? todayCigarettes >= allowanceToday / 2
+      ? todayCigarettes >= allowanceToday * 0.4
       : todayCigarettes > 0;
+  const lastCigMs = lastCigaretteAt ? new Date(lastCigaretteAt).getTime() : 0;
+  const recentCigarette = lastCigMs > 0 && sadTick - lastCigMs < SAD_WINDOW_MS;
+  const companionSad = overQuota && recentCigarette;
   const spriteCharacter = hasSprite(equipped.character)
     ? equipped.character!
     : characterForToday();
@@ -176,6 +196,9 @@ export default function Home() {
         </Pressable>
       </View>
       <View className="flex-1 items-center justify-center px-6">
+        <Animated.View
+          style={[{ width: '100%', alignItems: 'center' }, liftStyle]}
+        >
         <SpeechBubble text={companionLine} />
         <View className="mt-2">
           <Pressable
@@ -193,6 +216,7 @@ export default function Home() {
               <SecretCompanion
                 actionTrigger={secretTrigger}
                 sad={companionSad}
+                wakeTrigger={secretWake}
               />
             ) : (
               <SpriteCompanion character={spriteCharacter} sad={companionSad} />
@@ -205,12 +229,16 @@ export default function Home() {
             <Text className="text-sm font-bold text-primary-700">{status}</Text>
           </View>
         ) : null}
+        </Animated.View>
       </View>
 
       <View className="gap-3 px-6 pb-4">
         <Button
           label={t('home.cravingAction')}
-          onPress={() => router.push('/craving')}
+          onPress={() => {
+            setSecretWake((n) => n + 1);
+            router.push('/craving');
+          }}
         />
         <Button
           label={t('home.logAction')}

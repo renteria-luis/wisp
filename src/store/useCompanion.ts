@@ -22,6 +22,9 @@ interface CompanionState {
   setWorn: (worn: string[]) => void;
   /** Directly set the equipped character (used by the Home sprite picker). */
   setCharacter: (id: string) => void;
+  /** Persisted posture of the secret Secret so it survives app restarts. */
+  secretPosture: 'stand' | 'sit';
+  setSecretPosture: (posture: 'stand' | 'sit') => void;
   reset: () => void;
 }
 
@@ -32,6 +35,7 @@ const initial = {
     character: DEFAULT_CHARACTER_ID,
   } as Partial<Record<CosmeticType, string>>,
   worn: [] as string[],
+  secretPosture: 'stand' as 'stand' | 'sit',
 };
 
 export const useCompanion = create<CompanionState>()(
@@ -48,6 +52,7 @@ export const useCompanion = create<CompanionState>()(
       setWorn: (worn) => set({ worn }),
       setCharacter: (id) =>
         set((s) => ({ equipped: { ...s.equipped, character: id } })),
+      setSecretPosture: (secretPosture) => set({ secretPosture }),
       reset: () => set({ ...initial }),
     }),
     {
@@ -79,6 +84,7 @@ export const useCompanion = create<CompanionState>()(
         owned: s.owned,
         equipped: s.equipped,
         worn: s.worn,
+        secretPosture: s.secretPosture,
       }),
     },
   ),

@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -12,20 +11,17 @@ import Animated, {
 
 import { useSettings } from '@/store/useSettings';
 
-import { SpeechBubble } from './SpeechBubble';
-
 const PEEK = require('../../../assets/companion/secret/plan_peek.png');
 const PEEK_BLINK = require('../../../assets/companion/secret/plan_peek_blink.png');
 const ASPECT = 900 / 478;
 
 /**
- * Secret Secret peeking up from the bottom of the Plan screen, with a
- * little love note and a blink every 5s. Only rendered once the secret
- * companion has been unlocked (self-gating, so callers can render it freely).
+ * Secret Secret peeking up from the bottom of the Plan screen, blinking at
+ * a random 2–5s cadence, with a small hand-written love note tucked into the
+ * bottom-right corner. Only rendered once the secret companion is unlocked.
  */
 export function SecretPlanPeek() {
   const unlocked = useSettings((s) => s.secretCompanionUnlocked);
-  const { t } = useTranslation();
   const reduced = useReducedMotion();
   const [blinking, setBlinking] = useState(false);
   const rise = useSharedValue(reduced ? 0 : 1);
@@ -38,13 +34,32 @@ export function SecretPlanPeek() {
     });
   }, [unlocked, rise]);
 
+  // Blink at a random 2–5s cadence.
   useEffect(() => {
     if (!unlocked) return;
-    const id = setInterval(() => {
-      setBlinking(true);
-      setTimeout(() => setBlinking(false), 180);
-    }, 5000);
-    return () => clearInterval(id);
+    let alive = true;
+    let openTimer: ReturnType<typeof setTimeout>;
+    let closeTimer: ReturnType<typeof setTimeout>;
+    const loop = () => {
+      openTimer = setTimeout(
+        () => {
+          if (!alive) return;
+          setBlinking(true);
+          closeTimer = setTimeout(() => {
+            if (!alive) return;
+            setBlinking(false);
+            loop();
+          }, 180);
+        },
+        2000 + Math.random() * 3000,
+      );
+    };
+    loop();
+    return () => {
+      alive = false;
+      clearTimeout(openTimer);
+      clearTimeout(closeTimer);
+    };
   }, [unlocked]);
 
   const riseStyle = useAnimatedStyle(() => ({
@@ -55,10 +70,9 @@ export function SecretPlanPeek() {
   if (!unlocked) return null;
 
   return (
-    <View pointerEvents="none" className="items-center">
-      <SpeechBubble text={t('plan.secretLove')} />
+    <View pointerEvents="none" className="w-full items-center">
       <Animated.View
-        style={[{ width: '100%', maxWidth: 320 }, riseStyle]}
+        style={[{ width: '100%', maxWidth: 300 }, riseStyle]}
         accessibilityRole="image"
         accessibilityLabel="Secret"
       >
@@ -70,6 +84,10 @@ export function SecretPlanPeek() {
           cachePolicy="memory-disk"
         />
       </Animated.View>
+      <Text className="absolute bottom-3 right-3 text-right text-xs leading-4 text-ink-mute dark:text-neutral-400">
+        made{'\n'}with <Text className="text-accent-500">♥</Text>
+        {'\n'}for Tiffani
+      </Text>
     </View>
   );
 }

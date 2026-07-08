@@ -13,6 +13,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { useCompanion } from '@/store/useCompanion';
+
 import {
   PP_ACTIONS,
   PP_ASPECT,
@@ -28,6 +30,8 @@ type Props = {
   sad?: boolean;
   /** Bump this (e.g. on tap) to bounce + maybe play a random action. */
   actionTrigger?: number;
+  /** Bump this to make PP briefly open its eyes when asleep (e.g. a craving). */
+  wakeTrigger?: number;
 };
 
 type Posture = 'stand' | 'sit';
@@ -54,22 +58,29 @@ export function SecretCompanion({
   size = 248,
   sad = false,
   actionTrigger = 0,
+  wakeTrigger = 0,
 }: Props) {
   const reduced = useReducedMotion();
+  // Posture is persisted so PP stays sitting/standing across app restarts.
+  const savedPosture = useCompanion.getState().secretPosture;
   const [frame, setFrame] = useState<PPFrame>('base');
-  const [posture, setPostureState] = useState<Posture>('stand');
+  const [posture, setPostureState] = useState<Posture>(savedPosture);
   const [busy, setBusyState] = useState(false);
   const [night, setNight] = useState(isNightNow);
+  // Briefly true after `wakeTrigger` bumps — PP opens its eyes even at night.
+  const [forceAwake, setForceAwake] = useState(false);
   // Bumped on every tap; resets the "sit down after a while" idle timer.
   const [poke, setPoke] = useState(0);
+  const firstWake = useRef(true);
 
-  const postureRef = useRef<Posture>('stand');
+  const postureRef = useRef<Posture>(savedPosture);
   const busyRef = useRef(false);
   const sadRef = useRef(sad);
   const nightRef = useRef(night);
   const frameRef = useRef<PPFrame>('base');
   const actionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const firstTrigger = useRef(true);
+  const moodInit = useRef(true);
 
   const bob = useSharedValue(0);
   const pop = useSharedValue(0);
@@ -77,6 +88,7 @@ export function SecretCompanion({
   const setPosture = (p: Posture) => {
     postureRef.current = p;
     setPostureState(p);
+    useCompanion.getState().setSecretPosture(p);
   };
   const setBusy = (b: boolean) => {
     busyRef.current = b;
@@ -90,8 +102,13 @@ export function SecretCompanion({
     frameRef.current = frame;
   }, [night, frame]);
 
-  // Whenever mood context flips, straighten up so state starts from standing.
+  // When mood context flips, straighten up — but not on the first mount, so a
+  // persisted sitting posture is restored when the app reopens.
   useEffect(() => {
+    if (moodInit.current) {
+      moodInit.current = false;
+      return;
+    }
     setPosture('stand');
   }, [sad, night]);
 
@@ -100,6 +117,17 @@ export function SecretCompanion({
     const id = setInterval(() => setNight(isNightNow()), 5 * 60 * 1000);
     return () => clearInterval(id);
   }, []);
+
+  // A craving nudge briefly opens PP's eyes, even while it's asleep.
+  useEffect(() => {
+    if (firstWake.current) {
+      firstWake.current = false;
+      return;
+    }
+    setForceAwake(true);
+    const id = setTimeout(() => setForceAwake(false), 2200);
+    return () => clearTimeout(id);
+  }, [wakeTrigger]);
 
   const clearActionTimers = () => {
     actionTimers.current.forEach(clearTimeout);
@@ -129,7 +157,10 @@ export function SecretCompanion({
   useEffect(() => {
     if (busy) return;
     if (night) {
-      setFrame('blink'); // sleeping, standing
+      // Asleep: eyes closed (sit_blink when curled up, blink when standing).
+      // A craving nudge (forceAwake) briefly opens the eyes.
+      if (posture === 'sit') setFrame(forceAwake ? 'sit' : 'sit_blink');
+      else setFrame(forceAwake ? 'base' : 'blink');
       return;
     }
     if (sad) {
@@ -208,7 +239,7 @@ export function SecretCompanion({
       }, SIT_AFTER_MS),
     );
     return stop;
-  }, [busy, posture, sad, night, reduced, poke]);
+  }, [busy, posture, sad, night, forceAwake, reduced, poke]);
 
   // Tap: always a squishy bounce; then maybe an action.
   useEffect(() => {
@@ -225,7 +256,12 @@ export function SecretCompanion({
 
     // A new action can start only once the previous one has finished (busy),
     // and only from an idle posture — then each keeps its own probability.
-    if (nightRef.current || busyRef.current) return; // bounce only
+    if (busyRef.current) return; // bounce only mid-action
+    if (nightRef.current) {
+      // Asleep: a tap can make it curl up and sit (still asleep) — never stand.
+      if (postureRef.current === 'stand') setPosture('sit');
+      return;
+    }
 
     if (sadRef.current) {
       // Sad: never acts; only a small chance to get up from sad-sitting.
@@ -250,7 +286,10 @@ export function SecretCompanion({
       return;
     }
     const pool: PPActionId[] = ['cookieStand', 'hamster', 'pancake', 'giro'];
-    runAction(pool[Math.floor(Math.random() * pool.length)]!);
+    let pick = pool[Math.floor(Math.random() * pool.length)]!;
+    // Eating a cookie: 50% of the time PP stays seated instead of standing up.
+    if (pick === 'cookieStand' && Math.random() < 0.5) pick = 'cookieStandStay';
+    runAction(pick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionTrigger]);
 

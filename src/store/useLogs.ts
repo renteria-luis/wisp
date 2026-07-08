@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import {
   addCigarette,
   countCigarettesOnDate,
+  getLastCigaretteTimestamp,
 } from '@/data/repositories/cigaretteLog';
 import {
   addCraving,
@@ -27,6 +28,8 @@ interface LogsState {
   ready: boolean;
   todayCigarettes: number;
   todayResisted: number;
+  /** ISO timestamp of the most recent cigarette ever (null if none). */
+  lastCigaretteAt: string | null;
   init: () => Promise<void>;
   refreshToday: () => Promise<void>;
   logCigarette: (input?: LogInput) => Promise<void>;
@@ -41,6 +44,7 @@ export const useLogs = create<LogsState>((set, get) => ({
   ready: false,
   todayCigarettes: 0,
   todayResisted: 0,
+  lastCigaretteAt: null,
 
   init: async () => {
     try {
@@ -54,11 +58,16 @@ export const useLogs = create<LogsState>((set, get) => ({
 
   refreshToday: async () => {
     const today = todayISO();
-    const [cigarettes, resisted] = await Promise.all([
+    const [cigarettes, resisted, lastCig] = await Promise.all([
       countCigarettesOnDate(today),
       countResistedOnDate(today),
+      getLastCigaretteTimestamp(),
     ]);
-    set({ todayCigarettes: cigarettes, todayResisted: resisted });
+    set({
+      todayCigarettes: cigarettes,
+      todayResisted: resisted,
+      lastCigaretteAt: lastCig,
+    });
   },
 
   logCigarette: async (input) => {
