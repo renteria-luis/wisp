@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Text, TextInput, View } from 'react-native';
 
+import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/tokens';
 
 type Props = {
@@ -51,31 +52,26 @@ export function NumberField({
       <Text className="mb-1 text-sm font-medium text-ink-soft dark:text-neutral-300">
         {label}
       </Text>
-      <View className="flex-row items-center rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
-        <TextInput
-          value={text}
-          onChangeText={handle}
-          keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
-          placeholder={placeholder}
-          placeholderTextColor={colors.ink.mute}
-          textAlignVertical="center"
-          style={{ height: 46 }}
-          className="flex-1 text-base text-ink dark:text-neutral-50"
-        />
-        {suffix ? (
-          <Text className="pl-2 text-sm text-ink-mute dark:text-neutral-400">
-            {suffix}
-          </Text>
-        ) : null}
+      <View className="flex-row items-center gap-2">
+        <View className="flex-1 flex-row items-center rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
+          <TextInput
+            value={text}
+            onChangeText={handle}
+            keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
+            placeholder={placeholder}
+            placeholderTextColor={colors.ink.mute}
+            textAlignVertical="center"
+            style={{ height: 46 }}
+            className="flex-1 text-base text-ink dark:text-neutral-50"
+          />
+          {suffix ? (
+            <Text className="pl-2 text-sm text-ink-mute dark:text-neutral-400">
+              {suffix}
+            </Text>
+          ) : null}
+        </View>
         {showDone ? (
-          <Pressable
-            onPress={() => Keyboard.dismiss()}
-            accessibilityRole="button"
-            hitSlop={8}
-            className="pl-3"
-          >
-            <Text className="text-sm font-semibold text-primary-600">OK</Text>
-          </Pressable>
+          <Button label="OK" size="sm" onPress={() => Keyboard.dismiss()} />
         ) : null}
       </View>
     </View>

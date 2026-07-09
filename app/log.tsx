@@ -146,6 +146,7 @@ export default function Log() {
         contentContainerClassName="gap-6 px-6 pb-6 pt-2"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
       >
         <Text className="text-2xl font-bold text-ink dark:text-neutral-50">{t('log.title')}</Text>
 
@@ -251,24 +252,17 @@ export default function Log() {
               <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
                 {t('log.noteLabel')}
               </Text>
-              <View className="flex-row items-center rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
-                <TextInput
-                  value={note}
-                  onChangeText={setNote}
-                  placeholder={t('log.notePlaceholder')}
-                  placeholderTextColor={colors.ink.mute}
-                  className="flex-1 py-3 text-base text-ink dark:text-neutral-50"
-                />
-                <Pressable
-                  onPress={() => Keyboard.dismiss()}
-                  accessibilityRole="button"
-                  hitSlop={8}
-                  className="pl-3"
-                >
-                  <Text className="text-sm font-semibold text-primary-600">
-                    OK
-                  </Text>
-                </Pressable>
+              <View className="flex-row items-center gap-2">
+                <View className="flex-1 rounded-xl border border-neutral-200 bg-neutral-0 px-4 dark:border-neutral-800 dark:bg-neutral-900">
+                  <TextInput
+                    value={note}
+                    onChangeText={setNote}
+                    placeholder={t('log.notePlaceholder')}
+                    placeholderTextColor={colors.ink.mute}
+                    className="py-3 text-base text-ink dark:text-neutral-50"
+                  />
+                </View>
+                <Button label="OK" size="sm" onPress={() => Keyboard.dismiss()} />
               </View>
             </View>
           </>
