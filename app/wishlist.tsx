@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { WavingBuddy } from '@/components/companion/WavingBuddy';
+import { GiftBuddy } from '@/components/companion/GiftBuddy';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
@@ -35,6 +35,7 @@ export default function Wishlist() {
   const markBought = useWishlist((s) => s.markBought);
   const celebrate = useCelebration((s) => s.celebrate);
   const currency = useSettings((s) => s.pricing.currency);
+  const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
   const { saved } = useProgressData();
 
   const onBought = (id: string, itemName: string) => {
@@ -136,7 +137,7 @@ export default function Wishlist() {
 
         {sorted.length === 0 ? (
           <View className="mt-6 items-center">
-            <WavingBuddy />
+            {secretCompanionUnlocked ? <GiftBuddy /> : null}
             <Text className="mt-3 text-center text-sm text-ink-mute dark:text-neutral-400">
               {t('wishlist.empty')}
             </Text>

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -24,6 +24,7 @@ export function SecretPlanPeek() {
   const unlocked = useSettings((s) => s.secretCompanionUnlocked);
   const reduced = useReducedMotion();
   const [blinking, setBlinking] = useState(false);
+  const [held, setHeld] = useState(false);
   const rise = useSharedValue(reduced ? 0 : 1);
 
   useEffect(() => {
@@ -34,9 +35,9 @@ export function SecretPlanPeek() {
     });
   }, [unlocked, rise]);
 
-  // Blink at a random 2–5s cadence.
+  // Blink at a random 2–5s cadence — paused while held (eyes stay shut).
   useEffect(() => {
-    if (!unlocked) return;
+    if (!unlocked || held) return;
     let alive = true;
     let openTimer: ReturnType<typeof setTimeout>;
     let closeTimer: ReturnType<typeof setTimeout>;
@@ -60,7 +61,7 @@ export function SecretPlanPeek() {
       clearTimeout(openTimer);
       clearTimeout(closeTimer);
     };
-  }, [unlocked]);
+  }, [unlocked, held]);
 
   const riseStyle = useAnimatedStyle(() => ({
     opacity: 1 - rise.value,
@@ -70,21 +71,27 @@ export function SecretPlanPeek() {
   if (!unlocked) return null;
 
   return (
-    <View pointerEvents="none" className="w-full items-center">
-      <Animated.View
-        style={[{ width: '100%', maxWidth: 300 }, riseStyle]}
-        accessibilityRole="image"
-        accessibilityLabel="Secret"
-      >
-        <Image
-          source={blinking ? PEEK_BLINK : PEEK}
-          style={{ width: '100%', aspectRatio: ASPECT }}
-          contentFit="contain"
-          transition={0}
-          cachePolicy="memory-disk"
-        />
+    <View className="w-full items-center">
+      <Animated.View style={[{ width: '100%', maxWidth: 300 }, riseStyle]}>
+        <Pressable
+          onPressIn={() => setHeld(true)}
+          onPressOut={() => setHeld(false)}
+          accessibilityRole="image"
+          accessibilityLabel="companion"
+        >
+          <Image
+            source={held || blinking ? PEEK_BLINK : PEEK}
+            style={{ width: '100%', aspectRatio: ASPECT }}
+            contentFit="contain"
+            transition={0}
+            cachePolicy="memory-disk"
+          />
+        </Pressable>
       </Animated.View>
-      <Text className="absolute bottom-3 right-3 text-right text-xs leading-4 text-ink-mute dark:text-neutral-400">
+      <Text
+        pointerEvents="none"
+        className="absolute bottom-3 right-3 text-right text-xs leading-4 text-ink-mute dark:text-neutral-400"
+      >
         made{'\n'}with <Text className="text-accent-500">♥</Text>
         {'\n'}for Tiffani
       </Text>

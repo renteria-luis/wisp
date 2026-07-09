@@ -54,7 +54,7 @@ export default function Craving() {
     });
     const drop = () => {
       cravingLift.value = withTiming(0, {
-        duration: 300,
+        duration: 150,
         easing: Easing.out(Easing.cubic),
       });
     };

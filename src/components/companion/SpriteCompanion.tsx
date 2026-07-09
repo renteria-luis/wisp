@@ -20,6 +20,8 @@ type Props = {
   /** Equipped accessory ids. */
   worn?: string[];
   size?: number;
+  /** While true, keep the eyes closed (held press) and pause auto-blinking. */
+  holdClose?: boolean;
 };
 
 /** True between 11pm and 6am (local) — the companion sleeps (eyes closed). */
@@ -51,6 +53,7 @@ export function SpriteCompanion({
   sad = false,
   worn = [],
   size = 220,
+  holdClose = false,
 }: Props) {
   const reduced = useReducedMotion();
   const set = CHARACTER_SPRITES[character] ?? CHARACTER_SPRITES.cat!;
@@ -80,7 +83,7 @@ export function SpriteCompanion({
   // capped so there's always at least one blink every ~12s (≤15s guaranteed);
   // back-to-back blinks are fine.
   useEffect(() => {
-    if (night || sad) {
+    if (night || sad || holdClose) {
       setBlinking(false);
       return;
     }
@@ -105,14 +108,14 @@ export function SpriteCompanion({
       alive = false;
       clearTimeout(timer);
     };
-  }, [night, sad]);
+  }, [night, sad, holdClose]);
 
-  // Priority: asleep (night) → sad → mid-blink → awake & content.
+  // Priority: asleep (night) → sad → held/mid-blink → awake & content.
   const sprite = night
     ? set.closed
     : sad
       ? set.sad
-      : blinking
+      : blinking || holdClose
         ? set.closed
         : set.base;
 

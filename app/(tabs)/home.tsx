@@ -13,10 +13,10 @@ import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
   CHARACTER_SPRITES,
   SPRITE_CHARACTER_IDS,
-  characterForToday,
   hasSprite,
 } from '@/components/companion/sprites';
 import { SpriteCompanion } from '@/components/companion/SpriteCompanion';
+import { WispCircle } from '@/components/companion/WispCircle';
 import { Button } from '@/components/ui/Button';
 import { HeartBurst } from '@/components/ui/HeartBurst';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -105,9 +105,8 @@ export default function Home() {
   const lastCigMs = lastCigaretteAt ? new Date(lastCigaretteAt).getTime() : 0;
   const recentCigarette = lastCigMs > 0 && sadTick - lastCigMs < SAD_WINDOW_MS;
   const companionSad = overQuota && recentCigarette;
-  const spriteCharacter = hasSprite(equipped.character)
-    ? equipped.character!
-    : characterForToday();
+  // Eyes close while the companion is pressed and held (a quick tap = a blink).
+  const [holdClose, setHoldClose] = useState(false);
 
   // What the companion "says": by quota band, night, or a once-a-day morning
   // greeting (a craving context takes over inside the hook).
@@ -207,6 +206,8 @@ export default function Home() {
                 ? setSecretTrigger((n) => n + 1)
                 : setPickerOpen(true)
             }
+            onPressIn={() => setHoldClose(true)}
+            onPressOut={() => setHoldClose(false)}
             onLongPress={onCompanionLongPress}
             delayLongPress={300}
             accessibilityRole="image"
@@ -217,9 +218,16 @@ export default function Home() {
                 actionTrigger={secretTrigger}
                 sad={companionSad}
                 wakeTrigger={secretWake}
+                holdClose={holdClose}
+              />
+            ) : hasSprite(equipped.character) ? (
+              <SpriteCompanion
+                character={equipped.character!}
+                sad={companionSad}
+                holdClose={holdClose}
               />
             ) : (
-              <SpriteCompanion character={spriteCharacter} sad={companionSad} />
+              <WispCircle />
             )}
           </Pressable>
         </View>
@@ -280,8 +288,26 @@ export default function Home() {
               {t('home.pickCompanion')}
             </Text>
             <View className="flex-row flex-wrap justify-center gap-3">
+              <Pressable
+                key="wisp"
+                onPress={() => {
+                  setCharacter('char_wisp');
+                  setPickerOpen(false);
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: !hasSprite(equipped.character) }}
+                className={`items-center rounded-2xl border p-2 ${
+                  !hasSprite(equipped.character)
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900'
+                    : 'border-neutral-200 dark:border-neutral-800'
+                }`}
+              >
+                <View className="h-[66px] w-[66px] items-center justify-center rounded-full bg-primary-100">
+                  <View className="h-9 w-9 rounded-full bg-primary-400" />
+                </View>
+              </Pressable>
               {SPRITE_CHARACTER_IDS.map((id) => {
-                const active = spriteCharacter === id;
+                const active = equipped.character === id;
                 return (
                   <Pressable
                     key={id}

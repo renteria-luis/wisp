@@ -32,6 +32,8 @@ type Props = {
   actionTrigger?: number;
   /** Bump this to make PP briefly open its eyes when asleep (e.g. a craving). */
   wakeTrigger?: number;
+  /** While true, keep the eyes closed (held press) and pause auto-blinking. */
+  holdClose?: boolean;
 };
 
 type Posture = 'stand' | 'sit';
@@ -59,6 +61,7 @@ export function SecretCompanion({
   sad = false,
   actionTrigger = 0,
   wakeTrigger = 0,
+  holdClose = false,
 }: Props) {
   const reduced = useReducedMotion();
   // Posture is persisted so PP stays sitting/standing across app restarts.
@@ -156,6 +159,11 @@ export function SecretCompanion({
   // frames so this bails while busy.
   useEffect(() => {
     if (busy) return;
+    if (holdClose) {
+      // Held press: keep the eyes shut (closed frame for the current posture).
+      setFrame(posture === 'sit' ? 'sit_blink' : 'blink');
+      return;
+    }
     if (night) {
       // Asleep: eyes closed (sit_blink when curled up, blink when standing).
       // A craving nudge (forceAwake) briefly opens the eyes.
@@ -239,7 +247,7 @@ export function SecretCompanion({
       }, SIT_AFTER_MS),
     );
     return stop;
-  }, [busy, posture, sad, night, forceAwake, reduced, poke]);
+  }, [busy, posture, sad, night, forceAwake, holdClose, reduced, poke]);
 
   // Tap: always a squishy bounce; then maybe an action.
   useEffect(() => {
