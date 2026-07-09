@@ -217,6 +217,33 @@
     "atQuota": "That's your limit for today ({{allowance}}). Smoking more nudges your goal further out — but you made it through today 💚",
     "overQuota": "Past today's limit — it's okay, don't be hard on yourself. Tomorrow is a fresh start 💛"
   },
+  "manualLog": {
+    "title": "Add cigarettes",
+    "subtitle": "Backfill any past day since you started — you can only add, not remove.",
+    "dateLabel": "Day",
+    "timeLabel": "Time",
+    "countLabel": "Cigarettes that day",
+    "existing": "{{count}} already logged that day",
+    "register": "Register",
+    "registerN": "Add {{count}}"
+  },
+  "missed": {
+    "title": "Let's catch up",
+    "oneDay": "You didn't log anything yesterday. Did you smoke?",
+    "manyDays": "There are {{count}} recent days with no logs. Did you smoke on those?",
+    "addManually": "Yes — add them",
+    "skip": "No, I didn't smoke"
+  },
+  "history": {
+    "title": "Cigarette history",
+    "empty": "No cigarettes logged yet.",
+    "add": "Add past cigarettes",
+    "mine": "My own",
+    "gifted": "Gifted",
+    "shared": "Shared / partial",
+    "whole": "Whole",
+    "noteLabel": "Note"
+  },
   "progress": {
     "trend": "7-day trend",
     "perDayAvg": "cigarettes/day",

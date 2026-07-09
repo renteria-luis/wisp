@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Sparkline } from '@/components/charts/Sparkline';
 import { TrendChart } from '@/components/charts/TrendChart';
+import { CigaretteHistoryModal } from '@/components/health/CigaretteHistoryModal';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -47,6 +48,7 @@ export default function Progress() {
   const { nextGoal } = useSavingsGoals(data.saved);
   const purchased = useWishlist((s) => s.purchased);
   const [confirmReplan, setConfirmReplan] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -101,28 +103,38 @@ export default function Progress() {
           overQuota={data.overQuota}
         />
 
-        <Card>
-          <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
-            {t('progress.trend')}
-          </Text>
-          <View className="mt-1 flex-row items-baseline gap-2">
-            <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
-              {data.trend.toFixed(1)}
-            </Text>
-            <Text className="text-sm text-ink-mute dark:text-neutral-400">
-              {t('progress.perDayAvg')}
-            </Text>
-          </View>
-          <View className="mt-3">
-            <TrendChart
-              actual={trendActual}
-              allowances={trendAllow}
-              max={Math.max(plan.baseline, 1)}
-              startLabel={chartStartLabel}
-              endLabel={chartEndLabel}
-            />
-          </View>
-        </Card>
+        <Pressable
+          onPress={() => setHistoryOpen(true)}
+          accessibilityRole="button"
+        >
+          <Card>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
+                {t('progress.trend')}
+              </Text>
+              <Text className="text-xs text-primary-600">
+                {t('plan.tapForInfo')}
+              </Text>
+            </View>
+            <View className="mt-1 flex-row items-baseline gap-2">
+              <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
+                {data.trend.toFixed(1)}
+              </Text>
+              <Text className="text-sm text-ink-mute dark:text-neutral-400">
+                {t('progress.perDayAvg')}
+              </Text>
+            </View>
+            <View className="mt-3">
+              <TrendChart
+                actual={trendActual}
+                allowances={trendAllow}
+                max={Math.max(plan.baseline, 1)}
+                startLabel={chartStartLabel}
+                endLabel={chartEndLabel}
+              />
+            </View>
+          </Card>
+        </Pressable>
 
         <Card>
           {isReduction ? (
@@ -279,6 +291,11 @@ export default function Progress() {
           setConfirmReplan(false);
         }}
         onCancel={() => setConfirmReplan(false)}
+      />
+
+      <CigaretteHistoryModal
+        visible={historyOpen}
+        onClose={() => setHistoryOpen(false)}
       />
     </SafeAreaView>
   );

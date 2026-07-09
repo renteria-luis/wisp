@@ -10,6 +10,16 @@ export interface CigaretteRow {
   timestamp: string;
   trigger_category: string | null;
   note: string | null;
+  shared: number;
+  gifted: number;
+}
+
+/** Every cigarette, newest first — for the manual history view. */
+export async function getAllCigarettes(): Promise<CigaretteRow[]> {
+  const db = await getDb();
+  return db.getAllAsync<CigaretteRow>(
+    'SELECT * FROM cigarette_log ORDER BY timestamp DESC, id DESC',
+  );
 }
 
 export async function addCigarette(input?: {

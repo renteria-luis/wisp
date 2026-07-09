@@ -177,6 +177,10 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="log" options={{ presentation: 'modal' }} />
             <Stack.Screen
+              name="manual-log"
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
               name="craving"
               options={{
                 // Half-sheet so the Home companion stays visible behind it and

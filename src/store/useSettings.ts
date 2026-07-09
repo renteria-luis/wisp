@@ -39,6 +39,9 @@ interface SettingsState {
   lastMorningGreet: string | null;
   /** Secret Secret companion, unlocked via a hidden tap in onboarding. */
   secretCompanionUnlocked: boolean;
+  /** ISO date up to which missed-log days have been reviewed (so we don't
+   *  keep asking about the same gap). */
+  missedReviewedUntil: string | null;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -55,6 +58,7 @@ interface SettingsState {
   setTheme: (theme: 'system' | 'light' | 'dark' | 'pink') => void;
   setLastMorningGreet: (iso: string | null) => void;
   setSecretCompanionUnlocked: (unlocked: boolean) => void;
+  setMissedReviewedUntil: (iso: string | null) => void;
   reset: () => void;
 }
 
@@ -78,6 +82,7 @@ const initialState = {
   theme: 'system' as 'system' | 'light' | 'dark' | 'pink',
   lastMorningGreet: null as string | null,
   secretCompanionUnlocked: false,
+  missedReviewedUntil: null as string | null,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -105,6 +110,8 @@ export const useSettings = create<SettingsState>()(
       setLastMorningGreet: (lastMorningGreet) => set({ lastMorningGreet }),
       setSecretCompanionUnlocked: (secretCompanionUnlocked) =>
         set({ secretCompanionUnlocked }),
+      setMissedReviewedUntil: (missedReviewedUntil) =>
+        set({ missedReviewedUntil }),
       reset: () => set({ ...initialState }),
     }),
     {

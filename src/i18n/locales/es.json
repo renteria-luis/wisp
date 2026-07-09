@@ -217,6 +217,33 @@
     "atQuota": "Ese es tu límite de hoy ({{allowance}}). Fumar más aleja un poco tu meta — pero hoy ya lo lograste 💚",
     "overQuota": "Pasaste tu límite de hoy — está bien, no te castigues. Mañana es un nuevo comienzo 💛"
   },
+  "manualLog": {
+    "title": "Agregar cigarros",
+    "subtitle": "Completa cualquier día pasado desde que empezaste — solo puedes agregar, no quitar.",
+    "dateLabel": "Día",
+    "timeLabel": "Hora",
+    "countLabel": "Cigarros ese día",
+    "existing": "{{count}} ya registrados ese día",
+    "register": "Registrar",
+    "registerN": "Agregar {{count}}"
+  },
+  "missed": {
+    "title": "Pongámonos al día",
+    "oneDay": "No registraste nada ayer. ¿Fumaste?",
+    "manyDays": "Hay {{count}} días recientes sin registros. ¿Fumaste esos días?",
+    "addManually": "Sí — agregarlos",
+    "skip": "No, no fumé"
+  },
+  "history": {
+    "title": "Historial de cigarros",
+    "empty": "Aún no hay cigarros registrados.",
+    "add": "Agregar cigarros pasados",
+    "mine": "Míos",
+    "gifted": "Regalados",
+    "shared": "Compartido / parcial",
+    "whole": "Completo",
+    "noteLabel": "Nota"
+  },
   "progress": {
     "trend": "Tendencia de 7 días",
     "perDayAvg": "cigarrillos/día",

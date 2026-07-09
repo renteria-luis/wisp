@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { type Href, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
@@ -22,6 +22,7 @@ import { HeartBurst } from '@/components/ui/HeartBurst';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import type { QuotaBand } from '@/content/companionLines';
 import { useCompanionLine } from '@/hooks/useCompanionLine';
+import { useMissedDays } from '@/hooks/useMissedDays';
 import { allowanceForDay } from '@/engine/planEngine';
 import {
   requestNotificationPermission,
@@ -107,6 +108,9 @@ export default function Home() {
   const companionSad = overQuota && recentCigarette;
   // Eyes close while the companion is pressed and held (a quick tap = a blink).
   const [holdClose, setHoldClose] = useState(false);
+
+  // Nudge to backfill days the plan expected logs for but has none.
+  const { count: missedCount, dismiss: dismissMissed } = useMissedDays();
 
   // What the companion "says": by quota band, night, or a once-a-day morning
   // greeting (a craving context takes over inside the hook).
@@ -276,6 +280,35 @@ export default function Home() {
           </Pressable>
         </View>
       </View>
+
+      {missedCount > 0 ? (
+        <View className="absolute inset-0 items-center justify-center bg-black/40 px-8">
+          <View className="w-full max-w-sm rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
+            <Text className="text-center text-lg font-bold text-ink dark:text-neutral-50">
+              {t('missed.title')}
+            </Text>
+            <Text className="mt-2 text-center text-sm leading-5 text-ink-soft dark:text-neutral-300">
+              {missedCount === 1
+                ? t('missed.oneDay')
+                : t('missed.manyDays', { count: missedCount })}
+            </Text>
+            <View className="mt-5 gap-2">
+              <Button
+                label={t('missed.addManually')}
+                onPress={() => {
+                  dismissMissed();
+                  router.push('/manual-log' as Href);
+                }}
+              />
+              <Button
+                label={t('missed.skip')}
+                variant="ghost"
+                onPress={dismissMissed}
+              />
+            </View>
+          </View>
+        </View>
+      ) : null}
 
       {pickerOpen ? (
         <Pressable
