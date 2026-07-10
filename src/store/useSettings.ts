@@ -11,6 +11,9 @@ import type {
   TriggerCategory,
 } from '@/types/domain';
 
+/** Span shown by the Progress trend chart. */
+export type TrendRange = 'week' | 'month' | 'all';
+
 interface SettingsState {
   profile: Profile;
   pricing: Pricing;
@@ -42,6 +45,8 @@ interface SettingsState {
   /** ISO date up to which missed-log days have been reviewed (so we don't
    *  keep asking about the same gap). */
   missedReviewedUntil: string | null;
+  /** Span shown by the Progress trend chart (week / month / all-time). */
+  trendRange: TrendRange;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -59,6 +64,7 @@ interface SettingsState {
   setLastMorningGreet: (iso: string | null) => void;
   setSecretCompanionUnlocked: (unlocked: boolean) => void;
   setMissedReviewedUntil: (iso: string | null) => void;
+  setTrendRange: (range: TrendRange) => void;
   reset: () => void;
 }
 
@@ -83,6 +89,7 @@ const initialState = {
   lastMorningGreet: null as string | null,
   secretCompanionUnlocked: false,
   missedReviewedUntil: null as string | null,
+  trendRange: 'week' as TrendRange,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -112,6 +119,7 @@ export const useSettings = create<SettingsState>()(
         set({ secretCompanionUnlocked }),
       setMissedReviewedUntil: (missedReviewedUntil) =>
         set({ missedReviewedUntil }),
+      setTrendRange: (trendRange) => set({ trendRange }),
       reset: () => set({ ...initialState }),
     }),
     {

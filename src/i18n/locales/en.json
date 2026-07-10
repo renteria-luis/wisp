@@ -242,10 +242,19 @@
     "gifted": "Gifted",
     "shared": "Shared / partial",
     "whole": "Whole",
-    "noteLabel": "Note"
+    "noteLabel": "Note",
+    "rangeLabel": "Trend range",
+    "rangeHint": "Sets the span of the Progress graph.",
+    "rangeWeek": "Week",
+    "rangeMonth": "Month",
+    "rangeAll": "All",
+    "filterLabel": "Filter by day",
+    "allDays": "All days",
+    "dayTotal_one": "{{count}} cigarette",
+    "dayTotal_other": "{{count}} cigarettes"
   },
   "progress": {
-    "trend": "7-day trend",
+    "trend": "Trend",
     "perDayAvg": "cigarettes/day",
     "streak": "Win streak",
     "winDays": "Win days",

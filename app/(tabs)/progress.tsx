@@ -43,6 +43,7 @@ export default function Progress() {
   const setPlan = usePlan((s) => s.setPlan);
   const router = useRouter();
   const currency = useSettings((s) => s.pricing.currency);
+  const trendRange = useSettings((s) => s.trendRange);
   const seenEggs = useSettings((s) => s.seenEggs);
   const markEggSeen = useSettings((s) => s.markEggSeen);
   const { nextGoal } = useSavingsGoals(data.saved);
@@ -81,13 +82,21 @@ export default function Progress() {
   // Re-planning rewrites the schedule and can't be undone — confirm first (§9).
   const isEase = replan.action === 'ease';
 
-  // Last two weeks of the trend, with dates for the x-axis ends.
-  const trendActual = data.actual.slice(-14);
-  const trendAllow = data.allowances.slice(-14);
+  // The trend span follows the range chosen from the history sheet.
+  const windowDays =
+    trendRange === 'week' ? 7 : trendRange === 'month' ? 30 : data.actual.length;
+  const trendActual = data.actual.slice(-windowDays);
+  const trendAllow = data.allowances.slice(-windowDays);
   const chartStartLabel = formatMedium(
     addDaysISO(todayISO(), -Math.max(0, trendActual.length - 1)),
   );
   const chartEndLabel = formatMedium(todayISO());
+  const rangeLabel =
+    trendRange === 'week'
+      ? t('history.rangeWeek')
+      : trendRange === 'month'
+        ? t('history.rangeMonth')
+        : t('history.rangeAll');
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
@@ -110,7 +119,7 @@ export default function Progress() {
           <Card>
             <View className="flex-row items-center justify-between">
               <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
-                {t('progress.trend')}
+                {t('progress.trend')} · {rangeLabel}
               </Text>
               <Text className="text-xs text-primary-600">
                 {t('plan.tapForInfo')}

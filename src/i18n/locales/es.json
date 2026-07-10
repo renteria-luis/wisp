@@ -242,10 +242,19 @@
     "gifted": "Regalados",
     "shared": "Compartido / parcial",
     "whole": "Completo",
-    "noteLabel": "Nota"
+    "noteLabel": "Nota",
+    "rangeLabel": "Rango de tendencia",
+    "rangeHint": "Define el rango de la gráfica de Progreso.",
+    "rangeWeek": "Semana",
+    "rangeMonth": "Mes",
+    "rangeAll": "Todo",
+    "filterLabel": "Filtrar por día",
+    "allDays": "Todos los días",
+    "dayTotal_one": "{{count}} cigarro",
+    "dayTotal_other": "{{count}} cigarros"
   },
   "progress": {
-    "trend": "Tendencia de 7 días",
+    "trend": "Tendencia",
     "perDayAvg": "cigarrillos/día",
     "streak": "Racha de logros",
     "winDays": "Días logrados",
