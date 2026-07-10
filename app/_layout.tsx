@@ -21,6 +21,7 @@ import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppSplash } from '@/components/ui/AppSplash';
 import { CelebrationOverlay } from '@/components/ui/CelebrationOverlay';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { applyLanguage } from '@/i18n';
@@ -75,6 +76,10 @@ export default function RootLayout() {
   const router = useRouter();
   const theme = useSettings((s) => s.theme);
   const [ready, setReady] = useState(false);
+  // The in-app loading screen: kept mounted until it has faded out, and told
+  // which logo to show once settings hydrate (`null` = not yet known).
+  const [splashHidden, setSplashHidden] = useState(false);
+  const [splashUnlocked, setSplashUnlocked] = useState<boolean | null>(null);
   const [fontsLoaded] = useFonts({
     Changa_400Regular,
     Changa_500Medium,
@@ -100,6 +105,10 @@ export default function RootLayout() {
           whenHydrated(useRecovery),
           whenHydrated(useWishlist),
         ]);
+        // Now that settings are loaded, the splash can show the right logo.
+        if (!cancelled) {
+          setSplashUnlocked(useSettings.getState().secretCompanionUnlocked);
+        }
         // 2. Apply saved appearance + language before the first frame.
         applySavedTheme();
         applyLanguage(useSettings.getState().language);
@@ -133,11 +142,6 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Hide the splash the moment everything above (and the font) is loaded.
-  useEffect(() => {
-    if (ready && fontsLoaded) SplashScreen.hideAsync().catch(() => {});
-  }, [ready, fontsLoaded]);
-
   useEffect(() => {
     let sub: { remove: () => void } | undefined;
     void (async () => {
@@ -154,9 +158,10 @@ export default function RootLayout() {
     return () => sub?.remove();
   }, [router]);
 
-  // While not ready the native splash covers the screen, so render nothing —
-  // this avoids mounting the app with default data and flashing it.
-  if (!ready || !fontsLoaded) return null;
+  // The native splash covers the very first frames; then AppSplash (below) takes
+  // over and fades out. The app tree only mounts once everything is loaded, so
+  // it never flashes default data — and a warm resume never re-mounts AppSplash.
+  const appReady = ready && fontsLoaded;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -165,45 +170,56 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'slide_from_right',
-              animationDuration: 260,
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(onboarding)" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="log" options={{ presentation: 'modal' }} />
-            <Stack.Screen
-              name="manual-log"
-              options={{ presentation: 'modal' }}
-            />
-            <Stack.Screen
-              name="craving"
-              options={{
-                // A transparent screen so the craving sheet can be a custom,
-                // JS-gesture-driven half-sheet: the drag directly drives the
-                // Home companion's lift so it tracks the finger 1:1 (a native
-                // sheet never exposes the in-progress drag). Home stays mounted
-                // and visible behind it to coach the user.
-                presentation: 'transparentModal',
-                animation: 'none',
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="wishlist" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="ebooks" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="about" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
-          </Stack>
-          <CelebrationOverlay />
+          {appReady ? (
+            <>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  animation: 'slide_from_right',
+                  animationDuration: 260,
+                }}
+              >
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(onboarding)" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="log" options={{ presentation: 'modal' }} />
+                <Stack.Screen
+                  name="manual-log"
+                  options={{ presentation: 'modal' }}
+                />
+                <Stack.Screen
+                  name="craving"
+                  options={{
+                    // A transparent screen so the craving sheet can be a custom,
+                    // JS-gesture-driven half-sheet: the drag directly drives the
+                    // Home companion's lift so it tracks the finger 1:1 (a native
+                    // sheet never exposes the in-progress drag). Home stays
+                    // mounted and visible behind it to coach the user.
+                    presentation: 'transparentModal',
+                    animation: 'none',
+                    gestureEnabled: false,
+                  }}
+                />
+                <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="wishlist" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="ebooks" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="about" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
+              </Stack>
+              <CelebrationOverlay />
+            </>
+          ) : null}
           <StatusBar style="auto" />
         </ThemeProvider>
         </SafeAreaProvider>
+        {!splashHidden ? (
+          <AppSplash
+            done={appReady}
+            unlocked={splashUnlocked}
+            onHidden={() => setSplashHidden(true)}
+          />
+        ) : null}
       </View>
     </GestureHandlerRootView>
   );
