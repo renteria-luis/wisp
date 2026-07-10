@@ -30,8 +30,10 @@ type Props = {
   sad?: boolean;
   /** Bump this (e.g. on tap) to bounce + maybe play a random action. */
   actionTrigger?: number;
-  /** Bump this to make PP briefly open its eyes when asleep (e.g. a craving). */
-  wakeTrigger?: number;
+  /** While the craving sheet is open: stand up and close the eyes (breathe
+   *  along), without touching the saved posture — so PP returns to whatever it
+   *  was doing once the sheet closes. */
+  cravingActive?: boolean;
   /** While true, keep the eyes closed (held press) and pause auto-blinking. */
   holdClose?: boolean;
 };
@@ -60,7 +62,7 @@ export function SecretCompanion({
   size = 248,
   sad = false,
   actionTrigger = 0,
-  wakeTrigger = 0,
+  cravingActive = false,
   holdClose = false,
 }: Props) {
   const reduced = useReducedMotion();
@@ -70,11 +72,8 @@ export function SecretCompanion({
   const [posture, setPostureState] = useState<Posture>(savedPosture);
   const [busy, setBusyState] = useState(false);
   const [night, setNight] = useState(isNightNow);
-  // Briefly true after `wakeTrigger` bumps — PP opens its eyes even at night.
-  const [forceAwake, setForceAwake] = useState(false);
   // Bumped on every tap; resets the "sit down after a while" idle timer.
   const [poke, setPoke] = useState(0);
-  const firstWake = useRef(true);
 
   const postureRef = useRef<Posture>(savedPosture);
   const busyRef = useRef(false);
@@ -121,17 +120,6 @@ export function SecretCompanion({
     return () => clearInterval(id);
   }, []);
 
-  // A craving nudge briefly opens PP's eyes, even while it's asleep.
-  useEffect(() => {
-    if (firstWake.current) {
-      firstWake.current = false;
-      return;
-    }
-    setForceAwake(true);
-    const id = setTimeout(() => setForceAwake(false), 2200);
-    return () => clearTimeout(id);
-  }, [wakeTrigger]);
-
   const clearActionTimers = () => {
     actionTimers.current.forEach(clearTimeout);
     actionTimers.current = [];
@@ -159,16 +147,22 @@ export function SecretCompanion({
   // frames so this bails while busy.
   useEffect(() => {
     if (busy) return;
-    if (holdClose) {
+    if (cravingActive) {
+      // Craving sheet open: stand up and shut the eyes to breathe along. Posture
+      // is left untouched, so PP resumes its prior state once the sheet closes.
+      setFrame('blink');
+      return;
+    }
+    if (holdClose && !sad) {
       // Held press: keep the eyes shut (closed frame for the current posture).
+      // Never while sad — a sad PP keeps its eyes open when you press it.
       setFrame(posture === 'sit' ? 'sit_blink' : 'blink');
       return;
     }
     if (night) {
       // Asleep: eyes closed (sit_blink when curled up, blink when standing).
-      // A craving nudge (forceAwake) briefly opens the eyes.
-      if (posture === 'sit') setFrame(forceAwake ? 'sit' : 'sit_blink');
-      else setFrame(forceAwake ? 'base' : 'blink');
+      if (posture === 'sit') setFrame('sit_blink');
+      else setFrame('blink');
       return;
     }
     if (sad) {
@@ -247,7 +241,7 @@ export function SecretCompanion({
       }, SIT_AFTER_MS),
     );
     return stop;
-  }, [busy, posture, sad, night, forceAwake, holdClose, reduced, poke]);
+  }, [busy, posture, sad, night, cravingActive, holdClose, reduced, poke]);
 
   // Tap: always a squishy bounce; then maybe an action.
   useEffect(() => {

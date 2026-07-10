@@ -124,6 +124,30 @@ export async function clearAllCigaretteLogs(): Promise<void> {
   await db.runAsync('DELETE FROM cigarette_log');
 }
 
+/** Dev/God-mode: delete the most recent cigarette logged on a local day. */
+export async function deleteLatestCigaretteOnDate(
+  dateISO: string,
+): Promise<void> {
+  const db = await getDb();
+  await db.runAsync(
+    `DELETE FROM cigarette_log WHERE id = (
+       SELECT id FROM cigarette_log
+        WHERE substr(timestamp, 1, 10) = ?
+        ORDER BY timestamp DESC, id DESC
+        LIMIT 1)`,
+    dateISO,
+  );
+}
+
+/** Dev/God-mode: delete every cigarette logged on a local day. */
+export async function clearCigarettesOnDate(dateISO: string): Promise<void> {
+  const db = await getDb();
+  await db.runAsync(
+    'DELETE FROM cigarette_log WHERE substr(timestamp, 1, 10) = ?',
+    dateISO,
+  );
+}
+
 /** Dev/God-mode: shift every cigarette timestamp by whole days (time travel). */
 export async function shiftCigaretteDates(deltaDays: number): Promise<void> {
   const db = await getDb();

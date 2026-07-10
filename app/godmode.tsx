@@ -1,8 +1,11 @@
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
@@ -12,6 +15,9 @@ import { NumberField } from '@/components/ui/NumberField';
 import {
   addCigarette,
   clearAllCigaretteLogs,
+  clearCigarettesOnDate,
+  countCigarettesOnDate,
+  deleteLatestCigaretteOnDate,
   shiftCigaretteDates,
 } from '@/data/repositories/cigaretteLog';
 import {
@@ -33,6 +39,13 @@ function Row({ children }: { children: ReactNode }) {
   return <View className="flex-row gap-2">{children}</View>;
 }
 
+/** Local day key (YYYY-MM-DD). */
+function dayKey(d: Date): string {
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
 /**
  * God Mode — a panel to edit live state for testing/debugging. Reached from
  * About via 7 quick taps on the heart, then the code 3019 (works in prod too).
@@ -51,6 +64,37 @@ export default function GodMode() {
   const setOnboardingCompleted = useSettings((s) => s.setOnboardingCompleted);
 
   const [coinInput, setCoinInput] = useState<number | null>(balance);
+
+  // Remove cigarettes from an exact past day (calendar-picked).
+  const [remDate, setRemDate] = useState<Date>(() => new Date());
+  const [remCount, setRemCount] = useState(0);
+  const reloadRemCount = useCallback(async () => {
+    try {
+      setRemCount(await countCigarettesOnDate(dayKey(remDate)));
+    } catch {
+      setRemCount(0);
+    }
+  }, [remDate]);
+  useEffect(() => {
+    void reloadRemCount();
+  }, [reloadRemCount]);
+
+  const onRemDate = (_e: DateTimePickerEvent, d?: Date) => {
+    if (d) setRemDate(d);
+  };
+  const afterRemove = async () => {
+    await reloadRemCount();
+    await refreshToday();
+    await useVitalityStore.getState().recompute(usePlan.getState().plan);
+  };
+  const removeOne = async () => {
+    await deleteLatestCigaretteOnDate(dayKey(remDate));
+    await afterRemove();
+  };
+  const removeAllDay = async () => {
+    await clearCigarettesOnDate(dayKey(remDate));
+    await afterRemove();
+  };
 
   // Simulate `delta` days passing: move the plan window, shift existing logs
   // (so today's count resets and history is preserved) and advance recovery so
@@ -236,6 +280,36 @@ export default function GodMode() {
               label={t('godmode.clearLogs')}
               variant="ghost"
               onPress={clearLogs}
+            />
+          </View>
+        </Card>
+
+        <Card>
+          <Text className="mb-1 text-sm font-semibold text-ink dark:text-neutral-50">
+            {t('godmode.removeByDay')}
+          </Text>
+          <DateTimePicker
+            value={remDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            maximumDate={new Date()}
+            onChange={onRemDate}
+          />
+          <Text className="mb-2 mt-1 text-xs text-ink-mute dark:text-neutral-400">
+            {t('godmode.onDate', { count: remCount })}
+          </Text>
+          <View className="gap-2">
+            <Button
+              label={t('godmode.removeOne')}
+              variant="secondary"
+              disabled={remCount <= 0}
+              onPress={removeOne}
+            />
+            <Button
+              label={t('godmode.removeAllDay')}
+              variant="ghost"
+              disabled={remCount <= 0}
+              onPress={removeAllDay}
             />
           </View>
         </Card>

@@ -29,6 +29,7 @@ import {
   startSituationalSupport,
 } from '@/notifications/scheduler';
 import { personal } from '@/personal/personal.config';
+import { useCoach } from '@/store/useCoach';
 import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
@@ -57,7 +58,20 @@ export default function Home() {
   // Secret Secret companion (unlocked in onboarding) replaces the creatures.
   const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
   const [secretTrigger, setSecretTrigger] = useState(0);
-  const [secretWake, setSecretWake] = useState(0);
+  // The craving sheet sets a coach context while it's open — the companion
+  // stands and shuts its eyes to breathe along until it closes.
+  const cravingActive = useCoach((s) => s.context) != null;
+
+  // When the secret companion is unlocked, adopt its name by default — unless
+  // the user has already chosen a custom one.
+  useEffect(() => {
+    if (
+      secretCompanionUnlocked &&
+      (!companionName || companionName === personal.companionDefaultName)
+    ) {
+      useSettings.getState().setCompanionName('Secret');
+    }
+  }, [secretCompanionUnlocked, companionName]);
   // PP smoothly lifts up while the craving sheet is open (driven by that
   // screen's mount/unmount via the shared `cravingLift` value).
   const liftStyle = useAnimatedStyle(() => ({
@@ -221,13 +235,14 @@ export default function Home() {
               <SecretCompanion
                 actionTrigger={secretTrigger}
                 sad={companionSad}
-                wakeTrigger={secretWake}
+                cravingActive={cravingActive}
                 holdClose={holdClose}
               />
             ) : hasSprite(equipped.character) ? (
               <SpriteCompanion
                 character={equipped.character!}
                 sad={companionSad}
+                cravingActive={cravingActive}
                 holdClose={holdClose}
               />
             ) : (
@@ -247,10 +262,7 @@ export default function Home() {
       <View className="gap-3 px-6 pb-4">
         <Button
           label={t('home.cravingAction')}
-          onPress={() => {
-            setSecretWake((n) => n + 1);
-            router.push('/craving');
-          }}
+          onPress={() => router.push('/craving')}
         />
         <Button
           label={t('home.logAction')}

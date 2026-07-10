@@ -22,6 +22,8 @@ type Props = {
   size?: number;
   /** While true, keep the eyes closed (held press) and pause auto-blinking. */
   holdClose?: boolean;
+  /** While the craving sheet is open: eyes closed, breathing along. */
+  cravingActive?: boolean;
 };
 
 /** True between 11pm and 6am (local) — the companion sleeps (eyes closed). */
@@ -54,6 +56,7 @@ export function SpriteCompanion({
   worn = [],
   size = 220,
   holdClose = false,
+  cravingActive = false,
 }: Props) {
   const reduced = useReducedMotion();
   const set = CHARACTER_SPRITES[character] ?? CHARACTER_SPRITES.cat!;
@@ -83,7 +86,7 @@ export function SpriteCompanion({
   // capped so there's always at least one blink every ~12s (≤15s guaranteed);
   // back-to-back blinks are fine.
   useEffect(() => {
-    if (night || sad || holdClose) {
+    if (night || sad || holdClose || cravingActive) {
       setBlinking(false);
       return;
     }
@@ -108,16 +111,18 @@ export function SpriteCompanion({
       alive = false;
       clearTimeout(timer);
     };
-  }, [night, sad, holdClose]);
+  }, [night, sad, holdClose, cravingActive]);
 
-  // Priority: asleep (night) → sad → held/mid-blink → awake & content.
-  const sprite = night
+  // Priority: craving (breathe) → asleep → sad → held/mid-blink → content.
+  const sprite = cravingActive
     ? set.closed
-    : sad
-      ? set.sad
-      : blinking || holdClose
-        ? set.closed
-        : set.base;
+    : night
+      ? set.closed
+      : sad
+        ? set.sad
+        : blinking || holdClose
+          ? set.closed
+          : set.base;
 
   const bodyStyle = useAnimatedStyle(() => ({
     transform: [
