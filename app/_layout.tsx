@@ -183,13 +183,14 @@ export default function RootLayout() {
             <Stack.Screen
               name="craving"
               options={{
-                // Half-sheet so the Home companion stays visible behind it and
-                // can coach the user; draggable up via the grabber if needed.
-                presentation: 'formSheet',
-                sheetAllowedDetents: [0.63, 0.95],
-                sheetInitialDetentIndex: 0,
-                sheetGrabberVisible: true,
-                sheetCornerRadius: 22,
+                // A transparent screen so the craving sheet can be a custom,
+                // JS-gesture-driven half-sheet: the drag directly drives the
+                // Home companion's lift so it tracks the finger 1:1 (a native
+                // sheet never exposes the in-progress drag). Home stays mounted
+                // and visible behind it to coach the user.
+                presentation: 'transparentModal',
+                animation: 'none',
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />

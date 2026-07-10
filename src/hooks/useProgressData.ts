@@ -52,8 +52,8 @@ export interface ProgressData {
 export function useProgressData(): ProgressData {
   const plan = usePlan((s) => s.plan);
   const pricing = useSettings((s) => s.pricing);
-  // Today's count changes whenever a log is added — use it as a refetch trigger.
-  const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  // Bumped on every log write (today OR a backfilled past day) — refetch trigger.
+  const revision = useLogs((s) => s.revision);
   const recAnchor = useRecovery((s) => s.anchorMs);
   const recBase = useRecovery((s) => s.baseHours);
   const [actual, setActual] = useState<number[]>([]);
@@ -98,7 +98,7 @@ export function useProgressData(): ProgressData {
     return () => {
       cancelled = true;
     };
-  }, [plan, todayCigarettes]);
+  }, [plan, revision]);
 
   return useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];

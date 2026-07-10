@@ -9,6 +9,7 @@ import {
   type CigaretteRow,
   getAllCigarettes,
 } from '@/data/repositories/cigaretteLog';
+import { useLogs } from '@/store/useLogs';
 
 function formatWhen(iso: string): string {
   const d = new Date(iso);
@@ -42,6 +43,7 @@ export function CigaretteHistoryModal({
 }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const revision = useLogs((s) => s.revision);
   const [rows, setRows] = useState<CigaretteRow[]>([]);
   const [openId, setOpenId] = useState<number | null>(null);
 
@@ -56,7 +58,7 @@ export function CigaretteHistoryModal({
     return () => {
       cancelled = true;
     };
-  }, [visible]);
+  }, [visible, revision]);
 
   return (
     <Modal

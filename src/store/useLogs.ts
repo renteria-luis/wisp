@@ -28,6 +28,13 @@ interface LogsState {
   ready: boolean;
   todayCigarettes: number;
   todayResisted: number;
+  /**
+   * Bumped on every log write (incl. backfills to past days). Screens that
+   * derive from the full log history — the progress graph, the history list —
+   * watch this to refetch, since today's count alone doesn't change when a
+   * past day is edited.
+   */
+  revision: number;
   /** ISO timestamp of the most recent cigarette ever (null if none). */
   lastCigaretteAt: string | null;
   init: () => Promise<void>;
@@ -44,6 +51,7 @@ export const useLogs = create<LogsState>((set, get) => ({
   ready: false,
   todayCigarettes: 0,
   todayResisted: 0,
+  revision: 0,
   lastCigaretteAt: null,
 
   init: async () => {
@@ -63,11 +71,12 @@ export const useLogs = create<LogsState>((set, get) => ({
       countResistedOnDate(today),
       getLastCigaretteTimestamp(),
     ]);
-    set({
+    set((s) => ({
       todayCigarettes: cigarettes,
       todayResisted: resisted,
       lastCigaretteAt: lastCig,
-    });
+      revision: s.revision + 1,
+    }));
   },
 
   logCigarette: async (input) => {
