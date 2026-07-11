@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Keyboard, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 
 type Props = {
@@ -61,7 +62,7 @@ export function NumberField({
             placeholder={placeholder}
             placeholderTextColor={colors.ink.mute}
             textAlignVertical="center"
-            style={{ height: 46 }}
+            style={[{ height: 46 }, inputText]}
             className="flex-1 text-base text-ink dark:text-neutral-50"
           />
           {suffix ? (

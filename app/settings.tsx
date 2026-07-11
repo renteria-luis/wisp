@@ -25,6 +25,7 @@ import {
 } from '@/notifications/scheduler';
 import { useSettings } from '@/store/useSettings';
 import { applyTheme, type ThemePref } from '@/theme/appearance';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
 import type { Gender } from '@/types/domain';
@@ -72,6 +73,7 @@ function TextField({
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={colors.ink.mute}
+          style={inputText}
           className="py-3 text-base text-ink dark:text-neutral-50"
         />
       </View>

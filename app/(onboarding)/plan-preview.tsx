@@ -154,7 +154,7 @@ export default function PlanPreview() {
               </Text>
             </View>
             <View>
-              <Text className="mb-2 text-sm text-ink-soft dark:text-neutral-300">
+              <Text className="mb-4 text-sm text-ink-soft dark:text-neutral-300">
                 {t('plan.weekAhead')}
               </Text>
               <AllowanceBars allowances={plan.allowances} max={baseline} />

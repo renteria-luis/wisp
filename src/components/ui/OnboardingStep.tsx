@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from './Button';
 import { KeyboardAvoider } from './KeyboardAvoider';
 import { ProgressDots } from './ProgressDots';
+import { ThemeToggle } from './ThemeToggle';
 
 type Props = {
   stepIndex: number;
@@ -46,7 +47,10 @@ export function OnboardingStep({
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <ProgressDots index={stepIndex} total={totalSteps} />
+        <View className="flex-row items-center justify-between">
+          <ProgressDots index={stepIndex} total={totalSteps} />
+          <ThemeToggle />
+        </View>
         <Text className="mt-6 text-2xl font-bold text-ink dark:text-neutral-50">
           {title}
         </Text>

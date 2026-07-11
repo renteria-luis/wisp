@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useCelebration } from '@/store/useCelebration';
 import { useOnboarding } from '@/store/useOnboarding';
 import { useSettings } from '@/store/useSettings';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 
 /** Onboarding entry: name + framing, then into the adaptive flow. */
@@ -68,7 +69,8 @@ export default function Welcome() {
             onChangeText={(v) => patch({ name: v })}
             placeholder={t('onboarding.namePlaceholder')}
             placeholderTextColor={colors.ink.mute}
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900 px-4 py-3 text-base text-ink dark:text-neutral-50"
+            style={inputText}
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-0 dark:bg-neutral-900 px-4 py-4 text-base text-ink dark:text-neutral-50"
             returnKeyType="next"
             autoCapitalize="words"
           />

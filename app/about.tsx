@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { personal } from '@/personal/personal.config';
 import { useCelebration } from '@/store/useCelebration';
 import { useSettings } from '@/store/useSettings';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 
 const VERSION = '1.0.0';
@@ -134,6 +135,7 @@ export default function About() {
               placeholder="••••"
               placeholderTextColor={colors.ink.mute}
               onSubmitEditing={submitCode}
+              style={inputText}
               className="mt-4 rounded-xl border border-neutral-200 px-4 py-3 text-center text-2xl tracking-[8px] text-ink"
             />
             <View className="mt-5 flex-row justify-end gap-6">

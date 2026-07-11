@@ -4,7 +4,7 @@ import { Text, View } from 'react-native';
 
 import { OnboardingStep } from '@/components/ui/OnboardingStep';
 import { OptionChip } from '@/components/ui/OptionChip';
-import { Scale } from '@/components/ui/Scale';
+import { Slider } from '@/components/ui/Slider';
 import { useOnboarding } from '@/store/useOnboarding';
 import type { TrackPreference } from '@/types/domain';
 
@@ -35,7 +35,7 @@ export default function Readiness() {
         <Text className="mb-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
           {t('onboarding.readiness.confidence')}
         </Text>
-        <Scale value={readiness} onChange={(v) => patch({ readiness: v })} />
+        <Slider value={readiness} onChange={(v) => patch({ readiness: v })} />
         <View className="mt-2 flex-row justify-between">
           <Text className="text-xs text-ink-mute dark:text-neutral-400">
             {t('onboarding.readiness.confidenceLow')}
