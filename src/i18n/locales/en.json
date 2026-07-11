@@ -234,6 +234,85 @@
     "addManually": "Yes — add them",
     "skip": "No, I didn't smoke"
   },
+  "tutorial": {
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Done",
+    "tapPrompt": "Try it 👆",
+    "replayA11y": "View the tutorial",
+    "replayTitle": "Watch the tour again?",
+    "replayBody": "I'll walk you through where everything is once more.",
+    "replayConfirm": "Yes, show me",
+    "intro": {
+      "title": "Welcome! 👋",
+      "body": "A quick tour to show you around. You can skip it anytime, and replay it whenever you like from the ❓ up top."
+    },
+    "log": {
+      "title": "Log a cigarette",
+      "body": "When you smoke, you log it here. Tap Log to try it."
+    },
+    "save1": {
+      "title": "The details (optional)",
+      "body": "Here you can pick what triggered it, when it happened, whether it was shared, and add a note — all optional. Go ahead, try tapping a trigger."
+    },
+    "save2": {
+      "title": "Save it",
+      "body": "Save records it with the current time. Tap Save to log this one."
+    },
+    "trend": {
+      "title": "Your trend",
+      "body": "The cigarette you just logged shows up here. Tap the chart to see its record."
+    },
+    "history": {
+      "title": "Your history",
+      "body": "Here's the cigarette you logged, with its time — you can tap it to see its details. If you ever forget a day, you can add past cigarettes from here too."
+    },
+    "milestones": {
+      "title": "Your milestones",
+      "body": "Your recovery, stage by stage — each milestone shows what's healing in your body. Smoking sets it back a little."
+    },
+    "saved": {
+      "title": "Money saved",
+      "body": "Every cigarette you skip adds up here as money you saved — e.g. 20 {{currency}}."
+    },
+    "wishlistBtn": {
+      "title": "Your wishlist",
+      "body": "From this button you add things to save up for — having goals makes the savings feel real. Tap it to take a look."
+    },
+    "wish1": {
+      "title": "Make a wish",
+      "body": "This is your wishlist — treats to save up for with the money you don't smoke. Type **pants** as the name, **20 {{currency}}** as the price, then tap 'Add to wishlist'."
+    },
+    "wish2": {
+      "title": "Treat yourself",
+      "body": "Your wish is fully funded with the 20 you saved. When you've actually bought it in real life, tap 'I bought it' — try it now."
+    },
+    "wish3": {
+      "title": "Your treats",
+      "body": "Everything you treat yourself to is kept here — proof that quitting pays off."
+    },
+    "plan": {
+      "title": "Your plan",
+      "body": "Here you follow your plan day by day and how far you've come."
+    },
+    "craving": {
+      "title": "Feeling a craving?",
+      "body": "If the urge hits, help is one tap away. Tap it now to see."
+    },
+    "craving2": {
+      "title": "Three tools",
+      "body": "Guided breathing, a wait-it-out timer, and quick distractions."
+    },
+    "craving3": {
+      "title": "You beat it",
+      "body": "When the craving passes, tap 'I resisted' — it logs your win. Tap it to continue."
+    },
+    "done": {
+      "title": "All set! 🎉",
+      "body": "That was just practice — your real data is untouched and clean. Ready to start!"
+    }
+  },
   "history": {
     "title": "Cigarette history",
     "empty": "No cigarettes logged yet.",
@@ -279,7 +358,8 @@
     "confirmAccelBody": "We'll rebuild your plan to finish sooner: your daily targets drop faster and your smoke-free date moves earlier. This can't be undone.",
     "seeAll": "See all ›",
     "trendA11y": "Cigarettes per day over the last {{days}} days. Most recent: {{actual}}, target {{target}}.",
-    "savedTrendA11y": "Money saved is trending up — {{amount}} {{currency}} so far."
+    "savedTrendA11y": "Money saved is trending up — {{amount}} {{currency}} so far.",
+    "noSavingsYet": "No savings yet — smoke below your daily target and this chart starts climbing."
   },
   "goals": {
     "coffee": "a coffee",

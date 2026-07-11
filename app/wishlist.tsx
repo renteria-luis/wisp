@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Keyboard,
@@ -9,9 +9,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GiftBuddy } from '@/components/companion/GiftBuddy';
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
@@ -20,25 +22,82 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useProgressData } from '@/hooks/useProgressData';
 import { useCelebration } from '@/store/useCelebration';
 import { useSettings } from '@/store/useSettings';
-import { sortByPrice, useWishlist } from '@/store/useWishlist';
+import { useTutorial } from '@/store/useTutorial';
+import { useTutorialSandbox } from '@/store/useTutorialSandbox';
+import {
+  type PurchasedItem,
+  sortByPrice,
+  useWishlist,
+  type WishItem,
+} from '@/store/useWishlist';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
-import { formatMedium } from '@/utils/date';
+import { formatMedium, nowISO } from '@/utils/date';
 
 /** Manage the "save up for" wishlist; each item fills as smoke-free savings grow. */
 export default function Wishlist() {
   const router = useRouter();
   const { t } = useTranslation();
-  const items = useWishlist((s) => s.items);
-  const purchased = useWishlist((s) => s.purchased);
+  const realItems = useWishlist((s) => s.items);
+  const realPurchased = useWishlist((s) => s.purchased);
   const add = useWishlist((s) => s.add);
   const remove = useWishlist((s) => s.remove);
   const markBought = useWishlist((s) => s.markBought);
   const celebrate = useCelebration((s) => s.celebrate);
   const currency = useSettings((s) => s.pricing.currency);
   const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
+  // `saved` already reads the sandbox (20 pretend savings) during the tour.
   const { saved } = useProgressData();
 
+  // Guided tour: this screen runs on the practice wishlist — the user types the
+  // suggested item, "buys" it with the pretend savings, and sees where treats
+  // land, without touching the real list.
+  const tourOn = useTutorial((s) => s.active);
+  const sbxWishlist = useTutorialSandbox((s) => s.wishlist);
+  const formTarget = useTutorialTarget('wishlist-form');
+  const itemTarget = useTutorialTarget('wishlist-item');
+  const treatedTarget = useTutorialTarget('wishlist-treated');
+  const setScroller = useTutorial((s) => s.setScroller);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollY = useRef(0);
+  const insets = useSafeAreaInsets();
+  useEffect(() => {
+    if (!tourOn) return;
+    setScroller('wishlist', (targetWindowY) => {
+      const desired = insets.top + 120;
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, scrollY.current + (targetWindowY - desired)),
+        animated: true,
+      });
+    });
+    return () => setScroller('wishlist', undefined);
+  }, [tourOn, setScroller, insets.top]);
+
+  const items: WishItem[] = tourOn
+    ? sbxWishlist
+        .filter((w) => !w.purchased)
+        .map((w) => ({ id: w.id, name: w.name, price: w.price, createdAt: nowISO() }))
+    : realItems;
+  const purchased: PurchasedItem[] = tourOn
+    ? sbxWishlist
+        .filter((w) => w.purchased)
+        .map((w) => ({
+          id: w.id,
+          name: w.name,
+          price: w.price,
+          createdAt: nowISO(),
+          purchasedAt: nowISO(),
+        }))
+    : realPurchased;
+
   const onBought = (id: string, itemName: string) => {
+    if (tourOn) {
+      // Practice purchase: move it to the sandbox's treated list and let the
+      // tour advance to show where it landed.
+      useTutorialSandbox.getState().purchaseWish(id);
+      useTutorial.getState().signalAction('wish-buy');
+      return;
+    }
     markBought(id);
     celebrate('🎁', t('celebrate.bought', { name: itemName }));
   };
@@ -53,6 +112,20 @@ export default function Wishlist() {
   const onAdd = () => {
     if (!canAdd || price == null) return;
     const added = name.trim();
+    if (tourOn) {
+      // The tour asks for a specific practice item; accept only that one so the
+      // instructions and what appears on screen stay in sync.
+      const nm = added.toLowerCase();
+      const okName = nm === 'pants' || nm === 'pantalones';
+      if (!okName || price !== 20) return;
+      Keyboard.dismiss();
+      useTutorialSandbox.getState().addWish(added, 20);
+      setName('');
+      setPrice(null);
+      setNote('');
+      useTutorial.getState().signalAction('wish-add');
+      return;
+    }
     add(name, price, note);
     Keyboard.dismiss();
     celebrate('🎁', t('wishlist.added', { name: added }));
@@ -82,6 +155,11 @@ export default function Wishlist() {
       </View>
 
       <ScrollView
+        ref={scrollRef}
+        onScroll={(e) => {
+          scrollY.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
         contentContainerClassName="gap-4 px-6 pb-12 pt-2"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -90,6 +168,7 @@ export default function Wishlist() {
           {t('wishlist.subtitle')}
         </Text>
 
+        <View ref={formTarget.ref}>
         <Card>
           <View className="gap-3">
             <View>
@@ -102,7 +181,8 @@ export default function Wishlist() {
                   onChangeText={setName}
                   placeholder={t('wishlist.itemPlaceholder')}
                   placeholderTextColor={colors.ink.mute}
-                  className="py-3 text-base text-ink dark:text-neutral-50"
+                  style={inputText}
+                  className="py-4 text-base text-ink dark:text-neutral-50"
                 />
               </View>
             </View>
@@ -123,7 +203,8 @@ export default function Wishlist() {
                   onChangeText={setNote}
                   placeholder={t('wishlist.notePlaceholder')}
                   placeholderTextColor={colors.ink.mute}
-                  className="py-3 text-base text-ink dark:text-neutral-50"
+                  style={inputText}
+                  className="py-4 text-base text-ink dark:text-neutral-50"
                 />
               </View>
             </View>
@@ -134,6 +215,7 @@ export default function Wishlist() {
             />
           </View>
         </Card>
+        </View>
 
         {sorted.length === 0 ? (
           <View className="mt-6 items-center">
@@ -143,17 +225,18 @@ export default function Wishlist() {
             </Text>
           </View>
         ) : (
-          sorted.map((item) => {
+          sorted.map((item, idx) => {
             const pct = item.price > 0 ? Math.min(1, saved / item.price) : 1;
             const done = saved >= item.price;
             return (
-              <Card key={item.id}>
+              <View key={item.id} ref={idx === 0 ? itemTarget.ref : undefined}>
+              <Card>
                 <View className="flex-row items-start justify-between">
                   <Text className="flex-1 pr-3 text-base font-semibold text-ink dark:text-neutral-50">
                     {item.name}
                   </Text>
                   <Pressable
-                    onPress={() => remove(item.id)}
+                    onPress={() => (tourOn ? undefined : remove(item.id))}
                     accessibilityRole="button"
                     accessibilityLabel={t('common.cancel')}
                     hitSlop={8}
@@ -193,12 +276,13 @@ export default function Wishlist() {
                   </View>
                 ) : null}
               </Card>
+              </View>
             );
           })
         )}
 
         {purchased.length > 0 ? (
-          <>
+          <View ref={treatedTarget.ref}>
             <Text className="mt-4 text-sm font-semibold text-ink dark:text-neutral-50">
               {t('wishlist.treatedTitle')}
             </Text>
@@ -217,10 +301,11 @@ export default function Wishlist() {
                 </Text>
               </Card>
             ))}
-          </>
+          </View>
         ) : null}
       </ScrollView>
       </KeyboardAvoider>
+      <TutorialOverlay scope="modal" />
     </SafeAreaView>
   );
 }

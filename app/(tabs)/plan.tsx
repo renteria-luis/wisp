@@ -1,12 +1,13 @@
 import { useRouter } from 'expo-router';
 import { Gift } from 'phosphor-react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SecretPlanPeek } from '@/components/companion/SecretPlanPeek';
 import { MilestoneDetailModal } from '@/components/health/MilestoneDetailModal';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { AllowanceBars } from '@/components/ui/AllowanceBars';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -19,6 +20,7 @@ import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
 import { daysBetween, formatMedium, todayISO } from '@/utils/date';
 
 export default function Plan() {
@@ -30,6 +32,22 @@ export default function Plan() {
   const { goals } = useSavingsGoals(data.saved);
   const todayCigarettes = useLogs((s) => s.todayCigarettes);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const journeyTarget = useTutorialTarget('plan-journey');
+  const tourOn = useTutorial((s) => s.active);
+  const setScroller = useTutorial((s) => s.setScroller);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollY = useRef(0);
+  const insets = useSafeAreaInsets();
+  useEffect(() => {
+    setScroller('plan', (targetWindowY) => {
+      const desired = insets.top + 120;
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, scrollY.current + (targetWindowY - desired)),
+        animated: true,
+      });
+    });
+    return () => setScroller('plan', undefined);
+  }, [setScroller, insets.top]);
 
   if (!plan) {
     return (
@@ -45,7 +63,7 @@ export default function Plan() {
   // Journey = how far through the plan by the calendar, so it matches the
   // "day X of Y" label and never retreats. Whether you're actually cutting down
   // lives on the Progress tab (trend, streak, win days) + the recovery timeline.
-  const journeyPct = Math.min(1, (dayIndex + 1) / plan.nDays);
+  const journeyPct = tourOn ? 0 : Math.min(1, (dayIndex + 1) / plan.nDays);
   const next = nextMilestone(data.recoveryHours);
   const detail = detailId
     ? HEALTH_MILESTONES.find((m) => m.id === detailId)
@@ -53,7 +71,14 @@ export default function Plan() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
-      <ScrollView contentContainerClassName="gap-4 px-6 pb-0 pt-4">
+      <ScrollView
+        ref={scrollRef}
+        onScroll={(e) => {
+          scrollY.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
+        contentContainerClassName="gap-4 px-6 pb-0 pt-4"
+      >
         <View>
           <Text className="text-sm font-medium text-ink-mute dark:text-neutral-400">
             {t('tabs.plan')}
@@ -64,20 +89,22 @@ export default function Plan() {
         </View>
 
         {/* Journey progress */}
-        <Card>
-          <View className="mb-2 flex-row items-baseline justify-between">
-            <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
-              {t('plan.journey')}
-            </Text>
-            <Text className="text-sm text-ink-mute dark:text-neutral-400">
-              {t('plan.dayOf', {
-                day: Math.min(dayIndex + 1, plan.nDays),
-                total: plan.nDays,
-              })}
-            </Text>
-          </View>
-          <ProgressBar progress={journeyPct} height={10} />
-        </Card>
+        <View ref={journeyTarget.ref} onLayout={journeyTarget.onLayout}>
+          <Card>
+            <View className="mb-2 flex-row items-baseline justify-between">
+              <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
+                {t('plan.journey')}
+              </Text>
+              <Text className="text-sm text-ink-mute dark:text-neutral-400">
+                {t('plan.dayOf', {
+                  day: tourOn ? 1 : Math.min(dayIndex + 1, plan.nDays),
+                  total: plan.nDays,
+                })}
+              </Text>
+            </View>
+            <ProgressBar progress={journeyPct} height={10} />
+          </Card>
+        </View>
 
         {isReduction ? (
           <>
@@ -96,19 +123,13 @@ export default function Plan() {
                     </Text>
                   ) : (
                     <View className="mt-1.5 flex-row items-baseline">
-                      <Text
-                        className="text-primary-600 dark:text-primary-300"
-                        style={{ fontFamily: 'Changa_700Bold', fontSize: 18 }}
-                      >
+                      <Text className="text-lg font-bold text-primary-600 dark:text-primary-300">
                         {todayCigarettes}
                       </Text>
                       <Text className="mx-1 text-sm text-ink-mute dark:text-neutral-500">
                         /
                       </Text>
-                      <Text
-                        className="text-ink-soft dark:text-neutral-300"
-                        style={{ fontFamily: 'Changa_600SemiBold', fontSize: 18 }}
-                      >
+                      <Text className="text-lg font-semibold text-ink-soft dark:text-neutral-300">
                         {allowance}
                       </Text>
                       <Text className="ml-2 text-[10px] uppercase tracking-[2px] text-ink-mute dark:text-neutral-500">
@@ -124,7 +145,7 @@ export default function Plan() {
             </Card>
 
             <Card>
-              <Text className="mb-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
+              <Text className="mb-4 text-sm font-medium text-ink-soft dark:text-neutral-300">
                 {t('plan.weekAhead')}
               </Text>
               <AllowanceBars allowances={upcoming} max={plan.baseline} />

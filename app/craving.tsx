@@ -23,6 +23,9 @@ import { cravingLift } from '@/components/companion/cravingLift';
 import { BreathingGuide } from '@/components/craving/BreathingGuide';
 import { CravingTimer } from '@/components/craving/CravingTimer';
 import { Distraction } from '@/components/craving/Distraction';
+import { TUTORIAL_STEPS } from '@/components/tutorial/steps';
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { BreathePulse } from '@/components/ui/BreathePulse';
 import { Button } from '@/components/ui/Button';
 import { OptionChip } from '@/components/ui/OptionChip';
@@ -32,6 +35,7 @@ import { useCoach } from '@/store/useCoach';
 import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
+import { useTutorial } from '@/store/useTutorial';
 
 type Tool = 'breathe' | 'wait' | 'distract';
 
@@ -55,8 +59,38 @@ export default function Craving() {
   const celebrate = useCelebration((s) => s.celebrate);
   const setCoach = useCoach((s) => s.setContext);
 
+  // Guided tour: spotlight targets, a scripted demo of the three tools, and the
+  // sheet's drag-to-dismiss locked while the tour drives.
+  const tourOn = useTutorial((s) => s.active);
+  const tourStepKey = useTutorial((s) =>
+    s.active ? TUTORIAL_STEPS[s.stepIndex]?.key : null,
+  );
+  const toolsTarget = useTutorialTarget('craving-tools');
+  const resistedTarget = useTutorialTarget('craving-resisted');
+  // Keep cycling the three tools (3s each) for as long as the tour is showing
+  // the craving sheet — it keeps demoing while the user reads the last step.
+  useEffect(() => {
+    if (tourStepKey !== 'craving2' && tourStepKey !== 'craving3') return;
+    const order: Tool[] = ['breathe', 'wait', 'distract'];
+    let i = 0;
+    setTool(order[0]!);
+    const id = setInterval(() => {
+      i = (i + 1) % order.length;
+      setTool(order[i]!);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [tourStepKey]);
+
+  // One full pass through the tools (3 × 2s), then the tour moves on by itself.
+  useEffect(() => {
+    if (tourStepKey !== 'craving2') return;
+    const id = setTimeout(() => useTutorial.getState().next(), 6000);
+    return () => clearTimeout(id);
+  }, [tourStepKey]);
+
   // The sheet covers this much of the screen; Home peeks (and coaches) above it.
-  const sheetH = Math.round(height * 0.66);
+  // Kept tight so the companion has room to breathe up there.
+  const sheetH = Math.round(height * 0.62);
   // Companion lift captured when a drag begins, so the drag is relative to it.
   const savedLift = useSharedValue(1);
 
@@ -93,6 +127,7 @@ export default function Craving() {
   // Drag the grabber/header: translationY maps straight onto the companion's
   // lift (1 = sheet fully open, 0 = dismissed), so PP tracks the finger exactly.
   const pan = Gesture.Pan()
+    .enabled(!tourOn)
     .onStart(() => {
       savedLift.value = cravingLift.value;
     })
@@ -120,6 +155,13 @@ export default function Craving() {
 
   const onResisted = async () => {
     if (saving) return;
+    // In the tour: play the same celebration, but log nothing and award no
+    // coins — then hand control straight back to the tour.
+    if (tourOn) {
+      celebrate('💪', t('celebrate.resisted'));
+      useTutorial.getState().signalAction('resisted');
+      return;
+    }
     setSaving(true);
     setBreathing(true);
     try {
@@ -185,8 +227,8 @@ export default function Craving() {
             </View>
           </GestureDetector>
 
-          <ScrollView contentContainerClassName="gap-5 px-6 pb-6 pt-4">
-            <View className="flex-row gap-2">
+          <ScrollView contentContainerClassName="gap-4 px-6 pb-2 pt-3">
+            <View ref={toolsTarget.ref} className="flex-row gap-2">
               {TOOLS.map((tl) => (
                 <OptionChip
                   key={tl}
@@ -210,12 +252,14 @@ export default function Craving() {
             )}
           </ScrollView>
 
-          <View className="px-6 pt-2" style={{ paddingBottom: insets.bottom + 12 }}>
-            <Button
-              label={t('craving.resisted')}
-              onPress={onResisted}
-              disabled={saving}
-            />
+          <View className="px-6 pt-1" style={{ paddingBottom: insets.bottom + 10 }}>
+            <View ref={resistedTarget.ref}>
+              <Button
+                label={t('craving.resisted')}
+                onPress={onResisted}
+                disabled={saving}
+              />
+            </View>
           </View>
 
           {breathing ? (
@@ -228,6 +272,8 @@ export default function Craving() {
           ) : null}
         </View>
       </Animated.View>
+
+      <TutorialOverlay scope="modal" />
     </View>
   );
 }

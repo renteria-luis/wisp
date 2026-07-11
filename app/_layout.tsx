@@ -21,6 +21,7 @@ import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 import { AppSplash } from '@/components/ui/AppSplash';
 import { CelebrationOverlay } from '@/components/ui/CelebrationOverlay';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -30,11 +31,14 @@ import {
   rescheduleTriggerNotifications,
 } from '@/notifications/scheduler';
 import { useCompanion } from '@/store/useCompanion';
+import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
+import { useOnboarding } from '@/store/useOnboarding';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { useWishlist } from '@/store/useWishlist';
 import { applySavedTheme } from '@/theme/appearance';
@@ -75,6 +79,9 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const theme = useSettings((s) => s.theme);
+  // Lock the Log modal's swipe-to-dismiss during the tour (it would drop the
+  // user out of the sandbox mid-flow).
+  const tourActive = useTutorial((s) => s.active);
   const [ready, setReady] = useState(false);
   // The in-app loading screen: kept mounted until it has faded out, and told
   // which logo to show once settings hydrate (`null` = not yet known).
@@ -97,6 +104,11 @@ export default function RootLayout() {
     void (async () => {
       try {
         // 1. Wait for persisted stores to load from disk (plan, settings, …).
+        // EVERY persisted store must be listed. A store left out finishes
+        // rehydrating from AsyncStorage *while* a screen is already rendering,
+        // and its `set()` lands on a component that hasn't mounted yet — React
+        // then warns "Can't perform a React state update…" (onboarding hit this
+        // via useOnboarding).
         await Promise.all([
           whenHydrated(useSettings),
           whenHydrated(usePlan),
@@ -104,6 +116,8 @@ export default function RootLayout() {
           whenHydrated(useCompanion),
           whenHydrated(useRecovery),
           whenHydrated(useWishlist),
+          whenHydrated(useOnboarding),
+          whenHydrated(useDistractions),
         ]);
         // Now that settings are loaded, the splash can show the right logo.
         if (!cancelled) {
@@ -182,7 +196,13 @@ export default function RootLayout() {
                 <Stack.Screen name="index" />
                 <Stack.Screen name="(onboarding)" />
                 <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="log" options={{ presentation: 'modal' }} />
+                <Stack.Screen
+                  name="log"
+                  options={{
+                    presentation: 'modal',
+                    gestureEnabled: !tourActive,
+                  }}
+                />
                 <Stack.Screen
                   name="manual-log"
                   options={{ presentation: 'modal' }}
@@ -201,12 +221,21 @@ export default function RootLayout() {
                   }}
                 />
                 <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="wishlist" options={{ presentation: 'modal' }} />
+                <Stack.Screen
+                  name="wishlist"
+                  options={{
+                    presentation: 'modal',
+                    gestureEnabled: !tourActive,
+                  }}
+                />
                 <Stack.Screen name="ebooks" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="about" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
               </Stack>
+              <TutorialOverlay scope="root" />
+              {/* Above the tour's dim layer, so a celebration triggered during
+                  the tutorial is actually visible. */}
               <CelebrationOverlay />
             </>
           ) : null}

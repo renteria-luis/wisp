@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { Button } from '@/components/ui/Button';
 import { NumberField } from '@/components/ui/NumberField';
 import { OptionChip } from '@/components/ui/OptionChip';
@@ -24,6 +26,9 @@ import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
+import { useTutorial } from '@/store/useTutorial';
+import { useTutorialSandbox } from '@/store/useTutorialSandbox';
+import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 import type { TriggerCategory } from '@/types/domain';
 import { daysBetween, nowISO, todayISO } from '@/utils/date';
@@ -66,6 +71,13 @@ export default function Log() {
   const [note, setNote] = useState('');
   const [quotaMsg, setQuotaMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const saveTarget = useTutorialTarget('log-save');
+  const optionsTarget = useTutorialTarget('log-options');
+  // Guided tour: this modal is a sandbox — Save adds a demo cigarette to the
+  // practice world (never the real DB) and hands control back to the tour.
+  const tourOn = useTutorial((s) => s.active);
+  const signalAction = useTutorial((s) => s.signalAction);
+  const sbxAddCig = useTutorialSandbox((s) => s.addCig);
 
   // A warm, non-judgmental nudge as the day's allowance gets close / passes.
   const quotaReminder = (): string | null => {
@@ -84,6 +96,20 @@ export default function Log() {
 
   const onSave = async () => {
     if (saving) return;
+    // In the tour, "save" just drops a cigarette into the sandbox and lets the
+    // tour move on to show it in the trend — no real logging, no penalty. It
+    // carries whatever the user actually picked, so the practice history shows
+    // the trigger/note only when they filled one in.
+    if (tourOn) {
+      sbxAddCig({
+        trigger: trigger ?? null,
+        note: note.trim() || null,
+        shared,
+        gifted,
+      });
+      signalAction('save');
+      return;
+    }
     setSaving(true);
     try {
       if (mode === 'smoked') {
@@ -163,7 +189,7 @@ export default function Log() {
           />
         </View>
 
-        <View>
+        <View ref={optionsTarget.ref}>
           <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">
             {t('log.triggerLabel')}
           </Text>
@@ -259,6 +285,7 @@ export default function Log() {
                     onChangeText={setNote}
                     placeholder={t('log.notePlaceholder')}
                     placeholderTextColor={colors.ink.mute}
+                    style={inputText}
                     className="py-3 text-base text-ink dark:text-neutral-50"
                   />
                 </View>
@@ -279,8 +306,14 @@ export default function Log() {
       </ScrollView>
 
       <View className="px-6 pb-6">
-        <Button label={t('log.save')} onPress={onSave} disabled={saving} />
+        {/* ref on the button itself, not the padded row — otherwise the tour's
+            spotlight is much bigger than the control it's pointing at. */}
+        <View ref={saveTarget.ref}>
+          <Button label={t('log.save')} onPress={onSave} disabled={saving} />
+        </View>
       </View>
+
+      <TutorialOverlay scope="modal" />
 
       {quotaMsg ? (
         <Modal

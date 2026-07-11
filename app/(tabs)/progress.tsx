@@ -1,13 +1,14 @@
 import { useRouter } from 'expo-router';
 import { Gift } from 'phosphor-react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Sparkline } from '@/components/charts/Sparkline';
+import { SavingsChart } from '@/components/charts/SavingsChart';
 import { TrendChart } from '@/components/charts/TrendChart';
 import { CigaretteHistoryModal } from '@/components/health/CigaretteHistoryModal';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -24,6 +25,7 @@ import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { personal } from '@/personal/personal.config';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
 import { useWishlist } from '@/store/useWishlist';
 import { addDaysISO, formatMedium, todayISO } from '@/utils/date';
 
@@ -50,6 +52,31 @@ export default function Progress() {
   const purchased = useWishlist((s) => s.purchased);
   const [confirmReplan, setConfirmReplan] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  // Guided-tour targets + a scroller so the tour can bring them into view.
+  const scrollRef = useRef<ScrollView>(null);
+  const trendTarget = useTutorialTarget('progress-trend');
+  const milestonesTarget = useTutorialTarget('progress-milestones');
+  const savedTarget = useTutorialTarget('progress-saved');
+  const wishBtnTarget = useTutorialTarget('progress-wishlist');
+  const setScroller = useTutorial((s) => s.setScroller);
+  const tourWantsHistory = useTutorial(
+    (s) => s.active && s.openModal === 'history',
+  );
+  const scrollY = useRef(0);
+  const insets = useSafeAreaInsets();
+  useEffect(() => {
+    // The tour passes a target's on-screen Y; scroll so it sits comfortably
+    // below the top (using the live scroll offset, so nested targets work too).
+    setScroller('progress', (targetWindowY) => {
+      const desired = insets.top + 120;
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, scrollY.current + (targetWindowY - desired)),
+        animated: true,
+      });
+    });
+    return () => setScroller('progress', undefined);
+  }, [setScroller, insets.top]);
 
   if (!data.hasPlan || !plan) {
     return (
@@ -87,6 +114,9 @@ export default function Progress() {
     trendRange === 'week' ? 7 : trendRange === 'month' ? 30 : data.actual.length;
   const trendActual = data.actual.slice(-windowDays);
   const trendAllow = data.allowances.slice(-windowDays);
+  // Savings chart shares the trend's window, so both cards read the same span.
+  const savedSeries = data.savedSeries.slice(-windowDays);
+  const savedPeak = savedSeries.length ? Math.max(...savedSeries) : 0;
   const chartStartLabel = formatMedium(
     addDaysISO(todayISO(), -Math.max(0, trendActual.length - 1)),
   );
@@ -100,18 +130,28 @@ export default function Progress() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
-      <ScrollView contentContainerClassName="gap-4 px-6 pb-10 pt-4">
+      <ScrollView
+        ref={scrollRef}
+        onScroll={(e) => {
+          scrollY.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
+        contentContainerClassName="gap-4 px-6 pb-10 pt-4"
+      >
         <Text className="text-2xl font-bold text-ink dark:text-neutral-50">
           {t('tabs.progress')}
         </Text>
 
-        <HealthTimeline
-          recoveryAnchorMs={data.recoveryAnchorMs}
-          recoveryBaseHours={data.recoveryBaseHours}
-          smokeFreeSinceMs={data.smokeFreeSinceMs}
-          overQuota={data.overQuota}
-        />
+        <View ref={milestonesTarget.ref} onLayout={milestonesTarget.onLayout}>
+          <HealthTimeline
+            recoveryAnchorMs={data.recoveryAnchorMs}
+            recoveryBaseHours={data.recoveryBaseHours}
+            smokeFreeSinceMs={data.smokeFreeSinceMs}
+            overQuota={data.overQuota}
+          />
+        </View>
 
+        <View ref={trendTarget.ref} onLayout={trendTarget.onLayout}>
         <Pressable
           onPress={() => setHistoryOpen(true)}
           accessibilityRole="button"
@@ -144,6 +184,7 @@ export default function Progress() {
             </View>
           </Card>
         </Pressable>
+        </View>
 
         <Card>
           {isReduction ? (
@@ -160,26 +201,33 @@ export default function Progress() {
         </Card>
 
         <Card>
-          <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
-            {t('progress.saved')}
-          </Text>
-          <Text className="mt-1 text-4xl font-bold text-ink dark:text-neutral-50">
-            {data.saved.toFixed(2)} {currency}
-          </Text>
-          <Text className="mt-1 text-sm text-ink-mute dark:text-neutral-400">
-            {t('progress.cigsAvoided', { count: data.avoided })}
-          </Text>
-          {data.savedSeries.length > 1 ? (
-            <View className="mt-3">
-              <Sparkline
-                values={data.savedSeries}
-                accessibilityLabel={t('progress.savedTrendA11y', {
-                  amount: data.saved.toFixed(2),
-                  currency,
-                })}
-              />
+          <View ref={savedTarget.ref} onLayout={savedTarget.onLayout}>
+            <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
+              {t('progress.saved')}
+            </Text>
+            <Text className="mt-1 text-4xl font-bold text-ink dark:text-neutral-50">
+              {data.saved.toFixed(2)} {currency}
+            </Text>
+            <Text className="mt-1 text-sm text-ink-mute dark:text-neutral-400">
+              {t('progress.cigsAvoided', { count: data.avoided })}
+            </Text>
+            <View className="mt-4">
+              {savedSeries.length > 1 && savedPeak > 0 ? (
+                <SavingsChart
+                  values={savedSeries}
+                  currency={currency}
+                  startLabel={chartStartLabel}
+                  endLabel={chartEndLabel}
+                />
+              ) : (
+                // With nothing saved yet the curve would be a flat line hidden
+                // on the axis — say so instead of drawing an empty chart.
+                <Text className="py-6 text-center text-xs text-ink-mute dark:text-neutral-400">
+                  {t('progress.noSavingsYet')}
+                </Text>
+              )}
             </View>
-          ) : null}
+          </View>
           {purchased.length > 0 ? (
             <View className="mt-4">
               <Text className="text-xs font-medium text-ink-soft dark:text-neutral-300">
@@ -231,12 +279,14 @@ export default function Progress() {
               </>
             ) : null}
             <View className="mt-4 flex-row">
-              <Button
-                label={t('progress.wishlistLink')}
-                size="sm"
-                icon={<Gift size={16} color="#ffffff" weight="duotone" />}
-                onPress={() => router.push('/wishlist')}
-              />
+              <View ref={wishBtnTarget.ref}>
+                <Button
+                  label={t('progress.wishlistLink')}
+                  size="sm"
+                  icon={<Gift size={16} color="#ffffff" weight="duotone" />}
+                  onPress={() => router.push('/wishlist')}
+                />
+              </View>
             </View>
           </View>
         </Card>
@@ -303,8 +353,11 @@ export default function Progress() {
       />
 
       <CigaretteHistoryModal
-        visible={historyOpen}
-        onClose={() => setHistoryOpen(false)}
+        visible={historyOpen || tourWantsHistory}
+        onClose={() => {
+          if (tourWantsHistory) useTutorial.getState().next();
+          else setHistoryOpen(false);
+        }}
       />
     </SafeAreaView>
   );

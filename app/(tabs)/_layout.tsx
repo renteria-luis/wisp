@@ -11,6 +11,7 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTutorial } from '@/store/useTutorial';
 import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
 
@@ -29,6 +30,8 @@ export default function TabsLayout() {
   const c = useThemeColors();
   const isDark = useColorScheme() === 'dark';
   const insets = useSafeAreaInsets();
+  // Lock the swipe between tabs while the guided tour drives navigation itself.
+  const tourActive = useTutorial((s) => s.active);
 
   const barBg = isDark ? c.neutral['900'] : c.neutral['0'];
 
@@ -36,6 +39,7 @@ export default function TabsLayout() {
     <SwipeTabs
       tabBarPosition="bottom"
       screenOptions={{
+        swipeEnabled: !tourActive,
         tabBarActiveTintColor: c.primary['600'],
         tabBarInactiveTintColor: colors.ink.mute,
         tabBarShowIcon: true,

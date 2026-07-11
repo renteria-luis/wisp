@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { Button } from '@/components/ui/Button';
 import {
   type CigaretteRow,
@@ -11,6 +13,8 @@ import {
 } from '@/data/repositories/cigaretteLog';
 import { useLogs } from '@/store/useLogs';
 import { type TrendRange, useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
+import { useTutorialSandbox } from '@/store/useTutorialSandbox';
 
 const RANGES: TrendRange[] = ['week', 'month', 'all'];
 
@@ -106,9 +110,28 @@ export function CigaretteHistoryModal({
   const [dayFilter, setDayFilter] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [openDay, setOpenDay] = useState<string | null>(null);
+  // During the tour, show the sandbox's demo cigarette instead of real logs —
+  // carrying the trigger/note the user actually picked (or none at all).
+  const tourOn = useTutorial((s) => s.active);
+  const sbxCigs = useTutorialSandbox((s) => s.cigs);
+  const cigTarget = useTutorialTarget('history-cig');
+  const addTarget = useTutorialTarget('history-add');
 
   useEffect(() => {
     if (!visible) return;
+    if (tourOn) {
+      setRows(
+        sbxCigs.map((cg, i) => ({
+          id: -(i + 1),
+          timestamp: cg.timestamp,
+          trigger_category: cg.trigger,
+          note: cg.note,
+          shared: cg.shared ? 1 : 0,
+          gifted: cg.gifted ? 1 : 0,
+        })),
+      );
+      return;
+    }
     let cancelled = false;
     getAllCigarettes()
       .then((r) => {
@@ -118,7 +141,7 @@ export function CigaretteHistoryModal({
     return () => {
       cancelled = true;
     };
-  }, [visible, revision]);
+  }, [visible, revision, tourOn, sbxCigs]);
 
   // Rows are already newest-first; keep that order within each day group.
   const groups = useMemo(() => {
@@ -203,15 +226,17 @@ export function CigaretteHistoryModal({
           </View>
 
           <View className="flex-row">
-            <Button
-              label={t('history.add')}
-              size="sm"
-              variant="secondary"
-              onPress={() => {
-                onClose();
-                router.push('/manual-log' as Href);
-              }}
-            />
+            <View ref={addTarget.ref}>
+              <Button
+                label={t('history.add')}
+                size="sm"
+                variant="secondary"
+                onPress={() => {
+                  onClose();
+                  router.push('/manual-log' as Href);
+                }}
+              />
+            </View>
           </View>
 
           {groups.length === 0 ? (
@@ -270,11 +295,14 @@ export function CigaretteHistoryModal({
                 ) : null}
               </View>
 
-              {visibleGroups.map((g) => {
-                const dayOpen = openDay === g.key;
+              {visibleGroups.map((g, gi) => {
+                // During the tour, auto-open the (only) day so the cigarette is
+                // visible, and spotlight it.
+                const dayOpen = openDay === g.key || (tourOn && gi === 0);
                 return (
                   <View
                     key={g.key}
+                    ref={gi === 0 ? cigTarget.ref : undefined}
                     className="rounded-2xl border border-neutral-200 bg-neutral-0 p-3 dark:border-neutral-800 dark:bg-neutral-900"
                   >
                     <Pressable
@@ -307,6 +335,7 @@ export function CigaretteHistoryModal({
             </>
           )}
         </ScrollView>
+        <TutorialOverlay scope="modal" />
       </SafeAreaView>
     </Modal>
   );

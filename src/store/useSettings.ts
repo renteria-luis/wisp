@@ -47,6 +47,8 @@ interface SettingsState {
   missedReviewedUntil: string | null;
   /** Span shown by the Progress trend chart (week / month / all-time). */
   trendRange: TrendRange;
+  /** The post-onboarding guided tour has been seen (or skipped). */
+  tutorialCompleted: boolean;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -65,6 +67,7 @@ interface SettingsState {
   setSecretCompanionUnlocked: (unlocked: boolean) => void;
   setMissedReviewedUntil: (iso: string | null) => void;
   setTrendRange: (range: TrendRange) => void;
+  setTutorialCompleted: (completed: boolean) => void;
   reset: () => void;
 }
 
@@ -90,6 +93,7 @@ const initialState = {
   secretCompanionUnlocked: false,
   missedReviewedUntil: null as string | null,
   trendRange: 'week' as TrendRange,
+  tutorialCompleted: false,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -120,6 +124,7 @@ export const useSettings = create<SettingsState>()(
       setMissedReviewedUntil: (missedReviewedUntil) =>
         set({ missedReviewedUntil }),
       setTrendRange: (trendRange) => set({ trendRange }),
+      setTutorialCompleted: (tutorialCompleted) => set({ tutorialCompleted }),
       reset: () => set({ ...initialState }),
     }),
     {

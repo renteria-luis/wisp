@@ -27,7 +27,9 @@ export function Distraction({ selected, onSelect, onResisted }: Props) {
   const worked = topHelped(helped);
 
   return (
-    <View className="gap-4 py-2">
+    // No bottom padding: it was the widest part of the gap between the two
+    // buttons below and the sheet's pinned "I resisted".
+    <View className="gap-3 pt-1">
       <Text className="text-center text-base leading-6 text-ink-soft dark:text-neutral-300">
         {t('craving.distraction.intro')}
       </Text>

@@ -18,6 +18,9 @@ import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
+import { useTutorialSandbox } from '@/store/useTutorialSandbox';
+import type { Plan } from '@/types/domain';
 import { todayISO } from '@/utils/date';
 import { densifyDailyCounts } from '@/utils/series';
 
@@ -48,10 +51,52 @@ export interface ProgressData {
   recommendation: ReplanRecommendation;
 }
 
+/** A clean 0% dataset for the guided tour — plus the sandbox's demo cigarette
+ *  (so it shows up in the trend) and its pretend savings. Never reads real logs. */
+function templateProgressData(
+  plan: Plan | null,
+  cigsToday: number,
+  coins: number,
+): ProgressData {
+  const L = 7;
+  const baseline = plan?.baseline ?? 10;
+  const actual = Array.from({ length: L }, (_, i) =>
+    i === L - 1 ? cigsToday : 0,
+  );
+  const allowances = plan
+    ? plan.allowances.slice(0, L)
+    : new Array<number>(L).fill(baseline);
+  while (allowances.length < L) allowances.push(baseline);
+  const now = Date.now();
+  return {
+    hasPlan: !!plan,
+    actual,
+    allowances,
+    trend: currentTrend(actual),
+    winDayCount: countWinDays(actual, allowances),
+    streak: currentWinStreak(actual, allowances),
+    smokeFreeDays: actual.filter((n) => n === 0).length,
+    totalCigarettes: cigsToday,
+    avoided: 0,
+    saved: coins,
+    savedSeries: [0, coins],
+    smokeFreeSinceMs: now,
+    recoveryAnchorMs: now,
+    recoveryBaseHours: 0,
+    recoveryHours: 0,
+    overQuota: false,
+    recommendation: recommendReplan({ actual, allowances }),
+  };
+}
+
 /** Reads the logs for the active plan's span and derives all progress metrics. */
 export function useProgressData(): ProgressData {
   const plan = usePlan((s) => s.plan);
   const pricing = useSettings((s) => s.pricing);
+  // During the guided tour, everything reads a clean 0% sandbox instead.
+  const tutorialActive = useTutorial((s) => s.active);
+  const sbxCigs = useTutorialSandbox((s) => s.cigs.length);
+  const sbxCoins = useTutorialSandbox((s) => s.coins);
   // Bumped on every log write (today OR a backfilled past day) — refetch trigger.
   const revision = useLogs((s) => s.revision);
   const recAnchor = useRecovery((s) => s.anchorMs);
@@ -100,7 +145,12 @@ export function useProgressData(): ProgressData {
     };
   }, [plan, revision]);
 
-  return useMemo(() => {
+  const template = useMemo(
+    () => templateProgressData(plan, sbxCigs, sbxCoins),
+    [plan, sbxCigs, sbxCoins],
+  );
+
+  const real = useMemo(() => {
     const allowances = plan ? plan.allowances.slice(0, actual.length) : [];
     const baseline = plan?.baseline ?? 0;
     // Running recovery: stored base + time since the anchor. The anchor is
@@ -160,4 +210,6 @@ export function useProgressData(): ProgressData {
     pricing.packPrice,
     pricing.cigsPerPack,
   ]);
+
+  return tutorialActive ? template : real;
 }

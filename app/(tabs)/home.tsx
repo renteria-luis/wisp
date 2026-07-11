@@ -8,6 +8,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { cravingLift } from '@/components/companion/cravingLift';
+import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { SecretCompanion } from '@/components/companion/SecretCompanion';
 import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
@@ -34,6 +35,8 @@ import { useCompanion } from '@/store/useCompanion';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
+import { useTutorial } from '@/store/useTutorial';
+import { useTutorialSandbox } from '@/store/useTutorialSandbox';
 import { daysBetween, todayISO } from '@/utils/date';
 
 const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
@@ -49,8 +52,12 @@ export default function Home() {
   const notificationsEnabled = useSettings((s) => s.notificationsEnabled);
   const setNotificationsEnabled = useSettings((s) => s.setNotificationsEnabled);
   const plan = usePlan((s) => s.plan);
-  const todayCigarettes = useLogs((s) => s.todayCigarettes);
+  const todayCigarettesReal = useLogs((s) => s.todayCigarettes);
   const lastCigaretteAt = useLogs((s) => s.lastCigaretteAt);
+  // During the guided tour, Home reflects the sandbox (a clean practice world).
+  const tourOn = useTutorial((s) => s.active);
+  const sbxCigs = useTutorialSandbox((s) => s.cigs.length);
+  const todayCigarettes = tourOn ? sbxCigs : todayCigarettesReal;
   const equipped = useCompanion((s) => s.equipped);
   const setCharacter = useCompanion((s) => s.setCharacter);
   const name = userName || personal.dedicateeName;
@@ -75,7 +82,7 @@ export default function Home() {
   // PP smoothly lifts up while the craving sheet is open (driven by that
   // screen's mount/unmount via the shared `cravingLift` value).
   const liftStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: cravingLift.value * -90 }],
+    transform: [{ translateY: cravingLift.value * -110 }],
   }));
   // Tap the companion to pick which of the four creatures to show.
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -119,12 +126,27 @@ export default function Home() {
       : todayCigarettes > 0;
   const lastCigMs = lastCigaretteAt ? new Date(lastCigaretteAt).getTime() : 0;
   const recentCigarette = lastCigMs > 0 && sadTick - lastCigMs < SAD_WINDOW_MS;
-  const companionSad = overQuota && recentCigarette;
+  // Keep the companion content during the tour (the sandbox is a clean slate).
+  const companionSad = !tourOn && overQuota && recentCigarette;
   // Eyes close while the companion is pressed and held (a quick tap = a blink).
   const [holdClose, setHoldClose] = useState(false);
 
   // Nudge to backfill days the plan expected logs for but has none.
   const { count: missedCount, dismiss: dismissMissed } = useMissedDays();
+
+  // Guided tour: highlight targets, auto-run once after onboarding, replay via ?.
+  const logTarget = useTutorialTarget('home-log');
+  const cravingTarget = useTutorialTarget('home-craving');
+  const startTour = useTutorial((s) => s.start);
+  const tutorialCompleted = useSettings((s) => s.tutorialCompleted);
+  const onboardingCompleted = useSettings((s) => s.onboardingCompleted);
+  const [replayAsk, setReplayAsk] = useState(false);
+  useEffect(() => {
+    if (onboardingCompleted && !tutorialCompleted && !tourOn) {
+      const id = setTimeout(() => startTour(), 600);
+      return () => clearTimeout(id);
+    }
+  }, [onboardingCompleted, tutorialCompleted, tourOn, startTour]);
 
   // What the companion "says": by quota band, night, or a once-a-day morning
   // greeting (a craving context takes over inside the hook).
@@ -201,6 +223,15 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
       <View className="flex-row items-center justify-end gap-1 px-5 pt-1">
+        <Pressable
+          onPress={() => setReplayAsk(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t('tutorial.replayA11y')}
+          hitSlop={8}
+          className="px-2 py-1"
+        >
+          <Text className="text-xl">❓</Text>
+        </Pressable>
         <ThemeToggle />
         <Pressable
           onPress={() => router.push('/settings')}
@@ -253,22 +284,32 @@ export default function Home() {
 
         {status ? (
           <View className="mt-8 rounded-full bg-primary-100 px-5 py-2">
-            <Text className="text-sm font-bold text-primary-700">{status}</Text>
+            {/* explicit family: iOS won't synthesise a bold weight for Changa */}
+            <Text
+              className="text-primary-700"
+              style={{ fontFamily: 'Changa_700Bold', fontSize: 15 }}
+            >
+              {status}
+            </Text>
           </View>
         ) : null}
         </Animated.View>
       </View>
 
       <View className="gap-3 px-6 pb-4">
-        <Button
-          label={t('home.cravingAction')}
-          onPress={() => router.push('/craving')}
-        />
-        <Button
-          label={t('home.logAction')}
-          variant="secondary"
-          onPress={() => router.push('/log')}
-        />
+        <View ref={cravingTarget.ref}>
+          <Button
+            label={t('home.cravingAction')}
+            onPress={() => router.push('/craving')}
+          />
+        </View>
+        <View ref={logTarget.ref}>
+          <Button
+            label={t('home.logAction')}
+            variant="secondary"
+            onPress={() => router.push('/log')}
+          />
+        </View>
         <View className="flex-row justify-center gap-6 pt-1">
           <Pressable
             onPress={() => router.push('/checkin')}
@@ -398,6 +439,37 @@ export default function Home() {
             <Text className="mt-4 text-center text-sm font-semibold text-primary-600">
               {t('common.ok')}
             </Text>
+          </View>
+        </Pressable>
+      ) : null}
+
+      {replayAsk ? (
+        <Pressable
+          onPress={() => setReplayAsk(false)}
+          accessibilityRole="button"
+          className="absolute inset-0 items-center justify-center bg-black/30 px-8"
+        >
+          <View className="w-full max-w-sm rounded-2xl bg-neutral-0 p-6 dark:bg-neutral-900">
+            <Text className="text-center text-lg font-bold text-ink dark:text-neutral-50">
+              {t('tutorial.replayTitle')}
+            </Text>
+            <Text className="mt-2 text-center text-sm leading-5 text-ink-soft dark:text-neutral-300">
+              {t('tutorial.replayBody')}
+            </Text>
+            <View className="mt-5 gap-2">
+              <Button
+                label={t('tutorial.replayConfirm')}
+                onPress={() => {
+                  setReplayAsk(false);
+                  startTour();
+                }}
+              />
+              <Button
+                label={t('common.cancel')}
+                variant="ghost"
+                onPress={() => setReplayAsk(false)}
+              />
+            </View>
           </View>
         </Pressable>
       ) : null}

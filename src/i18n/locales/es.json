@@ -234,6 +234,85 @@
     "addManually": "Sí — agregarlos",
     "skip": "No, no fumé"
   },
+  "tutorial": {
+    "skip": "Saltar",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "finish": "Terminar",
+    "tapPrompt": "Pruébalo 👆",
+    "replayA11y": "Ver el tutorial",
+    "replayTitle": "¿Ver el tutorial otra vez?",
+    "replayBody": "Te muestro de nuevo dónde está cada cosa.",
+    "replayConfirm": "Sí, mostrar",
+    "intro": {
+      "title": "¡Bienvenida! 👋",
+      "body": "Un recorrido rápido para mostrarte todo. Puedes saltarlo cuando quieras, y repetirlo cuando gustes desde el ❓ de arriba."
+    },
+    "log": {
+      "title": "Registrar un cigarro",
+      "body": "Cuando fumes, lo registras aquí. Toca Log para probar."
+    },
+    "save1": {
+      "title": "Los detalles (opcional)",
+      "body": "Aquí puedes elegir qué lo provocó, cuándo fue, si fue compartido, y añadir una nota — todo opcional. Anda, prueba tocar un disparador."
+    },
+    "save2": {
+      "title": "Guárdalo",
+      "body": "Save lo registra con la hora actual. Toca Save para registrar este."
+    },
+    "trend": {
+      "title": "Tu tendencia",
+      "body": "El cigarro que registraste aparece aquí. Toca la gráfica para ver su registro."
+    },
+    "history": {
+      "title": "Tu historial",
+      "body": "Aquí está el cigarro que registraste, con su hora — puedes tocarlo para ver sus detalles. Y si algún día se te olvida, también puedes agregar cigarros pasados desde aquí."
+    },
+    "milestones": {
+      "title": "Tus hitos",
+      "body": "Tu recuperación por etapas — cada hito muestra qué se va sanando en tu cuerpo. Fumar la retrasa un poco."
+    },
+    "saved": {
+      "title": "Dinero ahorrado",
+      "body": "Cada cigarro que evitas se suma aquí como dinero ahorrado — ej. 20 {{currency}}."
+    },
+    "wishlistBtn": {
+      "title": "Tu wishlist",
+      "body": "Desde este botón agregas cosas para ahorrar — tener metas motiva a ahorrar. Tócalo para verla."
+    },
+    "wish1": {
+      "title": "Pide un deseo",
+      "body": "Esta es tu wishlist — gustos que ahorras con el dinero que no fumas. Escribe **pantalones** como nombre, **20 {{currency}}** de precio, y toca 'Agregar a la lista'."
+    },
+    "wish2": {
+      "title": "Date un gusto",
+      "body": "Tu deseo está completo con los 20 que ahorraste. Cuando de verdad te lo compres en la vida real, toca 'Lo compré' — pruébalo ahora."
+    },
+    "wish3": {
+      "title": "Tus gustos",
+      "body": "Todo lo que te das se guarda aquí — la prueba de que dejarlo paga."
+    },
+    "plan": {
+      "title": "Tu plan",
+      "body": "Aquí sigues tu plan día a día y qué tan lejos has llegado."
+    },
+    "craving": {
+      "title": "¿Ganas de fumar?",
+      "body": "Si te dan ganas, la ayuda está a un toque. Tócalo ahora y verás."
+    },
+    "craving2": {
+      "title": "Tres herramientas",
+      "body": "Respiración guiada, un temporizador para dejarlo pasar, y distracciones rápidas."
+    },
+    "craving3": {
+      "title": "Lo venciste",
+      "body": "Cuando el antojo pase, toca 'Lo resistí' — registra tu victoria. Tócalo para continuar."
+    },
+    "done": {
+      "title": "¡Listo! 🎉",
+      "body": "Eso fue solo práctica — tus datos reales quedan intactos y limpios. ¡A empezar!"
+    }
+  },
   "history": {
     "title": "Historial de cigarros",
     "empty": "Aún no hay cigarros registrados.",
@@ -279,7 +358,8 @@
     "confirmAccelBody": "Reconstruiremos tu plan para terminar antes: tu meta diaria baja más rápido y tu fecha sin fumar se adelanta. No se puede deshacer.",
     "seeAll": "Ver lista ›",
     "trendA11y": "Cigarrillos por día en los últimos {{days}} días. Más reciente: {{actual}}, objetivo {{target}}.",
-    "savedTrendA11y": "Tu ahorro va en aumento — {{amount}} {{currency}} hasta ahora."
+    "savedTrendA11y": "Tu ahorro va en aumento — {{amount}} {{currency}} hasta ahora.",
+    "noSavingsYet": "Aún no hay ahorro — fuma por debajo de tu meta diaria y esta gráfica empezará a subir."
   },
   "goals": {
     "coffee": "un café",
