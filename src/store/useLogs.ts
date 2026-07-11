@@ -11,6 +11,7 @@ import {
 } from '@/data/repositories/cravingLog';
 import type { TriggerCategory } from '@/types/domain';
 import { todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 interface LogInput {
   trigger?: TriggerCategory;
@@ -58,7 +59,8 @@ export const useLogs = create<LogsState>((set, get) => ({
     try {
       await get().refreshToday();
       set({ ready: true });
-    } catch {
+    } catch (err) {
+      logDev('store/useLogs', err);
       // SQLite unavailable (e.g. during web prerender) — render without counts.
       set({ ready: false });
     }

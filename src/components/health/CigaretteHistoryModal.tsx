@@ -15,6 +15,7 @@ import { useLogs } from '@/store/useLogs';
 import { type TrendRange, useSettings } from '@/store/useSettings';
 import { useTutorial } from '@/store/useTutorial';
 import { useTutorialSandbox } from '@/store/useTutorialSandbox';
+import { dateLocaleTag } from '@/utils/date';
 
 const RANGES: TrendRange[] = ['week', 'month', 'all'];
 
@@ -23,8 +24,10 @@ function dayKeyOf(iso: string): string {
   return iso.slice(0, 10);
 }
 
+// `[]` here would mean "the phone's locale", which can disagree with the app's
+// language — Spanish copy, English dates. Follow the app instead.
 function formatDay(key: string): string {
-  return new Date(`${key}T12:00:00`).toLocaleDateString([], {
+  return new Date(`${key}T12:00:00`).toLocaleDateString(dateLocaleTag(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -33,7 +36,7 @@ function formatDay(key: string): string {
 }
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
+  return new Date(iso).toLocaleTimeString(dateLocaleTag(), {
     hour: '2-digit',
     minute: '2-digit',
   });

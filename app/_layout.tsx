@@ -44,6 +44,7 @@ import { useWishlist } from '@/store/useWishlist';
 import { applySavedTheme } from '@/theme/appearance';
 import { applyFontDefault } from '@/theme/fontDefault';
 import { defaultVarsInput, pinkVarsInput } from '@/theme/themes';
+import { logDev } from '@/utils/logger';
 
 applyFontDefault();
 
@@ -143,7 +144,8 @@ export default function RootLayout() {
           s.quietHours,
           s.notificationsEnabled,
         );
-      } catch {
+      } catch (err) {
+        logDev('_layout', err);
         /* best effort — reveal the app regardless */
       } finally {
         if (!cancelled) setReady(true);
@@ -165,7 +167,8 @@ export default function RootLayout() {
           const url = response.notification.request.content.data?.url;
           if (url === '/craving') router.push('/craving');
         });
-      } catch {
+      } catch (err) {
+        logDev('_layout', err);
         /* notifications unavailable */
       }
     })();

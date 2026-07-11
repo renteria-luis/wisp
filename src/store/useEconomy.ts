@@ -11,6 +11,7 @@ import { accrueCoins, recoveryMultiplier } from '@/engine/economy';
 import { liveRecoveryHours, reachedCount } from '@/engine/health';
 import { useRecovery } from '@/store/useRecovery';
 import type { Plan } from '@/types/domain';
+import { logDev } from '@/utils/logger';
 
 const HOUR_MS = 3_600_000;
 
@@ -53,7 +54,8 @@ export const useEconomy = create<EconomyState>()(
             reason,
             balanceAfter: balance,
           });
-        } catch {
+        } catch (err) {
+          logDev('store/useEconomy', err);
           /* ledger is best-effort */
         }
       },
@@ -68,7 +70,8 @@ export const useEconomy = create<EconomyState>()(
             reason,
             balanceAfter: balance,
           });
-        } catch {
+        } catch (err) {
+          logDev('store/useEconomy', err);
           /* ledger is best-effort */
         }
         return true;
@@ -88,7 +91,8 @@ export const useEconomy = create<EconomyState>()(
             reason: 'claim',
             balanceAfter: balance,
           });
-        } catch {
+        } catch (err) {
+          logDev('store/useEconomy', err);
           /* ledger is best-effort */
         }
         return amount;
@@ -127,7 +131,8 @@ export const useEconomy = create<EconomyState>()(
             pending: Math.round(get().pending + Math.max(0, coins)),
             lastAccrualAt: new Date(now).toISOString(),
           });
-        } catch {
+        } catch (err) {
+          logDev('store/useEconomy', err);
           /* SQLite unavailable (e.g. web prerender) — skip accrual */
         }
       },

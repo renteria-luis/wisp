@@ -3,8 +3,32 @@
  * dates (`yyyy-MM-dd`) for anything persisted so plans are timezone-stable.
  */
 import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
+import { enUS, es } from 'date-fns/locale';
 
 export const ISO_DATE = 'yyyy-MM-dd';
+
+/**
+ * Which language the *human-readable* formatters speak. date-fns defaults to
+ * en-US unless you hand it a locale, so without this a Spanish user still read
+ * "Jul 17, 2026" everywhere. Machine formats (the ISO ones above/below) are
+ * deliberately locale-free and never change.
+ *
+ * Set from `applyLanguage` in the i18n module — the app's language, not the
+ * phone's, so the two can't disagree.
+ */
+const EN = { fns: enUS, tag: 'en-US' } as const;
+const ES = { fns: es, tag: 'es-ES' } as const;
+let active: typeof EN | typeof ES = EN;
+
+export function setDateLocale(language: string): void {
+  active = language.slice(0, 2) === 'es' ? ES : EN;
+}
+
+/** BCP-47 tag for the app's language — hand it to `toLocale*String` so those
+ *  follow the app instead of the device. */
+export function dateLocaleTag(): string {
+  return active.tag;
+}
 
 export function todayISO(now: Date = new Date()): string {
   return format(now, ISO_DATE);
@@ -40,7 +64,7 @@ export function daysBetween(fromISO: string, toISO: string): number {
   return differenceInCalendarDays(parseISO(toISO), parseISO(fromISO));
 }
 
-/** Friendly medium date, e.g. "Jul 17, 2026". */
+/** Friendly medium date — "Jul 17, 2026" in English, "17 jul 2026" in Spanish. */
 export function formatMedium(iso: string): string {
-  return format(parseISO(iso), 'PP');
+  return format(parseISO(iso), 'PP', { locale: active.fns });
 }

@@ -7,6 +7,8 @@ import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { setDateLocale } from '@/utils/date';
+
 import en from './locales/en.json';
 import es from './locales/es.json';
 
@@ -27,20 +29,25 @@ function detectDeviceLanguage(): SupportedLanguage {
 }
 
 if (!i18n.isInitialized) {
+  const initial = detectDeviceLanguage();
+  setDateLocale(initial);
   // eslint-disable-next-line import/no-named-as-default-member
   i18n.use(initReactI18next).init({
     resources,
-    lng: detectDeviceLanguage(),
+    lng: initial,
     fallbackLng: defaultLanguage,
     interpolation: { escapeValue: false },
     returnNull: false,
   });
 }
 
-/** Apply a language override, or follow the device locale when `null`. */
+/** Apply a language override, or follow the device locale when `null`. Dates go
+ *  with it — otherwise the copy is Spanish and the dates are still English. */
 export function applyLanguage(language: SupportedLanguage | null): void {
+  const lng = language ?? detectDeviceLanguage();
+  setDateLocale(lng);
   // eslint-disable-next-line import/no-named-as-default-member
-  void i18n.changeLanguage(language ?? detectDeviceLanguage());
+  void i18n.changeLanguage(lng);
 }
 
 export default i18n;

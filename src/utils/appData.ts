@@ -18,6 +18,7 @@ import { useSettings } from '@/store/useSettings';
 import { useWishlist } from '@/store/useWishlist';
 import type { Plan } from '@/types/domain';
 import { todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 const TABLES = [
   'cigarette_log',
@@ -106,7 +107,8 @@ export async function exportAppData(): Promise<ExportOutcome> {
       UTI: 'public.json',
     });
     return 'shared';
-  } catch {
+  } catch (err) {
+    logDev('utils/appData', err);
     return 'error';
   }
 }
@@ -207,7 +209,8 @@ export async function importAppData(): Promise<ImportOutcome> {
     if (data?.app !== 'Wisp') return 'invalid';
     await restoreAppState(data);
     return 'imported';
-  } catch {
+  } catch (err) {
+    logDev('utils/appData', err);
     return 'error';
   }
 }
@@ -217,7 +220,8 @@ export async function wipeAppData(): Promise<void> {
   try {
     const db = await getDb();
     for (const table of TABLES) await db.runAsync(`DELETE FROM ${table}`);
-  } catch {
+  } catch (err) {
+    logDev('utils/appData', err);
     /* db unavailable (web) — stores are still reset below */
   }
   useEconomy.getState().reset();

@@ -18,6 +18,7 @@ import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { nowISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 function dayKey(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -94,7 +95,8 @@ export default function ManualLog() {
       await refreshToday().catch(() => {});
       await useVitalityStore.getState().recompute(plan);
       router.back();
-    } catch {
+    } catch (err) {
+      logDev('manual-log', err);
       setSaving(false);
     }
   };

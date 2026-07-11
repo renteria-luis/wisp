@@ -5,6 +5,7 @@ import { allowanceForDay } from '@/engine/planEngine';
 import { usePlan } from '@/store/usePlan';
 import { useSettings } from '@/store/useSettings';
 import { addDaysISO, daysBetween, todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 /**
  * How many recent past days the plan expected some smoking (allowance > 0) yet
@@ -46,7 +47,8 @@ export function useMissedDays(): { count: number; dismiss: () => void } {
           d = addDaysISO(d, 1);
         }
         if (!cancelled) setCount(missed);
-      } catch {
+      } catch (err) {
+        logDev('hooks/useMissedDays', err);
         if (!cancelled) setCount(0);
       }
     })();

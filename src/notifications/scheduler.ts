@@ -9,6 +9,7 @@
 import { dailyNudgeWindows, situationalOffsets } from '@/engine/triggers';
 import i18n from '@/i18n';
 import type { QuietHours, TriggerCategory } from '@/types/domain';
+import { logDev } from '@/utils/logger';
 
 const CRAVING_URL = '/craving';
 const LOG_URL = '/log';
@@ -29,7 +30,8 @@ export async function configureNotificationHandler(): Promise<void> {
         shouldSetBadge: false,
       }),
     });
-  } catch {
+  } catch (err) {
+    logDev('notifications/scheduler', err);
     /* notifications unavailable */
   }
 }
@@ -41,7 +43,8 @@ export async function requestNotificationPermission(): Promise<boolean> {
     if (current.granted) return true;
     const requested = await N.requestPermissionsAsync();
     return requested.granted;
-  } catch {
+  } catch (err) {
+    logDev('notifications/scheduler', err);
     return false;
   }
 }
@@ -81,7 +84,8 @@ export async function rescheduleTriggerNotifications(
         },
       });
     }
-  } catch {
+  } catch (err) {
+    logDev('notifications/scheduler', err);
     /* notifications unavailable */
   }
 }
@@ -97,7 +101,8 @@ export async function notifyMilestoneReached(title: string): Promise<void> {
       },
       trigger: null, // present right away
     });
-  } catch {
+  } catch (err) {
+    logDev('notifications/scheduler', err);
     /* notifications unavailable */
   }
 }
@@ -120,7 +125,8 @@ export async function startSituationalSupport(): Promise<void> {
         },
       });
     }
-  } catch {
+  } catch (err) {
+    logDev('notifications/scheduler', err);
     /* notifications unavailable */
   }
 }

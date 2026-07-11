@@ -32,6 +32,7 @@ import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 import type { TriggerCategory } from '@/types/domain';
 import { daysBetween, nowISO, todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 const CATEGORIES: TriggerCategory[] = [
   'work_break',
@@ -147,7 +148,8 @@ export default function Log() {
         celebrate('💪', t('celebrate.resisted'));
       }
       router.back();
-    } catch {
+    } catch (err) {
+      logDev('log', err);
       setSaving(false);
     }
   };

@@ -13,6 +13,7 @@ import {
 } from '@/engine/vitality';
 import type { Plan, VitalityState } from '@/types/domain';
 import { daysBetween, nowISO, todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 const HOUR_MS = 3_600_000;
 
@@ -57,7 +58,8 @@ export const useVitalityStore = create<VitalityStore>((set) => ({
         hoursSinceLastCigarette,
       });
       set({ score, band: vitalityBand(score) });
-    } catch {
+    } catch (err) {
+      logDev('store/useVitalityStore', err);
       /* SQLite unavailable (e.g. web prerender) — keep the previous value */
     }
   },

@@ -11,6 +11,7 @@ import { getCheckIn, upsertCheckIn } from '@/data/repositories/checkIn';
 import { BONUS_CHECK_IN } from '@/engine/economy';
 import { useEconomy } from '@/store/useEconomy';
 import { todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 const MOODS = [
   { value: 1, emoji: '😔' },
@@ -58,7 +59,8 @@ export default function CheckIn() {
       }
       setDone(true);
       setTimeout(() => router.back(), 850);
-    } catch {
+    } catch (err) {
+      logDev('checkin', err);
       setSaving(false);
     }
   };

@@ -36,6 +36,7 @@ import { useDistractions } from '@/store/useDistractions';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
 import { useTutorial } from '@/store/useTutorial';
+import { logDev } from '@/utils/logger';
 
 type Tool = 'breathe' | 'wait' | 'distract';
 
@@ -175,7 +176,8 @@ export default function Craving() {
         celebrate('💪', t('celebrate.resisted'));
         close();
       }, 1600);
-    } catch {
+    } catch (err) {
+      logDev('craving', err);
       setBreathing(false);
       setSaving(false);
     }

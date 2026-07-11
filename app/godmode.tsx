@@ -34,6 +34,7 @@ import { useSettings } from '@/store/useSettings';
 import { useVitalityStore } from '@/store/useVitalityStore';
 import { wipeAppData } from '@/utils/appData';
 import { addDaysISO, daysBetween, nowISO, todayISO } from '@/utils/date';
+import { logDev } from '@/utils/logger';
 
 function Row({ children }: { children: ReactNode }) {
   return <View className="flex-row gap-2">{children}</View>;
@@ -71,7 +72,8 @@ export default function GodMode() {
   const reloadRemCount = useCallback(async () => {
     try {
       setRemCount(await countCigarettesOnDate(dayKey(remDate)));
-    } catch {
+    } catch (err) {
+      logDev('godmode', err);
       setRemCount(0);
     }
   }, [remDate]);
