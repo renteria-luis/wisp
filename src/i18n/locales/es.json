@@ -359,7 +359,9 @@
     "seeAll": "Ver lista ›",
     "trendA11y": "Cigarrillos por día en los últimos {{days}} días. Más reciente: {{actual}}, objetivo {{target}}.",
     "savedTrendA11y": "Tu ahorro va en aumento — {{amount}} {{currency}} hasta ahora.",
-    "noSavingsYet": "Aún no hay ahorro — fuma por debajo de tu meta diaria y esta gráfica empezará a subir."
+    "noSavingsYet": "Aún no hay ahorro — fuma por debajo de tu meta diaria y esta gráfica empezará a subir.",
+    "noPackPrice": "No sabemos cuánto te cuesta un paquete, así que no podemos calcular lo que ahorras.",
+    "setPackPrice": "Pon el precio de tu paquete →"
   },
   "goals": {
     "coffee": "un café",

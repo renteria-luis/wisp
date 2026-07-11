@@ -44,7 +44,8 @@ export default function Progress() {
   const plan = usePlan((s) => s.plan);
   const setPlan = usePlan((s) => s.setPlan);
   const router = useRouter();
-  const currency = useSettings((s) => s.pricing.currency);
+  const pricing = useSettings((s) => s.pricing);
+  const currency = pricing.currency;
   const trendRange = useSettings((s) => s.trendRange);
   const seenEggs = useSettings((s) => s.seenEggs);
   const markEggSeen = useSettings((s) => s.markEggSeen);
@@ -117,6 +118,9 @@ export default function Progress() {
   // Savings chart shares the trend's window, so both cards read the same span.
   const savedSeries = data.savedSeries.slice(-windowDays);
   const savedPeak = savedSeries.length ? Math.max(...savedSeries) : 0;
+  // No pack price ⇒ every cigarette is worth 0 ⇒ savings can never be anything
+  // but zero. That is a broken setup, not an honest result.
+  const noPrice = pricing.packPrice <= 0 || pricing.cigsPerPack <= 0;
   const chartStartLabel = formatMedium(
     addDaysISO(todayISO(), -Math.max(0, trendActual.length - 1)),
   );
@@ -206,13 +210,30 @@ export default function Progress() {
               {t('progress.saved')}
             </Text>
             <Text className="mt-1 text-4xl font-bold text-ink dark:text-neutral-50">
-              {data.saved.toFixed(2)} {currency}
+              {/* Without a pack price we cannot know — say so, rather than
+                  claiming a very confident "0.00". */}
+              {noPrice ? '—' : `${data.saved.toFixed(2)} ${currency}`}
             </Text>
             <Text className="mt-1 text-sm text-ink-mute dark:text-neutral-400">
               {t('progress.cigsAvoided', { count: data.avoided })}
             </Text>
             <View className="mt-4">
-              {savedSeries.length > 1 && savedPeak > 0 ? (
+              {noPrice ? (
+                // A missing pack price makes every saving zero, forever. Never
+                // let that fail silently — send them where they can fix it.
+                <Pressable
+                  onPress={() => router.push('/settings')}
+                  accessibilityRole="button"
+                  className="rounded-xl border border-accent-300 bg-accent-50 px-4 py-3 dark:border-accent-700 dark:bg-accent-900"
+                >
+                  <Text className="text-center text-xs leading-5 text-ink-soft dark:text-neutral-300">
+                    {t('progress.noPackPrice')}
+                  </Text>
+                  <Text className="mt-1 text-center text-xs font-semibold text-primary-600">
+                    {t('progress.setPackPrice')}
+                  </Text>
+                </Pressable>
+              ) : savedSeries.length > 1 && savedPeak > 0 ? (
                 <SavingsChart
                   values={savedSeries}
                   currency={currency}

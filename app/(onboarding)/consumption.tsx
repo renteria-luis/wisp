@@ -15,7 +15,12 @@ export default function Consumption() {
   const { cigarettesPerDay, packPrice, cigsPerPack, currency, patch } =
     useOnboarding();
 
-  const valid = (cigarettesPerDay ?? 0) > 0;
+  // The pack price is NOT optional: it is the only thing that turns "cigarettes
+  // not smoked" into money. Leaving it empty made `moneySaved` a permanent zero
+  // — savings and the whole wishlist economy silently dead, with nothing on
+  // screen to explain why.
+  const valid =
+    (cigarettesPerDay ?? 0) > 0 && (packPrice ?? 0) > 0 && cigsPerPack > 0;
 
   return (
     <OnboardingStep

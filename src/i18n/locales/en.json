@@ -359,7 +359,9 @@
     "seeAll": "See all ›",
     "trendA11y": "Cigarettes per day over the last {{days}} days. Most recent: {{actual}}, target {{target}}.",
     "savedTrendA11y": "Money saved is trending up — {{amount}} {{currency}} so far.",
-    "noSavingsYet": "No savings yet — smoke below your daily target and this chart starts climbing."
+    "noSavingsYet": "No savings yet — smoke below your daily target and this chart starts climbing.",
+    "noPackPrice": "We don't know what a pack costs you, so we can't work out what you're saving.",
+    "setPackPrice": "Set your pack price →"
   },
   "goals": {
     "coffee": "a coffee",
