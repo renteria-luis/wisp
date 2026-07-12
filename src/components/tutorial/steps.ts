@@ -47,6 +47,32 @@ export type TutorialStep = {
   sandbox?: 'giveCoins' | 'reset' | 'clearWish';
 };
 
+/** Modals reachable by pushing a route. Others (the history sheet) are
+ *  state-driven and only toggled through `openModal`. */
+export const MODAL_ROUTE: Record<string, string | undefined> = {
+  log: '/log',
+  wishlist: '/wishlist',
+  craving: '/craving',
+};
+
+/**
+ * The one route a step is allowed to stand on. This is the tour's single source
+ * of truth about "where am I supposed to be": the controller navigates *to* it,
+ * watches the real route and steers back if anything drifts, and the overlay
+ * refuses to draw a spotlight anywhere else — so a stray tap can never leave a
+ * step pointing at coordinates measured on a screen the user has since left.
+ */
+export function stepPath(step: TutorialStep): string {
+  return (
+    (step.modal ? MODAL_ROUTE[step.modal] : undefined) ?? step.nav ?? '/home'
+  );
+}
+
+/** Every route the tour ever stands on. A path outside this set is none of the
+ *  tour's business, so the overlay stays out of its way instead of guessing. */
+export const TOUR_PATHS = new Set<string>(['/home', '/plan', '/progress']);
+for (const r of Object.values(MODAL_ROUTE)) if (r) TOUR_PATHS.add(r);
+
 /**
  * The scripted tour. It runs on a throwaway sandbox (0% template) — the user
  * really taps Log/Save, sees the cigarette land in the trend and its record in

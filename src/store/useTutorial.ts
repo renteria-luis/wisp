@@ -56,6 +56,11 @@ export const useTutorial = create<TutorialState>((set) => ({
   openModal: null,
   transitioning: false,
 
+  // Every step change raises `transitioning` in the SAME tick as `stepIndex`.
+  // The overlay treats that flag as "block everything, spotlight nothing", so
+  // there is never a frame where the step has moved on but the screen it is
+  // heading to is still open for business — that gap was wide enough to tap a
+  // tab through, and the tour would carry on against the wrong screen.
   start: () =>
     set({
       active: true,
@@ -64,18 +69,38 @@ export const useTutorial = create<TutorialState>((set) => ({
       pendingAction: null,
       transitioning: true,
     }),
-  stop: () => set({ active: false, stepIndex: 0, pendingAction: null }),
-  next: () => set((s) => ({ stepIndex: s.stepIndex + 1, pendingAction: null })),
+  stop: () =>
+    set({
+      active: false,
+      stepIndex: 0,
+      pendingAction: null,
+      transitioning: false,
+    }),
+  next: () =>
+    set((s) => ({
+      stepIndex: s.stepIndex + 1,
+      pendingAction: null,
+      transitioning: true,
+    })),
   back: () =>
-    set((s) => ({ stepIndex: Math.max(0, s.stepIndex - 1), pendingAction: null })),
+    set((s) => ({
+      stepIndex: Math.max(0, s.stepIndex - 1),
+      pendingAction: null,
+      transitioning: true,
+    })),
   goTo: (index) =>
-    set({ stepIndex: Math.max(0, index), pendingAction: null }),
+    set({
+      stepIndex: Math.max(0, index),
+      pendingAction: null,
+      transitioning: true,
+    }),
   signalAction: (id) => set({ pendingAction: id }),
   clearAction: () => set({ pendingAction: null }),
   setOpenModal: (openModal) => set({ openModal }),
   setTransitioning: (transitioning) => set({ transitioning }),
   setRect: (id, rect) => set((s) => ({ rects: { ...s.rects, [id]: rect } })),
-  setContentY: (id, y) => set((s) => ({ contentY: { ...s.contentY, [id]: y } })),
+  setContentY: (id, y) =>
+    set((s) => ({ contentY: { ...s.contentY, [id]: y } })),
   setScroller: (screen, fn) =>
     set((s) => ({ scrollers: { ...s.scrollers, [screen]: fn } })),
 }));

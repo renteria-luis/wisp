@@ -1,8 +1,9 @@
-import { type Href, useRouter } from 'expo-router';
+import { type Href, usePathname, useRouter } from 'expo-router';
 import { Gift } from 'phosphor-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  BackHandler,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -19,18 +20,20 @@ import { useTutorial } from '@/store/useTutorial';
 import { useTutorialSandbox } from '@/store/useTutorialSandbox';
 import { useThemeColors } from '@/theme/useThemeColors';
 
-import { TUTORIAL_STEP_COUNT, TUTORIAL_STEPS } from './steps';
+import {
+  MODAL_ROUTE,
+  stepPath,
+  TOUR_PATHS,
+  TUTORIAL_STEP_COUNT,
+  TUTORIAL_STEPS,
+} from './steps';
 
 const DIM = '#000000';
 const DIM_OPACITY = 0.66;
 const TUTORIAL_COINS = 20;
-// Modals reachable by pushing a route (others, like the history sheet, are
-// state-driven and just toggled via `openModal`).
-const MODAL_ROUTE: Record<string, Href | undefined> = {
-  log: '/log' as Href,
-  wishlist: '/wishlist' as Href,
-  craving: '/craving' as Href,
-};
+// Give up on any "wait for the screen to arrive" loop after this and carry on:
+// a slow device should look sluggish, never stuck.
+const SETTLE_TIMEOUT = 1500;
 const wait = (ms: number): Promise<void> =>
   new Promise((r) => setTimeout(r, ms));
 
@@ -83,6 +86,7 @@ export function TutorialOverlay({
   const back = useTutorial((s) => s.back);
   const clearAction = useTutorial((s) => s.clearAction);
   const transitioning = useTutorial((s) => s.transitioning);
+  const openModal = useTutorial((s) => s.openModal);
   const rect = useTutorial((s) => {
     const st = TUTORIAL_STEPS[s.stepIndex];
     return st?.target ? s.rects[st.target] : undefined;
@@ -115,94 +119,176 @@ export function TutorialOverlay({
     return () => subs.forEach((s) => s.remove());
   }, []);
 
-  // Step side-effects: keep the right nav state, run sandbox effects, scroll.
-  // Root instance only, guarded so it fires once per step (re-runs on Back too).
+  // The live route. Everything below steers by this rather than by what the tour
+  // *believes* it did: a cached "I already navigated there" is a lie the moment
+  // anything else touches the router, and it used to strand whole steps.
+  const pathname = usePathname();
+  const pathRef = useRef(pathname);
+  pathRef.current = pathname;
+
+  // Only the newest run of the controller may act; an older one aborts at its
+  // next checkpoint (the user tapped Back, or drifted, while it was working).
+  const runToken = useRef(0);
+  // The step whose screen is fully in place. Until then the route is *meant* to
+  // be moving, so the watchdog below must not mistake it for drift.
+  const settledAt = useRef(-1);
+  // A repair that keeps failing must not turn into an endless navigate loop.
+  const repairs = useRef(0);
+
+  /**
+   * Bring the app to exactly where a step lives — the right tab, the right
+   * modal, scrolled to the right card — and only then reveal the spotlight.
+   * Written as a reconciler, not a script: it compares the desired screen with
+   * the real one and does whatever closes the gap, so it is safe to run at any
+   * time, from any state, however the user got there.
+   */
+  const drive = useCallback(
+    (idx: number): void => {
+      const step = TUTORIAL_STEPS[idx];
+      if (!step) return;
+      const my = ++runToken.current;
+      const T = useTutorial.getState;
+      const dead = (): boolean =>
+        runToken.current !== my || !T().active || T().stepIndex !== idx;
+      // Wait for a condition instead of sleeping a guessed number of ms: it
+      // returns the instant the screen is really there (no dead pause when it
+      // already was) and still gives up rather than hanging.
+      const until = async (cond: () => boolean): Promise<void> => {
+        const t0 = Date.now();
+        while (!cond() && Date.now() - t0 < SETTLE_TIMEOUT) {
+          await wait(40);
+          if (dead()) return;
+        }
+      };
+
+      void (async () => {
+        T().setTransitioning(true);
+        if (idx === 0) useTutorialSandbox.getState().reset();
+
+        const want = step.modal ?? null;
+
+        // The route is the only honest witness to what is on screen, so the
+        // "which modal is open" flag is rebuilt from it first — stale in either
+        // direction (a modal it thinks is closed, or one it never saw open) it
+        // would otherwise make every decision below wrong.
+        const onRoute =
+          Object.keys(MODAL_ROUTE).find(
+            (k) => MODAL_ROUTE[k] === pathRef.current,
+          ) ?? null;
+        const flag = T().openModal;
+        // A pushed modal is open iff we stand on its route; the state-driven
+        // history sheet has no route, so its flag is taken at its word.
+        const open = onRoute ?? (flag && !MODAL_ROUTE[flag] ? flag : null);
+        if (open !== flag) T().setOpenModal(open);
+
+        // 1. Close a modal this step does not want.
+        if (open && open !== want) {
+          const route = MODAL_ROUTE[open];
+          if (route && router.canGoBack()) {
+            router.back();
+            await until(() => pathRef.current !== route);
+            // The route pops before the sheet has finished sliding away; let it,
+            // so the tab underneath doesn't visibly swap behind a closing modal.
+            await wait(180);
+          }
+          if (dead()) return;
+          T().setOpenModal(null);
+        }
+
+        // 2. Stand on the step's tab. Skipped when we are already there (that
+        //    needless round trip is what made consecutive Progress steps feel
+        //    like a long dead pause), and when the step's own modal is already
+        //    up — the tab is then behind it and cannot be wrong.
+        const staying = want !== null && T().openModal === want;
+        if (step.nav && !staying && pathRef.current !== step.nav) {
+          router.navigate(step.nav as Href);
+          await until(() => pathRef.current === step.nav);
+          if (dead()) return;
+        }
+
+        // 3. Open the modal the step needs (a pushed route, or a state toggle).
+        if (want && T().openModal !== want) {
+          const route = MODAL_ROUTE[want];
+          if (route) {
+            router.push(route as Href);
+            await until(() => pathRef.current === route);
+            if (dead()) return;
+          }
+          T().setOpenModal(want);
+          await wait(300); // let it animate in before the spotlight appears
+          if (dead()) return;
+        }
+
+        if (
+          step.sandbox === 'giveCoins' &&
+          useTutorialSandbox.getState().coins < TUTORIAL_COINS
+        ) {
+          useTutorialSandbox.getState().giveCoins(TUTORIAL_COINS);
+        }
+        if (step.sandbox === 'reset') useTutorialSandbox.getState().reset();
+        if (step.sandbox === 'clearWish')
+          useTutorialSandbox.getState().clearWishlist();
+
+        if (step.scrollScreen && step.target) {
+          const id = step.target;
+          const screen = step.scrollScreen;
+          await until(() => !!T().rects[id]);
+          if (dead()) return;
+          const rr = T().rects[id];
+          if (rr) T().scrollers[screen]?.(rr.y);
+          // The spotlight may be revealed while the scroll is still gliding —
+          // the target is re-measured continuously, so the hole rides with it.
+          await wait(140);
+        }
+
+        if (dead()) return;
+        settledAt.current = idx;
+        T().setTransitioning(false);
+      })();
+    },
+    [router],
+  );
+
+  // Drive each step once, on entry (Back re-enters, so it re-drives).
   const lastStep = useRef(-1);
-  // Which tab we already put them on. Re-navigating to the tab you're already
-  // standing on is a no-op that still costs a wait — and steps 8/9 (both on
-  // Progress) paid it in both directions, which read as a long dead pause.
-  const navAt = useRef<string | null>(null);
   useEffect(() => {
     if (!active) {
       lastStep.current = -1;
-      navAt.current = null;
+      settledAt.current = -1;
       return;
     }
     if (scope !== 'root') return;
     if (lastStep.current === stepIndex) return;
     lastStep.current = stepIndex;
+    settledAt.current = -1;
+    repairs.current = 0;
+    drive(stepIndex);
+  }, [scope, active, stepIndex, drive]);
+
+  // Watchdog: a settled step must stay on its own screen. If the route or the
+  // open modal drifts from what the step declared — a stray tap, a dismissed
+  // sheet, anything the tour did not do itself — steer straight back instead of
+  // carrying on against a screen that is no longer there.
+  useEffect(() => {
+    if (!active || scope !== 'root') return;
     const step = TUTORIAL_STEPS[stepIndex];
     if (!step) return;
-    const myStep = stepIndex;
-    // Abort a stale run (e.g. the user tapped Back before this one finished).
-    const dead = (): boolean =>
-      useTutorial.getState().stepIndex !== myStep ||
-      !useTutorial.getState().active;
-    void (async () => {
-      // Hide the spotlight until the screen has settled on the right element.
-      useTutorial.getState().setTransitioning(true);
-      if (myStep === 0) useTutorialSandbox.getState().reset();
-      await wait(80);
-      if (dead()) return;
-      const want = step.modal ?? null;
-      // 1. Close any modal we don't want open. (`canGoBack` guards the
-      //    "GO_BACK was not handled by any navigator" warning if it already
-      //    dismissed itself.)
-      const cur = useTutorial.getState().openModal;
-      if (cur && cur !== want) {
-        if (MODAL_ROUTE[cur] && router.canGoBack()) {
-          router.back();
-          await wait(260);
-        }
-        useTutorial.getState().setOpenModal(null);
-        if (dead()) return;
-      }
-      // 2. Switch to the step's base tab — unless we're already sitting in the
-      //    modal this step wants (then the tab underneath is already right).
-      const stayingInModal =
-        want !== null && useTutorial.getState().openModal === want;
-      if (step.nav && !stayingInModal && navAt.current !== step.nav) {
-        router.navigate(step.nav as Href);
-        navAt.current = step.nav;
-        await wait(220);
-        if (dead()) return;
-      }
-      // 3. Open the modal this step needs (a pushed route, or a state toggle).
-      if (want && useTutorial.getState().openModal !== want) {
-        const route = MODAL_ROUTE[want];
-        if (route) router.push(route);
-        useTutorial.getState().setOpenModal(want);
-        await wait(360); // let the modal animate in before revealing
-        if (dead()) return;
-      }
-      if (
-        step.sandbox === 'giveCoins' &&
-        useTutorialSandbox.getState().coins < TUTORIAL_COINS
-      ) {
-        useTutorialSandbox.getState().giveCoins(TUTORIAL_COINS);
-      }
-      if (step.sandbox === 'reset') useTutorialSandbox.getState().reset();
-      if (step.sandbox === 'clearWish')
-        useTutorialSandbox.getState().clearWishlist();
-      if (step.scrollScreen && step.target) {
-        await wait(50);
-        for (let i = 0; i < 20; i++) {
-          if (dead()) return;
-          const rr = useTutorial.getState().rects[step.target];
-          if (rr) {
-            useTutorial.getState().scrollers[step.scrollScreen]?.(rr.y);
-            break;
-          }
-          await wait(50);
-        }
-        // The spotlight may be revealed while the scroll is still gliding — the
-        // target is re-measured continuously, so the hole simply rides with it.
-        await wait(140);
-      }
-      if (dead()) return;
-      useTutorial.getState().setTransitioning(false);
-    })();
-  }, [scope, active, stepIndex, router]);
+    if (settledAt.current !== stepIndex) return; // still being driven
+    const adrift =
+      pathname !== stepPath(step) || openModal !== (step.modal ?? null);
+    if (!adrift || repairs.current >= 3) return;
+    repairs.current += 1;
+    settledAt.current = -1;
+    drive(stepIndex);
+  }, [active, scope, stepIndex, pathname, openModal, drive]);
+
+  // Android's back button would pop the step's modal (or leave the app) out from
+  // under the tour. The tour owns navigation while it runs; Skip is the way out.
+  useEffect(() => {
+    if (!active || scope !== 'root') return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => sub.remove();
+  }, [active, scope]);
 
   // Forced-tap advancement: when the user performs the step's real action.
   useEffect(() => {
@@ -213,27 +299,73 @@ export function TutorialOverlay({
   }, [active, scope, pendingAction, stepIndex, next, clearAction]);
 
   const finish = (): void => {
+    // Stop first: any controller run still in flight sees the tour is over at
+    // its next checkpoint and aborts, instead of pushing a modal onto a user
+    // who has already left.
+    const open = useTutorial.getState().openModal;
+    useTutorial.getState().stop();
     // Skipping mid-flow can leave a modal on top — close it so the user lands
     // back on a normal screen.
-    const open = useTutorial.getState().openModal;
     if (open && MODAL_ROUTE[open] && router.canGoBack()) router.back();
     useTutorial.getState().setOpenModal(null);
     useTutorialSandbox.getState().reset();
     useSettings.getState().setTutorialCompleted(true);
-    useTutorial.getState().stop();
   };
 
   const step = TUTORIAL_STEPS[stepIndex];
   const myScope = step?.scope ?? 'root';
-  if (!active || !step || myScope !== scope) return null;
+  if (!active || !step) return null;
+
+  // Who holds the screen, and when.
+  //
+  // The root overlay sits ABOVE the navigator, so it alone can cover the tab
+  // bar — but it would also cover a modal, which is why modal steps get their
+  // own overlay inside the modal and the root one steps aside. It used to step
+  // aside the instant the step changed, leaving the app fully live for the half
+  // second the modal took to open: long enough to tap a tab and send the rest
+  // of the tour chasing a screen the user had already left. So now, while a
+  // step is in transition, BOTH layers block — the root because it covers the
+  // navigator, the modal one because a native modal renders in its own window
+  // that the root cannot reach. At no instant is neither of them there.
+  const mine = myScope === scope;
+  if (scope === 'modal' && !mine) return null;
+  if (scope === 'root' && !mine && !transitioning) return null;
+
+  // Block-only: an impenetrable sheet, no spotlight and no card. The root wears
+  // the dim (it is on top for pushed modals); the modal layer stays clear so
+  // the two never stack into a double-dark flash.
+  const blockOnly = !mine || (scope === 'modal' && transitioning);
+  if (blockOnly) {
+    return (
+      <View style={StyleSheet.absoluteFill}>
+        <Pressable onPress={() => {}} style={StyleSheet.absoluteFill} />
+        {mine ? null : (
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: `rgba(0,0,0,${DIM_OPACITY})` },
+            ]}
+          />
+        )}
+      </View>
+    );
+  }
 
   const isLast = stepIndex === TUTORIAL_STEP_COUNT - 1;
   const forced = !!step.advanceOn;
   const P = 10;
+  // A rect stays in the store until its step ends, so one measured on a screen
+  // the user has since left would still draw a hole — over whatever now happens
+  // to be under those coordinates. A step only ever lights up its own screen.
+  // (Unknown routes are none of the tour's business: it stays out of the way
+  // rather than guessing, and the watchdog is already steering back.)
+  const offStage = TOUR_PATHS.has(pathname) && pathname !== stepPath(step);
+  const settled = !transitioning && !offStage;
   // No spotlight while the screen is still settling — avoids a flash on the
   // wrong element mid-transition.
   const hole =
-    !transitioning && step.target && rect
+    settled && step.target && rect
       ? {
           x: Math.max(0, rect.x - P),
           y: Math.max(0, rect.y - P),
@@ -245,7 +377,7 @@ export function TutorialOverlay({
   // A second element kept lit (never tappable — the touch layer below only ever
   // opens the primary hole, so this one still sits under a blocker/catcher).
   const hole2 =
-    !transitioning && step.alsoLit && rect2
+    settled && step.alsoLit && rect2
       ? {
           x: Math.max(0, rect2.x - P),
           y: Math.max(0, rect2.y - P),
@@ -284,10 +416,46 @@ export function TutorialOverlay({
     <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
       {passThrough && hole ? (
         <>
-          <Pressable onPress={() => {}} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: hole.y }} />
-          <Pressable onPress={() => {}} style={{ position: 'absolute', left: 0, right: 0, top: hole.y + hole.h, bottom: 0 }} />
-          <Pressable onPress={() => {}} style={{ position: 'absolute', left: 0, top: hole.y, width: hole.x, height: hole.h }} />
-          <Pressable onPress={() => {}} style={{ position: 'absolute', left: hole.x + hole.w, right: 0, top: hole.y, height: hole.h }} />
+          <Pressable
+            onPress={() => {}}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              height: hole.y,
+            }}
+          />
+          <Pressable
+            onPress={() => {}}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: hole.y + hole.h,
+              bottom: 0,
+            }}
+          />
+          <Pressable
+            onPress={() => {}}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: hole.y,
+              width: hole.x,
+              height: hole.h,
+            }}
+          />
+          <Pressable
+            onPress={() => {}}
+            style={{
+              position: 'absolute',
+              left: hole.x + hole.w,
+              right: 0,
+              top: hole.y,
+              height: hole.h,
+            }}
+          />
         </>
       ) : (
         /* Block everything by default; the proxy below re-opens just the hole. */
@@ -343,7 +511,10 @@ export function TutorialOverlay({
       ) : (
         <View
           pointerEvents="none"
-          style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(0,0,0,${DIM_OPACITY})` }]}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: `rgba(0,0,0,${DIM_OPACITY})` },
+          ]}
         />
       )}
 
@@ -421,7 +592,11 @@ export function TutorialOverlay({
           <View className="mt-4 flex-row items-center justify-between">
             <View className="flex-row items-center gap-4">
               {stepIndex > 0 ? (
-                <Pressable onPress={onBack} hitSlop={8} accessibilityRole="button">
+                <Pressable
+                  onPress={onBack}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                >
                   <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
                     {t('tutorial.back')}
                   </Text>
@@ -429,7 +604,11 @@ export function TutorialOverlay({
               ) : null}
               {/* Nothing left to skip on the closing card — only "Done". */}
               {isLast ? null : (
-                <Pressable onPress={finish} hitSlop={8} accessibilityRole="button">
+                <Pressable
+                  onPress={finish}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                >
                   <Text className="text-sm font-medium text-ink-mute dark:text-neutral-400">
                     {t('tutorial.skip')}
                   </Text>
