@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -14,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCompanion } from '@/store/useCompanion';
+import { tap } from '@/utils/feedback';
 
 import {
   PP_ACTIONS,
@@ -253,7 +253,7 @@ export function SecretCompanion({
       withTiming(1, { duration: 110 }),
       withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) }),
     );
-    void Haptics.selectionAsync();
+    tap();
     setPoke((p) => p + 1); // reset the idle "sit down" timer
 
     // A new action can start only once the previous one has finished (busy),

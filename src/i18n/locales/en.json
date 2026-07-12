@@ -31,6 +31,9 @@
     "quietHours": "Quiet hours (no notifications)",
     "quietStart": "From",
     "quietEnd": "Until",
+    "feedback": "Feedback",
+    "enableHaptics": "Vibration",
+    "hapticsNote": "Wisp never makes a sound — a gentle tap is all it uses, so you can open it anywhere.",
     "language": "Language",
     "lang": {
       "auto": "Automatic",

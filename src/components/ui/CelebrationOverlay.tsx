@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -14,6 +13,7 @@ import Animated, {
 
 import { useCelebration } from '@/store/useCelebration';
 import { useThemeColors } from '@/theme/useThemeColors';
+import { success } from '@/utils/feedback';
 
 const CONFETTI = ['✨', '⭐', '💫', '🎊', '🌟', '✨'];
 const HOLD_MS = 1900;
@@ -82,7 +82,7 @@ export function CelebrationOverlay() {
 
   useEffect(() => {
     if (!current) return;
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    success();
     if (reduced) {
       scale.value = 1;
       opacity.value = 1;

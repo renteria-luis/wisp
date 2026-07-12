@@ -49,6 +49,10 @@ interface SettingsState {
   trendRange: TrendRange;
   /** The post-onboarding guided tour has been seen (or skipped). */
   tutorialCompleted: boolean;
+  /** Haptic feedback (the app's only "sound"). Some people can't stand it, and
+   *  it is the one channel that fires on almost every tap — so it gets a
+   *  switch. See utils/feedback. */
+  hapticsEnabled: boolean;
 
   setProfile: (patch: Partial<Profile>) => void;
   setPricing: (patch: Partial<Pricing>) => void;
@@ -68,6 +72,7 @@ interface SettingsState {
   setMissedReviewedUntil: (iso: string | null) => void;
   setTrendRange: (range: TrendRange) => void;
   setTutorialCompleted: (completed: boolean) => void;
+  setHapticsEnabled: (enabled: boolean) => void;
   reset: () => void;
 }
 
@@ -94,6 +99,7 @@ const initialState = {
   missedReviewedUntil: null as string | null,
   trendRange: 'week' as TrendRange,
   tutorialCompleted: false,
+  hapticsEnabled: true,
 };
 
 export const useSettings = create<SettingsState>()(
@@ -125,6 +131,7 @@ export const useSettings = create<SettingsState>()(
         set({ missedReviewedUntil }),
       setTrendRange: (trendRange) => set({ trendRange }),
       setTutorialCompleted: (tutorialCompleted) => set({ tutorialCompleted }),
+      setHapticsEnabled: (hapticsEnabled) => set({ hapticsEnabled }),
       reset: () => set({ ...initialState }),
     }),
     {

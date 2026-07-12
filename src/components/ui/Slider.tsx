@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -9,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useThemeColors } from '@/theme/useThemeColors';
+import { tap } from '@/utils/feedback';
 
 type Props = {
   value: number;
@@ -24,7 +24,7 @@ const TRACK_H = 10;
 
 /** The iOS picker-style tick as the value crosses a whole number. */
 function tick(): void {
-  void Haptics.selectionAsync();
+  tap();
 }
 
 /**

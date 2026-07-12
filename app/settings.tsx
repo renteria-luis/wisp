@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +29,7 @@ import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
 import type { Gender } from '@/types/domain';
 import { exportAppData, importAppData, wipeAppData } from '@/utils/appData';
+import { tap } from '@/utils/feedback';
 
 const GENDERS: Gender[] = ['female', 'male', 'nonbinary', 'prefer_not'];
 const CURRENCIES = ['CAD', 'PEN', 'USD'];
@@ -154,7 +154,7 @@ export default function Settings() {
   const onLanguage = (value: SupportedLanguage | null) => {
     s.setLanguage(value);
     applyLanguage(value);
-    void Haptics.selectionAsync();
+    tap();
   };
 
   const onExport = async () => {
@@ -318,6 +318,27 @@ export default function Settings() {
             value={quiet.end.hour}
             onChange={(h) => setQuiet({ end: { hour: h, minute: 0 } })}
           />
+        </Section>
+
+        <Section title={t('settings.feedback')}>
+          <View className="flex-row items-center justify-between">
+            <Text className="flex-1 pr-3 text-sm font-medium text-ink-soft dark:text-neutral-300">
+              {t('settings.enableHaptics')}
+            </Text>
+            <Switch
+              value={s.hapticsEnabled}
+              onValueChange={(v) => {
+                s.setHapticsEnabled(v);
+                // Only when switching ON: the tick you feel is the setting
+                // demonstrating itself, never a parting shot on the way out.
+                if (v) tap();
+              }}
+              trackColor={{ true: c.primary['400'] }}
+            />
+          </View>
+          <Text className="text-xs text-ink-mute dark:text-neutral-400">
+            {t('settings.hapticsNote')}
+          </Text>
         </Section>
 
         <Section title={t('settings.language')}>

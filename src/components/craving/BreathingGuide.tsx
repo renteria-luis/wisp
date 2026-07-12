@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -9,13 +8,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { breathe } from '@/utils/feedback';
+
 const PHASES = [
   { key: 'inhale', duration: 4000, scale: 1 },
   { key: 'hold', duration: 4000, scale: 1 },
   { key: 'exhale', duration: 6000, scale: 0.55 },
 ] as const;
 
-/** A calming inhale–hold–exhale breathing circle with a haptic on each phase. */
+/**
+ * A calming inhale–hold–exhale breathing circle. Each phase change has its own
+ * distinct haptic, so she can lower the phone and close her eyes and still
+ * follow it by touch — a breathing exercise you have to keep staring at is
+ * fighting itself.
+ */
 export function BreathingGuide() {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
@@ -27,7 +33,7 @@ export function BreathingGuide() {
       duration: phase.duration,
       easing: Easing.inOut(Easing.ease),
     });
-    void Haptics.selectionAsync();
+    breathe(phase.key);
     const id = setTimeout(
       () => setIndex((i) => (i + 1) % PHASES.length),
       phase.duration,

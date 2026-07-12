@@ -31,6 +31,9 @@
     "quietHours": "Horas de silencio (sin notificaciones)",
     "quietStart": "Desde",
     "quietEnd": "Hasta",
+    "feedback": "Respuesta táctil",
+    "enableHaptics": "Vibración",
+    "hapticsNote": "Wisp nunca suena — solo un toque suave, para que puedas abrirla donde sea.",
     "language": "Idioma",
     "lang": {
       "auto": "Automático",

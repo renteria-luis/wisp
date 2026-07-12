@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +10,7 @@ import { getCheckIn, upsertCheckIn } from '@/data/repositories/checkIn';
 import { BONUS_CHECK_IN } from '@/engine/economy';
 import { useEconomy } from '@/store/useEconomy';
 import { todayISO } from '@/utils/date';
+import { success, tap } from '@/utils/feedback';
 import { logDev } from '@/utils/logger';
 
 const MOODS = [
@@ -53,9 +53,9 @@ export default function CheckIn() {
       await upsertCheckIn({ date: todayISO(), mood });
       if (firstToday) {
         await useEconomy.getState().award(BONUS_CHECK_IN, 'check_in');
-        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        success();
       } else {
-        void Haptics.selectionAsync();
+        tap();
       }
       setDone(true);
       setTimeout(() => router.back(), 850);

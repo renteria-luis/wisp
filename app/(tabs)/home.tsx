@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { type Href, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -38,6 +37,7 @@ import { useSettings } from '@/store/useSettings';
 import { useTutorial } from '@/store/useTutorial';
 import { useTutorialSandbox } from '@/store/useTutorialSandbox';
 import { daysBetween, todayISO } from '@/utils/date';
+import { success } from '@/utils/feedback';
 
 const SITUATIONAL_MS = 3 * 60 * 60 * 1000;
 
@@ -102,7 +102,7 @@ export default function Home() {
       longPresses.current = [];
       setBurst(true);
       setEggVisible(true);
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      success();
     }
   };
 
@@ -200,7 +200,7 @@ export default function Home() {
     }
     await startSituationalSupport();
     setSituationalUntil(new Date(Date.now() + SITUATIONAL_MS).toISOString());
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    success();
     setSupportInfo(true);
   };
 

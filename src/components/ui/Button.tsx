@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -10,6 +9,7 @@ import Animated, {
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColors } from '@/theme/useThemeColors';
+import { tap } from '@/utils/feedback';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 
@@ -107,7 +107,7 @@ export function Button({
       }}
       onPress={() => {
         if (disabled) return;
-        void Haptics.selectionAsync();
+        tap();
         onPress();
       }}
       disabled={disabled}
