@@ -42,7 +42,8 @@ interface SettingsState {
   theme: 'system' | 'light' | 'dark' | 'pink';
   /** ISO date the morning greeting was last shown (so it shows once a day). */
   lastMorningGreet: string | null;
-  /** Secret Secret companion, unlocked via a hidden tap in onboarding. */
+  /** The secret companion, unlocked by a hidden tap in onboarding. Its name
+   *  lives in personal.config and nowhere else. */
   secretCompanionUnlocked: boolean;
   /** ISO date up to which missed-log days have been reviewed (so we don't
    *  keep asking about the same gap). */
@@ -128,7 +129,9 @@ export const useSettings = create<SettingsState>()(
         set({ notificationsEnabled }),
       setSituationalUntil: (situationalUntil) => set({ situationalUntil }),
       markEggSeen: (id) =>
-        set((s) => (s.seenEggs.includes(id) ? s : { seenEggs: [...s.seenEggs, id] })),
+        set((s) =>
+          s.seenEggs.includes(id) ? s : { seenEggs: [...s.seenEggs, id] },
+        ),
       setTheme: (theme) => set({ theme }),
       setLastMorningGreet: (lastMorningGreet) => set({ lastMorningGreet }),
       setSecretCompanionUnlocked: (secretCompanionUnlocked) =>
@@ -143,6 +146,11 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'wisp-settings',
       storage: createJSONStorage(() => AsyncStorage),
+      // NOTE: renaming `secretCompanionUnlocked` deliberately ships WITHOUT a
+      // migration. Reading the old key across would mean naming it here, which
+      // is the one thing this rename exists to stop — and the app has never
+      // shipped, so the only cost is that a dev install forgets the unlock.
+      // Re-enable it from About. Do not "fix" this by adding the old name back.
       version: 1,
     },
   ),

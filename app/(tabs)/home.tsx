@@ -62,7 +62,7 @@ export default function Home() {
   const setCharacter = useCompanion((s) => s.setCharacter);
   const name = userName || personal.dedicateeName;
 
-  // Secret Secret companion (unlocked in onboarding) replaces the creatures.
+  // The secret companion (unlocked in onboarding) replaces the creatures.
   const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
   const [secretTrigger, setSecretTrigger] = useState(0);
   // The craving sheet sets a coach context while it's open — the companion
@@ -76,7 +76,7 @@ export default function Home() {
       secretCompanionUnlocked &&
       (!companionName || companionName === personal.companionDefaultName)
     ) {
-      useSettings.getState().setCompanionName('Secret');
+      useSettings.getState().setCompanionName(personal.secretCompanionName);
     }
   }, [secretCompanionUnlocked, companionName]);
   // PP smoothly lifts up while the craving sheet is open (driven by that

@@ -132,7 +132,7 @@
       "greeting": "Hola {{name}} — lo haremos juntas."
     },
     "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso.",
-    "secretUnlocked": "Secret desbloqueado — solo para ti"
+    "secretUnlocked": "{{name}} desbloqueado — solo para ti"
   },
   "gender": {
     "female": "Mujer",
@@ -187,7 +187,6 @@
     "nextMilestone": "Próximo hito de salud",
     "noPlan": "Aún no hay plan — termina la introducción para empezar.",
     "ebooks": "📚 Lecturas gratis",
-    "secretLove": "hecho con ❤️ para Tiffani",
     "remainingToday": "Te quedan hoy",
     "overBy": "Te pasaste por {{count}} 💛",
     "smokedOf": "{{count}} de {{allowance}} hoy",
@@ -775,7 +774,7 @@
   },
   "egg": {
     "title": "Easter egg",
-    "secretOn": "Modo Secret activado",
+    "secretOn": "Modo secreto activado",
     "secretOff": "Modo normal activado"
   },
   "godmode": {

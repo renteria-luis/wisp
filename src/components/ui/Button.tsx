@@ -60,7 +60,7 @@ function skinFor(
 /**
  * A soft, chunky pill button: a coloured lip peeks under the face and the face
  * sinks onto it when pressed (with a little haptic), giving a tactile,
- * Secret-ish bounce. Colours track the light / dark / pink themes.
+ * A soft, toy-like bounce. Colours track the light / dark / pink themes.
  */
 export function Button({
   label,

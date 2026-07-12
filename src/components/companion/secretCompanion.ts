@@ -1,7 +1,7 @@
 import type { ImageSourcePropType } from 'react-native';
 
 /**
- * Secret frames — the secret companion (unlocked only for her).
+ * Sprite frames for the secret companion (revealed by the hidden unlock).
  *
  * Hand-drawn smooth-line poses, all normalized to a single locked canvas
  * (720×780) so PP never jumps between frames: the blue background was keyed out

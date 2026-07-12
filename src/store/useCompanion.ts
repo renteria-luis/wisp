@@ -22,7 +22,7 @@ interface CompanionState {
   setWorn: (worn: string[]) => void;
   /** Directly set the equipped character (used by the Home sprite picker). */
   setCharacter: (id: string) => void;
-  /** Persisted posture of the secret Secret so it survives app restarts. */
+  /** Persisted posture of the secret companion, so it survives app restarts. */
   secretPosture: 'stand' | 'sit';
   setSecretPosture: (posture: 'stand' | 'sit') => void;
   reset: () => void;
@@ -61,6 +61,8 @@ export const useCompanion = create<CompanionState>()(
       version: 2,
       // v2 introduced the `character` slot — make sure the free wisp is owned
       // and equipped for installs created before characters existed.
+      // (The renamed posture field ships without a migration on purpose — see
+      // the note in useSettings.)
       migrate: (state, version) => {
         const s = state as {
           owned?: string[];

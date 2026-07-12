@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useNavOnce } from '@/hooks/useNavOnce';
+import { personal } from '@/personal/personal.config';
 import { useCelebration } from '@/store/useCelebration';
 import { useOnboarding } from '@/store/useOnboarding';
 import { useSettings } from '@/store/useSettings';
@@ -21,10 +22,10 @@ export default function Welcome() {
   const leave = useNavOnce();
   const name = useOnboarding((s) => s.name);
   const patch = useOnboarding((s) => s.patch);
-  const setSecret = useSettings((s) => s.setSecretCompanionUnlocked);
+  const setSecretUnlocked = useSettings((s) => s.setSecretCompanionUnlocked);
   const celebrate = useCelebration((s) => s.celebrate);
 
-  // Secret: 7 quick taps on the center circle unlock the Secret companion.
+  // Secret: 7 quick taps on the center circle unlock the hidden companion.
   const taps = useRef(0);
   const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSecretTap = () => {
@@ -35,8 +36,8 @@ export default function Welcome() {
     }, 1500);
     if (taps.current >= 7) {
       taps.current = 0;
-      setSecret(true);
-      celebrate('🍮', t('onboarding.secretUnlocked'));
+      setSecretUnlocked(true);
+      celebrate('🍮', t('onboarding.secretUnlocked', { name: personal.secretCompanionName }));
     }
   };
 

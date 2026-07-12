@@ -12,6 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { tap } from '@/utils/feedback';
 
@@ -21,7 +22,7 @@ import {
   PP_FRAMES,
   type PPActionId,
   type PPFrame,
-} from './secret';
+} from './secretCompanion';
 
 type Props = {
   /** Rendered height in px; width follows the frame aspect. */
@@ -51,7 +52,7 @@ const isNightNow = () => {
 const SIT_AFTER_MS = 10_000;
 
 /**
- * The secret Secret companion. Idle standing with random blinks and the
+ * The secret companion. Idle standing with random blinks and the
  * occasional lean / sit-down; sits and nibbles a cookie, shows the hamster or
  * pancakes, or turns around to wave; sleeps at night; sad (and eventually
  * sad-sitting) past 80% of the quota. Tapping always bounces in any state, but
@@ -344,7 +345,7 @@ export function SecretCompanion({
       <Animated.View
         style={[{ width: W, height: H }, bodyStyle]}
         accessibilityRole="image"
-        accessibilityLabel="Secret"
+        accessibilityLabel={personal.secretCompanionName}
       >
         <Image
           source={PP_FRAMES[frame]}

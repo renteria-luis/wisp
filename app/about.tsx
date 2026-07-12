@@ -54,7 +54,7 @@ export default function About() {
       // Activate God mode.
       router.push('/godmode');
     } else if (c === '5131') {
-      // Toggle Secret (Secret) mode ↔ normal, with a self-fading popup.
+      // Toggle the secret companion ↔ normal, with a self-fading popup.
       const next = !useSettings.getState().secretCompanionUnlocked;
       useSettings.getState().setSecretCompanionUnlocked(next);
       celebrate(next ? '🍮' : '🐰', t(next ? 'egg.secretOn' : 'egg.secretOff'));

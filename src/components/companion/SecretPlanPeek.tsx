@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { personal } from '@/personal/personal.config';
 import { useSettings } from '@/store/useSettings';
 
 const PEEK = require('../../../assets/companion/secret/plan_peek.png');
@@ -16,7 +17,7 @@ const PEEK_BLINK = require('../../../assets/companion/secret/plan_peek_blink.png
 const ASPECT = 900 / 478;
 
 /**
- * Secret Secret peeking up from the bottom of the Plan screen, blinking at
+ * The secret companion peeking up from the bottom of the Plan screen, blinking at
  * a random 2–5s cadence, with a small hand-written love note tucked into the
  * bottom-right corner. Only rendered once the secret companion is unlocked.
  */
@@ -93,7 +94,7 @@ export function SecretPlanPeek() {
         className="absolute bottom-3 right-3 text-right text-xs leading-4 text-ink-mute dark:text-neutral-400"
       >
         made{'\n'}with <Text className="text-accent-500">♥</Text>
-        {'\n'}for Tiffani
+        {'\n'}for {personal.dedicateeName}
       </Text>
     </View>
   );

@@ -8,6 +8,13 @@
 export const personal = {
   appName: 'Wisp',
   companionDefaultName: 'Wisp',
+
+  /**
+   * The secret companion revealed by the hidden unlock. Its name lives HERE and
+   * nowhere else — no other file, and no locale string, may name it — so a
+   * public build stays a one-file swap and carries no one else's trademark.
+   */
+  secretCompanionName: 'Sunny',
   dedicateeName: 'Tiffani',
   authorName: 'Luis',
   dedicationLine: 'Made with ♥ for Tiffani',

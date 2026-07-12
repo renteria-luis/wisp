@@ -132,7 +132,7 @@
       "greeting": "Hi {{name}} — we'll do this together."
     },
     "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress.",
-    "secretUnlocked": "Secret unlocked — just for you"
+    "secretUnlocked": "{{name}} unlocked — just for you"
   },
   "gender": {
     "female": "Female",
@@ -187,7 +187,6 @@
     "nextMilestone": "Next health milestone",
     "noPlan": "No plan yet — finish onboarding to get started.",
     "ebooks": "📚 Free reads",
-    "secretLove": "made with ❤️ for Tiffani",
     "remainingToday": "You have left today",
     "overBy": "Over by {{count}} 💛",
     "smokedOf": "{{count}} of {{allowance}} today",
