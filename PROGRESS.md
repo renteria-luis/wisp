@@ -45,13 +45,12 @@ left is release, not features.
   2. **Paid ($99/yr)** — `eas.json` profiles → EAS build → **TestFlight**. No
      weekly refresh, no VPN. This is the cleaner long-term path.
 - Add the four screenshots the README embeds (`docs/screenshots/`).
-- Companion art: finish the AI-generated originals (see the note below).
 
 ## Notes / deviations from PROJECT.md
 
 - **Companion art is a work in progress.** The sprite system is built and
-  driven by vitality; the original characters still need a final art pass
-  (borderless regeneration plus a ground shadow). Not a blocker.
+  driven by vitality; the characters still deserve a final art pass. Not a
+  blocker.
 - **Trigger windows use per-category defaults**; a precise per-window editor
   (e.g. two 15-minute breaks and one 30-minute break in a shift) is still
   future polish.
@@ -62,9 +61,11 @@ left is release, not features.
   on but `tsc`/CI run with `.expo/types` absent; charts are hand-built with
   SVG + Reanimated; route files default-export, shared modules are named.
 
-## Image assets — read before making the repo public
+## A note on the artwork
 
-`assets/` contains third-party character artwork used for a **private, personal
-build**. It is excluded from the MIT licence (see `LICENSE`), but a licence note
-is not a licence to redistribute: if this repo goes public as a portfolio piece,
-either remove that artwork from the public history or keep the repo private.
+Every image in `assets/` is original to this project. An earlier build carried a
+secret companion drawn from third-party character art, kept for one private,
+personal install — it was never something a public repository could hold, and a
+licence note is not a licence to redistribute. It has been removed from the code
+and from the history, and the personal build that keeps it is generated
+separately and lives nowhere near this repo.

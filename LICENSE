@@ -26,6 +26,7 @@ NOTE ON ASSETS
 
 This licence covers the SOURCE CODE only.
 
-Image assets under `assets/` are NOT covered by it and are NOT redistributable.
-Some are third-party artwork included solely for a private, personal build and
-remain the property of their respective owners. Do not reuse them.
+The artwork under `assets/` -- the companion characters, their cosmetics, and
+the app icon -- is original to this project and remains (c) 2026 Luis Renteria.
+It is not covered by the licence above. Read the code, learn from it, reuse it;
+please leave the drawings alone.

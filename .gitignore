@@ -24,9 +24,6 @@ expo-env.d.ts
 # testing
 coverage/
 
-# local tool settings
-.the agent/settings.json
-
 # debug
 npm-debug.*
 yarn-debug.*

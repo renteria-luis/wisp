@@ -522,16 +522,15 @@ without touching their real data. Only Phase 8 remains.
 
 ---
 
-## 21. how this gets built
+## 21. How this gets built
 
-1. Put this `PROJECT.md` at the repo root. Create an empty `PROGRESS.md`.
-2. Each session, start with: **"Read PROJECT.md and PROGRESS.md. Continue with Phase N."** (Start at Phase 0.)
-3. the agent should: create the phase branch, implement the phase, run `lint + typecheck + test`, commit in small conventional commits, open/merge the PR, then **update PROGRESS.md** with what's done and the exact next step.
-4. Do **one phase per session.** Always leave the repo runnable and committed. Never start a phase without finishing/committing the previous one cleanly.
-5. Do not change architecture decisions in this document silently — if something here turns out to be wrong or better, flag it in `PROGRESS.md` and note the change.
-6. Because the real context lives in the repo + these two files, session/token limits never lose work: a fresh session re-reads them and resumes.
+The whole project runs off two files: **this one** (what we are building and why) and **`PROGRESS.md`** (where we are). Everything else is derivable from the repo, so no context ever lives only in someone's head.
 
-**`PROGRESS.md` format :**
+1. **One phase at a time.** Branch, implement, run `lint + typecheck + test`, commit in small conventional commits, merge, then update `PROGRESS.md` with what landed and the exact next step.
+2. **Every phase ends runnable.** Never start one without finishing and committing the last cleanly — so the repo is always in a state you could hand to someone else.
+3. **Architecture decisions are not changed silently.** If something in this document turns out to be wrong, or there is a better way, say so in `PROGRESS.md` and record the change.
+
+**`PROGRESS.md` format:**
 
 ```
 # PROGRESS

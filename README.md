@@ -138,7 +138,7 @@ The recovery timeline shows standard, cited public-health information and is **n
 
 Source code: [MIT](./LICENSE).
 
-Image assets under `assets/` are **not** covered by it and are not redistributable — some are third-party artwork included only for a private personal build.
+The artwork — the companion characters, their cosmetics, the app icon — is original to this project and **isn't** covered by it. Read the code, learn from it, reuse it; please leave the drawings alone.
 
 ---
 
