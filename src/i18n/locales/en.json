@@ -131,8 +131,7 @@
       "confirm": "Start my plan",
       "greeting": "Hi {{name}} — we'll do this together."
     },
-    "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress.",
-    "secretUnlocked": "{{name}} unlocked — just for you"
+    "sincere": "Be honest with yourself — this only works if your logs are real. No judgment here, just you and your progress."
   },
   "gender": {
     "female": "Female",
@@ -773,9 +772,7 @@
     "madeBy": "Made by {{name}}"
   },
   "egg": {
-    "title": "Easter egg",
-    "secretOn": "Secret mode on",
-    "secretOff": "Normal mode on"
+    "title": "Easter egg"
   },
   "godmode": {
     "title": "God Mode 🔧",

@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
@@ -12,8 +11,6 @@ import Animated, {
 
 import { WispCircle } from '@/components/companion/WispCircle';
 
-const PP_HEAD = require('../../../assets/companion/secret/plan_peek.png');
-
 // Matches the native splash background (app.config `expo-splash-screen`), so the
 // hand-off from the native splash to this JS one is seamless — no black gap.
 const SPLASH_BG = '#faf6ef';
@@ -21,9 +18,9 @@ const SPLASH_BG = '#faf6ef';
 type Props = {
   /** Load finished — fade the splash out and reveal the app underneath. */
   done: boolean;
-  /** Whether the secret companion is unlocked; `null` until settings hydrate,
-   *  so the logo only appears once we know which one to show. */
-  unlocked: boolean | null;
+  /** True once settings have hydrated, so the logo only fades in when the app
+   *  actually knows what it is about to show. */
+  ready: boolean;
   /** Called after the fade-out completes so the parent can unmount this. */
   onHidden: () => void;
 };
@@ -34,7 +31,7 @@ type Props = {
  * JS-first-frame hand-off so the launch feels smooth instead of flashing black,
  * then cross-fades to reveal the app. A warm resume never re-mounts this.
  */
-export function AppSplash({ done, unlocked, onHidden }: Props) {
+export function AppSplash({ done, ready, onHidden }: Props) {
   const opacity = useSharedValue(1);
   const logo = useSharedValue(0);
   const hidNative = useRef(false);
@@ -46,12 +43,15 @@ export function AppSplash({ done, unlocked, onHidden }: Props) {
     SplashScreen.hideAsync().catch(() => {});
   };
 
-  // Fade the logo in once we know which one to show (after settings hydrate).
+  // Fade the logo in once settings have hydrated.
   useEffect(() => {
-    if (unlocked !== null) {
-      logo.value = withTiming(1, { duration: 260, easing: Easing.out(Easing.cubic) });
+    if (ready) {
+      logo.value = withTiming(1, {
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+      });
     }
-  }, [unlocked, logo]);
+  }, [ready, logo]);
 
   // Fade the whole splash out when loading finishes, then unmount.
   useEffect(() => {
@@ -86,16 +86,7 @@ export function AppSplash({ done, unlocked, onHidden }: Props) {
       ]}
     >
       <Animated.View style={logoStyle}>
-        {unlocked === true ? (
-          <Image
-            source={PP_HEAD}
-            style={{ width: 168, height: 168 }}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-          />
-        ) : unlocked === false ? (
-          <WispCircle size={132} />
-        ) : null}
+        {ready ? <WispCircle size={132} /> : null}
       </Animated.View>
     </Animated.View>
   );

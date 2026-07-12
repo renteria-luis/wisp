@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { cravingLift } from '@/components/companion/cravingLift';
 import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
-import { SecretCompanion } from '@/components/companion/SecretCompanion';
 import { SpeechBubble } from '@/components/companion/SpeechBubble';
 import {
   CHARACTER_SPRITES,
@@ -62,25 +61,12 @@ export default function Home() {
   const setCharacter = useCompanion((s) => s.setCharacter);
   const name = userName || personal.dedicateeName;
 
-  // The secret companion (unlocked in onboarding) replaces the creatures.
-  const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
-  const [secretTrigger, setSecretTrigger] = useState(0);
   // The craving sheet sets a coach context while it's open — the companion
   // stands and shuts its eyes to breathe along until it closes.
   const cravingActive = useCoach((s) => s.context) != null;
 
-  // When the secret companion is unlocked, adopt its name by default — unless
-  // the user has already chosen a custom one.
-  useEffect(() => {
-    if (
-      secretCompanionUnlocked &&
-      (!companionName || companionName === personal.companionDefaultName)
-    ) {
-      useSettings.getState().setCompanionName(personal.secretCompanionName);
-    }
-  }, [secretCompanionUnlocked, companionName]);
-  // PP smoothly lifts up while the craving sheet is open (driven by that
-  // screen's mount/unmount via the shared `cravingLift` value).
+  // The companion smoothly lifts up while the craving sheet is open (driven by
+  // that screen's mount/unmount via the shared `cravingLift` value).
   const liftStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: cravingLift.value * -110 }],
   }));
@@ -221,7 +207,10 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
+    <SafeAreaView
+      className="flex-1 bg-cream dark:bg-neutral-950"
+      edges={['top']}
+    >
       <View className="flex-row items-center justify-end gap-1 px-5 pt-1">
         <Pressable
           onPress={() => setReplayAsk(true)}
@@ -247,52 +236,41 @@ export default function Home() {
         <Animated.View
           style={[{ width: '100%', alignItems: 'center' }, liftStyle]}
         >
-        <SpeechBubble text={companionLine} />
-        <View className="mt-2">
-          <Pressable
-            onPress={() =>
-              secretCompanionUnlocked
-                ? setSecretTrigger((n) => n + 1)
-                : setPickerOpen(true)
-            }
-            onPressIn={() => setHoldClose(true)}
-            onPressOut={() => setHoldClose(false)}
-            onLongPress={onCompanionLongPress}
-            delayLongPress={300}
-            accessibilityRole="image"
-            accessibilityLabel={companionName}
-          >
-            {secretCompanionUnlocked ? (
-              <SecretCompanion
-                actionTrigger={secretTrigger}
-                sad={companionSad}
-                cravingActive={cravingActive}
-                holdClose={holdClose}
-              />
-            ) : hasSprite(equipped.character) ? (
-              <SpriteCompanion
-                character={equipped.character!}
-                sad={companionSad}
-                cravingActive={cravingActive}
-                holdClose={holdClose}
-              />
-            ) : (
-              <WispCircle />
-            )}
-          </Pressable>
-        </View>
-
-        {status ? (
-          <View className="mt-8 rounded-full bg-primary-100 px-5 py-2">
-            {/* explicit family: iOS won't synthesise a bold weight for Changa */}
-            <Text
-              className="text-primary-700"
-              style={{ fontFamily: 'Changa_700Bold', fontSize: 15 }}
+          <SpeechBubble text={companionLine} />
+          <View className="mt-2">
+            <Pressable
+              onPress={() => setPickerOpen(true)}
+              onPressIn={() => setHoldClose(true)}
+              onPressOut={() => setHoldClose(false)}
+              onLongPress={onCompanionLongPress}
+              delayLongPress={300}
+              accessibilityRole="image"
+              accessibilityLabel={companionName}
             >
-              {status}
-            </Text>
+              {hasSprite(equipped.character) ? (
+                <SpriteCompanion
+                  character={equipped.character!}
+                  sad={companionSad}
+                  cravingActive={cravingActive}
+                  holdClose={holdClose}
+                />
+              ) : (
+                <WispCircle />
+              )}
+            </Pressable>
           </View>
-        ) : null}
+
+          {status ? (
+            <View className="mt-8 rounded-full bg-primary-100 px-5 py-2">
+              {/* explicit family: iOS won't synthesise a bold weight for Changa */}
+              <Text
+                className="text-primary-700"
+                style={{ fontFamily: 'Changa_700Bold', fontSize: 15 }}
+              >
+                {status}
+              </Text>
+            </View>
+          ) : null}
         </Animated.View>
       </View>
 
@@ -381,7 +359,9 @@ export default function Home() {
                   setPickerOpen(false);
                 }}
                 accessibilityRole="button"
-                accessibilityState={{ selected: !hasSprite(equipped.character) }}
+                accessibilityState={{
+                  selected: !hasSprite(equipped.character),
+                }}
                 className={`items-center rounded-2xl border p-2 ${
                   !hasSprite(equipped.character)
                     ? 'border-primary-500 bg-primary-50 dark:bg-primary-900'

@@ -67,7 +67,6 @@ export function collectAppState(): Record<string, unknown> {
       situationalUntil: settings.situationalUntil,
       seenEggs: settings.seenEggs,
       lastMorningGreet: settings.lastMorningGreet,
-      secretCompanionUnlocked: settings.secretCompanionUnlocked,
       isPremium: settings.isPremium,
       onboardingCompleted: settings.onboardingCompleted,
     },

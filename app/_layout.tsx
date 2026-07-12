@@ -87,7 +87,7 @@ export default function RootLayout() {
   // The in-app loading screen: kept mounted until it has faded out, and told
   // which logo to show once settings hydrate (`null` = not yet known).
   const [splashHidden, setSplashHidden] = useState(false);
-  const [splashUnlocked, setSplashUnlocked] = useState<boolean | null>(null);
+  const [splashReady, setSplashReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Changa_400Regular,
     Changa_500Medium,
@@ -120,10 +120,8 @@ export default function RootLayout() {
           whenHydrated(useOnboarding),
           whenHydrated(useDistractions),
         ]);
-        // Now that settings are loaded, the splash can show the right logo.
-        if (!cancelled) {
-          setSplashUnlocked(useSettings.getState().secretCompanionUnlocked);
-        }
+        // Settings are loaded — the splash can fade its logo in now.
+        if (!cancelled) setSplashReady(true);
         // 2. Apply saved appearance + language before the first frame.
         applySavedTheme();
         applyLanguage(useSettings.getState().language);
@@ -184,71 +182,86 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={[{ flex: 1 }, theme === 'pink' ? PINK_VARS : LIGHT_VARS]}>
         <SafeAreaProvider>
-        <ThemeProvider
-          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-        >
-          {appReady ? (
-            <>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  animation: 'slide_from_right',
-                  animationDuration: 260,
-                }}
-              >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(onboarding)" />
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen
-                  name="log"
-                  options={{
-                    presentation: 'modal',
-                    gestureEnabled: !tourActive,
+          <ThemeProvider
+            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+          >
+            {appReady ? (
+              <>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: 'slide_from_right',
+                    animationDuration: 260,
                   }}
-                />
-                <Stack.Screen
-                  name="manual-log"
-                  options={{ presentation: 'modal' }}
-                />
-                <Stack.Screen
-                  name="craving"
-                  options={{
-                    // A transparent screen so the craving sheet can be a custom,
-                    // JS-gesture-driven half-sheet: the drag directly drives the
-                    // Home companion's lift so it tracks the finger 1:1 (a native
-                    // sheet never exposes the in-progress drag). Home stays
-                    // mounted and visible behind it to coach the user.
-                    presentation: 'transparentModal',
-                    animation: 'none',
-                    gestureEnabled: false,
-                  }}
-                />
-                <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
-                <Stack.Screen
-                  name="wishlist"
-                  options={{
-                    presentation: 'modal',
-                    gestureEnabled: !tourActive,
-                  }}
-                />
-                <Stack.Screen name="ebooks" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="about" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="godmode" options={{ presentation: 'modal' }} />
-              </Stack>
-              <TutorialOverlay scope="root" />
-              {/* Above the tour's dim layer, so a celebration triggered during
+                >
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(onboarding)" />
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen
+                    name="log"
+                    options={{
+                      presentation: 'modal',
+                      gestureEnabled: !tourActive,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="manual-log"
+                    options={{ presentation: 'modal' }}
+                  />
+                  <Stack.Screen
+                    name="craving"
+                    options={{
+                      // A transparent screen so the craving sheet can be a custom,
+                      // JS-gesture-driven half-sheet: the drag directly drives the
+                      // Home companion's lift so it tracks the finger 1:1 (a native
+                      // sheet never exposes the in-progress drag). Home stays
+                      // mounted and visible behind it to coach the user.
+                      presentation: 'transparentModal',
+                      animation: 'none',
+                      gestureEnabled: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="checkin"
+                    options={{ presentation: 'modal' }}
+                  />
+                  <Stack.Screen
+                    name="wishlist"
+                    options={{
+                      presentation: 'modal',
+                      gestureEnabled: !tourActive,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="ebooks"
+                    options={{ presentation: 'modal' }}
+                  />
+                  <Stack.Screen
+                    name="about"
+                    options={{ presentation: 'modal' }}
+                  />
+                  <Stack.Screen
+                    name="settings"
+                    options={{ presentation: 'modal' }}
+                  />
+                  <Stack.Screen
+                    name="godmode"
+                    options={{ presentation: 'modal' }}
+                  />
+                </Stack>
+                <TutorialOverlay scope="root" />
+                {/* Above the tour's dim layer, so a celebration triggered during
                   the tutorial is actually visible. */}
-              <CelebrationOverlay />
-            </>
-          ) : null}
-          <StatusBar style="auto" />
-        </ThemeProvider>
+                <CelebrationOverlay />
+              </>
+            ) : null}
+            <StatusBar style="auto" />
+          </ThemeProvider>
         </SafeAreaProvider>
         {!splashHidden ? (
           <AppSplash
             done={appReady}
-            unlocked={splashUnlocked}
+            ready={splashReady}
             onHidden={() => setSplashHidden(true)}
           />
         ) : null}

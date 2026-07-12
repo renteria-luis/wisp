@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { GiftBuddy } from '@/components/companion/GiftBuddy';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { Button } from '@/components/ui/Button';
@@ -45,7 +44,6 @@ export default function Wishlist() {
   const markBought = useWishlist((s) => s.markBought);
   const celebrate = useCelebration((s) => s.celebrate);
   const currency = useSettings((s) => s.pricing.currency);
-  const secretCompanionUnlocked = useSettings((s) => s.secretCompanionUnlocked);
   // `saved` already reads the sandbox (20 pretend savings) during the tour.
   const { saved } = useProgressData();
 
@@ -219,7 +217,6 @@ export default function Wishlist() {
 
         {sorted.length === 0 ? (
           <View className="mt-6 items-center">
-            {secretCompanionUnlocked ? <GiftBuddy /> : null}
             <Text className="mt-3 text-center text-sm text-ink-mute dark:text-neutral-400">
               {t('wishlist.empty')}
             </Text>

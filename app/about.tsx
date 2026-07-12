@@ -13,8 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { personal } from '@/personal/personal.config';
-import { useCelebration } from '@/store/useCelebration';
-import { useSettings } from '@/store/useSettings';
 import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 
@@ -23,7 +21,6 @@ const VERSION = '1.0.0';
 export default function About() {
   const router = useRouter();
   const { t } = useTranslation();
-  const celebrate = useCelebration((s) => s.celebrate);
 
   // Hidden easter egg: 7 quick taps on the heart open a 4-digit code prompt.
   const taps = useRef(0);
@@ -53,11 +50,6 @@ export default function About() {
     if (c === '3019') {
       // Activate God mode.
       router.push('/godmode');
-    } else if (c === '5131') {
-      // Toggle the secret companion ↔ normal, with a self-fading popup.
-      const next = !useSettings.getState().secretCompanionUnlocked;
-      useSettings.getState().setSecretCompanionUnlocked(next);
-      celebrate(next ? '🍮' : '🐰', t(next ? 'egg.secretOn' : 'egg.secretOff'));
     }
     // Any other code: silently closed.
   };
@@ -128,7 +120,9 @@ export default function About() {
             </Text>
             <TextInput
               value={code}
-              onChangeText={(v) => setCode(v.replace(/[^0-9]/g, '').slice(0, 4))}
+              onChangeText={(v) =>
+                setCode(v.replace(/[^0-9]/g, '').slice(0, 4))
+              }
               keyboardType="number-pad"
               maxLength={4}
               autoFocus
@@ -139,12 +133,20 @@ export default function About() {
               className="mt-4 rounded-xl border border-neutral-200 px-4 py-3 text-center text-2xl tracking-[8px] text-ink"
             />
             <View className="mt-5 flex-row justify-end gap-6">
-              <Pressable onPress={closeCode} accessibilityRole="button" hitSlop={8}>
+              <Pressable
+                onPress={closeCode}
+                accessibilityRole="button"
+                hitSlop={8}
+              >
                 <Text className="text-base font-medium text-ink-mute">
                   {t('common.cancel')}
                 </Text>
               </Pressable>
-              <Pressable onPress={submitCode} accessibilityRole="button" hitSlop={8}>
+              <Pressable
+                onPress={submitCode}
+                accessibilityRole="button"
+                hitSlop={8}
+              >
                 <Text className="text-base font-semibold text-primary-600">
                   {t('common.ok')}
                 </Text>

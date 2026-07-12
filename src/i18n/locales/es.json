@@ -131,8 +131,7 @@
       "confirm": "Empezar mi plan",
       "greeting": "Hola {{name}} — lo haremos juntas."
     },
-    "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso.",
-    "secretUnlocked": "{{name}} desbloqueado — solo para ti"
+    "sincere": "Sé honesto/a contigo: esto solo funciona si tus registros son reales. Aquí no hay juicios, solo tú y tu progreso."
   },
   "gender": {
     "female": "Mujer",
@@ -773,9 +772,7 @@
     "madeBy": "Hecho por {{name}}"
   },
   "egg": {
-    "title": "Easter egg",
-    "secretOn": "Modo secreto activado",
-    "secretOff": "Modo normal activado"
+    "title": "Easter egg"
   },
   "godmode": {
     "title": "Modo Dios 🔧",

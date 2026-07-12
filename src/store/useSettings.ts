@@ -42,9 +42,6 @@ interface SettingsState {
   theme: 'system' | 'light' | 'dark' | 'pink';
   /** ISO date the morning greeting was last shown (so it shows once a day). */
   lastMorningGreet: string | null;
-  /** The secret companion, unlocked by a hidden tap in onboarding. Its name
-   *  lives in personal.config and nowhere else. */
-  secretCompanionUnlocked: boolean;
   /** ISO date up to which missed-log days have been reviewed (so we don't
    *  keep asking about the same gap). */
   missedReviewedUntil: string | null;
@@ -71,7 +68,6 @@ interface SettingsState {
   markEggSeen: (id: string) => void;
   setTheme: (theme: 'system' | 'light' | 'dark' | 'pink') => void;
   setLastMorningGreet: (iso: string | null) => void;
-  setSecretCompanionUnlocked: (unlocked: boolean) => void;
   setMissedReviewedUntil: (iso: string | null) => void;
   setTrendRange: (range: TrendRange) => void;
   setTutorialCompleted: (completed: boolean) => void;
@@ -102,7 +98,6 @@ const initialState = {
   seenEggs: [] as string[],
   theme: 'system' as 'system' | 'light' | 'dark' | 'pink',
   lastMorningGreet: null as string | null,
-  secretCompanionUnlocked: false,
   missedReviewedUntil: null as string | null,
   trendRange: 'week' as TrendRange,
   tutorialCompleted: false,
@@ -134,8 +129,6 @@ export const useSettings = create<SettingsState>()(
         ),
       setTheme: (theme) => set({ theme }),
       setLastMorningGreet: (lastMorningGreet) => set({ lastMorningGreet }),
-      setSecretCompanionUnlocked: (secretCompanionUnlocked) =>
-        set({ secretCompanionUnlocked }),
       setMissedReviewedUntil: (missedReviewedUntil) =>
         set({ missedReviewedUntil }),
       setTrendRange: (trendRange) => set({ trendRange }),
@@ -146,11 +139,6 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'wisp-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      // NOTE: renaming `secretCompanionUnlocked` deliberately ships WITHOUT a
-      // migration. Reading the old key across would mean naming it here, which
-      // is the one thing this rename exists to stop — and the app has never
-      // shipped, so the only cost is that a dev install forgets the unlock.
-      // Re-enable it from About. Do not "fix" this by adding the old name back.
       version: 1,
     },
   ),

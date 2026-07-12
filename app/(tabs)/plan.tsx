@@ -8,7 +8,6 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { SecretPlanPeek } from '@/components/companion/SecretPlanPeek';
 import { MilestoneDetailModal } from '@/components/health/MilestoneDetailModal';
 import { useTutorialTarget } from '@/components/tutorial/useTutorialTarget';
 import { AllowanceBars } from '@/components/ui/AllowanceBars';
@@ -251,7 +250,6 @@ export default function Plan() {
 
         {/* Last item: at the bottom of the scroll its face meets the tab bar;
             scrolling up carries it away so it never covers the button. */}
-        <SecretPlanPeek />
       </ScrollView>
 
       {detail ? (
