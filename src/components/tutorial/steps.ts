@@ -171,18 +171,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     button: { labelKey: 'home.cravingAction', variant: 'primary' },
   },
   {
+    // One step: the three tools cycle on their own (and stay lit) while the
+    // spotlight sits on "I resisted" — which the sheet keeps disabled until a
+    // full pass through the tools has played, so nobody skips the demo.
     key: 'craving2',
-    target: 'craving-tools',
-    scope: 'modal',
-    modal: 'craving',
-    nav: '/home',
-    tip: 'top',
-    auto: true,
-  },
-  {
-    key: 'craving3',
     target: 'craving-resisted',
-    // Keep the three tools lit (they carry on cycling) while we point at the win.
     alsoLit: 'craving-tools',
     scope: 'modal',
     modal: 'craving',
@@ -192,9 +185,6 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // The real button takes the tap (same screen as this overlay), so it plays
     // its normal celebration.
     passThrough: true,
-    // Back would land on the self-advancing tools demo, which would just push
-    // us straight back here — return to the craving button instead.
-    backToKey: 'craving',
   },
   { key: 'done', target: null, nav: '/home', sandbox: 'reset' },
 ];

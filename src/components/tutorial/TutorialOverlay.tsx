@@ -118,9 +118,14 @@ export function TutorialOverlay({
   // Step side-effects: keep the right nav state, run sandbox effects, scroll.
   // Root instance only, guarded so it fires once per step (re-runs on Back too).
   const lastStep = useRef(-1);
+  // Which tab we already put them on. Re-navigating to the tab you're already
+  // standing on is a no-op that still costs a wait — and steps 8/9 (both on
+  // Progress) paid it in both directions, which read as a long dead pause.
+  const navAt = useRef<string | null>(null);
   useEffect(() => {
     if (!active) {
       lastStep.current = -1;
+      navAt.current = null;
       return;
     }
     if (scope !== 'root') return;
@@ -156,8 +161,9 @@ export function TutorialOverlay({
       //    modal this step wants (then the tab underneath is already right).
       const stayingInModal =
         want !== null && useTutorial.getState().openModal === want;
-      if (step.nav && !stayingInModal) {
+      if (step.nav && !stayingInModal && navAt.current !== step.nav) {
         router.navigate(step.nav as Href);
+        navAt.current = step.nav;
         await wait(220);
         if (dead()) return;
       }
@@ -179,17 +185,19 @@ export function TutorialOverlay({
       if (step.sandbox === 'clearWish')
         useTutorialSandbox.getState().clearWishlist();
       if (step.scrollScreen && step.target) {
-        await wait(120);
-        for (let i = 0; i < 16; i++) {
+        await wait(50);
+        for (let i = 0; i < 20; i++) {
           if (dead()) return;
           const rr = useTutorial.getState().rects[step.target];
           if (rr) {
             useTutorial.getState().scrollers[step.scrollScreen]?.(rr.y);
             break;
           }
-          await wait(80);
+          await wait(50);
         }
-        await wait(320); // let the scroll animation settle before revealing
+        // The spotlight may be revealed while the scroll is still gliding — the
+        // target is re-measured continuously, so the hole simply rides with it.
+        await wait(140);
       }
       if (dead()) return;
       useTutorial.getState().setTransitioning(false);
@@ -419,11 +427,14 @@ export function TutorialOverlay({
                   </Text>
                 </Pressable>
               ) : null}
-              <Pressable onPress={finish} hitSlop={8} accessibilityRole="button">
-                <Text className="text-sm font-medium text-ink-mute dark:text-neutral-400">
-                  {t('tutorial.skip')}
-                </Text>
-              </Pressable>
+              {/* Nothing left to skip on the closing card — only "Done". */}
+              {isLast ? null : (
+                <Pressable onPress={finish} hitSlop={8} accessibilityRole="button">
+                  <Text className="text-sm font-medium text-ink-mute dark:text-neutral-400">
+                    {t('tutorial.skip')}
+                  </Text>
+                </Pressable>
+              )}
             </View>
             {forced ? (
               <Text className="text-xs font-medium text-primary-600">

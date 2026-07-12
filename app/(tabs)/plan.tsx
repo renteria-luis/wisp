@@ -3,7 +3,10 @@ import { Gift } from 'phosphor-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import { SecretPlanPeek } from '@/components/companion/SecretPlanPeek';
 import { MilestoneDetailModal } from '@/components/health/MilestoneDetailModal';
@@ -70,7 +73,10 @@ export default function Plan() {
     : null;
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-neutral-950" edges={['top']}>
+    <SafeAreaView
+      className="flex-1 bg-cream dark:bg-neutral-950"
+      edges={['top']}
+    >
       <ScrollView
         ref={scrollRef}
         onScroll={(e) => {
@@ -88,8 +94,15 @@ export default function Plan() {
           </Text>
         </View>
 
-        {/* Journey progress */}
-        <View ref={journeyTarget.ref} onLayout={journeyTarget.onLayout}>
+        {/* The tour spotlights this whole block: the journey bar AND what it
+            drives — today's allowance and the week ahead are all "the plan".
+            `gap-4` keeps the cards spaced exactly as the ScrollView did. */}
+        <View
+          ref={journeyTarget.ref}
+          onLayout={journeyTarget.onLayout}
+          className="gap-4"
+        >
+          {/* Journey progress */}
           <Card>
             <View className="mb-2 flex-row items-baseline justify-between">
               <Text className="text-sm font-medium text-ink-soft dark:text-neutral-300">
@@ -104,63 +117,65 @@ export default function Plan() {
             </View>
             <ProgressBar progress={journeyPct} height={10} />
           </Card>
-        </View>
 
-        {isReduction ? (
-          <>
-            <Card>
-              <View className="flex-row items-end justify-between">
-                <View>
-                  <Text className="text-sm text-ink-soft dark:text-neutral-300">
-                    {t('plan.remainingToday')}
-                  </Text>
-                  <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
-                    {Math.max(0, remaining)}
-                  </Text>
-                  {remaining < 0 ? (
-                    <Text className="mt-0.5 text-xs font-semibold text-accent-600 dark:text-accent-300">
-                      {t('plan.overBy', { count: -remaining })}
+          {isReduction ? (
+            <>
+              <Card>
+                <View className="flex-row items-end justify-between">
+                  <View>
+                    <Text className="text-sm text-ink-soft dark:text-neutral-300">
+                      {t('plan.remainingToday')}
                     </Text>
-                  ) : (
-                    <View className="mt-1.5 flex-row items-baseline">
-                      <Text className="text-lg font-bold text-primary-600 dark:text-primary-300">
-                        {todayCigarettes}
+                    <Text className="text-4xl font-bold text-ink dark:text-neutral-50">
+                      {Math.max(0, remaining)}
+                    </Text>
+                    {remaining < 0 ? (
+                      <Text className="mt-0.5 text-xs font-semibold text-accent-600 dark:text-accent-300">
+                        {t('plan.overBy', { count: -remaining })}
                       </Text>
-                      <Text className="mx-1 text-sm text-ink-mute dark:text-neutral-500">
-                        /
-                      </Text>
-                      <Text className="text-lg font-semibold text-ink-soft dark:text-neutral-300">
-                        {allowance}
-                      </Text>
-                      <Text className="ml-2 text-[10px] uppercase tracking-[2px] text-ink-mute dark:text-neutral-500">
-                        {t('plan.todayShort')}
-                      </Text>
-                    </View>
-                  )}
+                    ) : (
+                      <View className="mt-1.5 flex-row items-baseline">
+                        <Text className="text-lg font-bold text-primary-600 dark:text-primary-300">
+                          {todayCigarettes}
+                        </Text>
+                        <Text className="mx-1 text-sm text-ink-mute dark:text-neutral-500">
+                          /
+                        </Text>
+                        <Text className="text-lg font-semibold text-ink-soft dark:text-neutral-300">
+                          {allowance}
+                        </Text>
+                        <Text className="ml-2 text-[10px] uppercase tracking-[2px] text-ink-mute dark:text-neutral-500">
+                          {t('plan.todayShort')}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="text-sm text-ink-mute dark:text-neutral-400">
+                    {t('plan.targetDate')}: {formatMedium(plan.targetDate)}
+                  </Text>
                 </View>
-                <Text className="text-sm text-ink-mute dark:text-neutral-400">
-                  {t('plan.targetDate')}: {formatMedium(plan.targetDate)}
-                </Text>
-              </View>
-            </Card>
+              </Card>
 
+              <Card>
+                <Text className="mb-4 text-sm font-medium text-ink-soft dark:text-neutral-300">
+                  {t('plan.weekAhead')}
+                </Text>
+                <AllowanceBars allowances={upcoming} max={plan.baseline} />
+              </Card>
+            </>
+          ) : (
             <Card>
-              <Text className="mb-4 text-sm font-medium text-ink-soft dark:text-neutral-300">
-                {t('plan.weekAhead')}
+              <Text className="text-base font-semibold text-ink dark:text-neutral-50">
+                {t('plan.smokeFreeSince', {
+                  date: formatMedium(plan.startDate),
+                })}
               </Text>
-              <AllowanceBars allowances={upcoming} max={plan.baseline} />
+              <Text className="mt-2 text-sm leading-5 text-ink-soft dark:text-neutral-300">
+                {t('plan.criticalWindow', { days: plan.nDays })}
+              </Text>
             </Card>
-          </>
-        ) : (
-          <Card>
-            <Text className="text-base font-semibold text-ink dark:text-neutral-50">
-              {t('plan.smokeFreeSince', { date: formatMedium(plan.startDate) })}
-            </Text>
-            <Text className="mt-2 text-sm leading-5 text-ink-soft dark:text-neutral-300">
-              {t('plan.criticalWindow', { days: plan.nDays })}
-            </Text>
-          </Card>
-        )}
+          )}
+        </View>
 
         {/* Savings so far + wishlist preview */}
         <Card>
@@ -182,7 +197,9 @@ export default function Plan() {
                 <Text
                   className={`text-xs ${g.reached ? 'font-bold text-primary-600' : 'text-ink-mute dark:text-neutral-400'}`}
                 >
-                  {g.reached ? t('wishlist.reached') : `${Math.round(g.pct * 100)}%`}
+                  {g.reached
+                    ? t('wishlist.reached')
+                    : `${Math.round(g.pct * 100)}%`}
                 </Text>
               </View>
               <View className="mt-1">

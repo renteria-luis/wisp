@@ -68,25 +68,27 @@ export default function Craving() {
   );
   const toolsTarget = useTutorialTarget('craving-tools');
   const resistedTarget = useTutorialTarget('craving-resisted');
-  // Keep cycling the three tools (3s each) for as long as the tour is showing
-  // the craving sheet — it keeps demoing while the user reads the last step.
+  // The tour demos the three tools by cycling them itself (2s each), and keeps
+  // cycling while the user reads. "I resisted" only unlocks once a full pass has
+  // played — otherwise the demo could be skipped before it has shown anything.
+  const [demoDone, setDemoDone] = useState(false);
   useEffect(() => {
-    if (tourStepKey !== 'craving2' && tourStepKey !== 'craving3') return;
+    if (tourStepKey !== 'craving2') {
+      setDemoDone(false);
+      return;
+    }
     const order: Tool[] = ['breathe', 'wait', 'distract'];
     let i = 0;
     setTool(order[0]!);
-    const id = setInterval(() => {
+    const cycle = setInterval(() => {
       i = (i + 1) % order.length;
       setTool(order[i]!);
     }, 2000);
-    return () => clearInterval(id);
-  }, [tourStepKey]);
-
-  // One full pass through the tools (3 × 2s), then the tour moves on by itself.
-  useEffect(() => {
-    if (tourStepKey !== 'craving2') return;
-    const id = setTimeout(() => useTutorial.getState().next(), 6000);
-    return () => clearTimeout(id);
+    const unlock = setTimeout(() => setDemoDone(true), 3 * 2000);
+    return () => {
+      clearInterval(cycle);
+      clearTimeout(unlock);
+    };
   }, [tourStepKey]);
 
   // The sheet covers this much of the screen; Home peeks (and coaches) above it.
@@ -259,7 +261,7 @@ export default function Craving() {
               <Button
                 label={t('craving.resisted')}
                 onPress={onResisted}
-                disabled={saving}
+                disabled={saving || (tourOn && !demoDone)}
               />
             </View>
           </View>
