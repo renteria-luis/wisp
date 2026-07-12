@@ -2,12 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type {
-  CurveType,
-  Gender,
-  TrackPreference,
-  Track,
-  TriggerCategory,
+import {
+  type CurveType,
+  DEFAULT_CIGS_PER_PACK,
+  DEFAULT_CURRENCY,
+  type Gender,
+  type Track,
+  type TrackPreference,
+  type TriggerCategory,
 } from '@/types/domain';
 
 /** In-progress onboarding answers. Persisted so a half-finished flow resumes. */
@@ -40,8 +42,8 @@ const initialDraft: OnboardingDraft = {
   name: '',
   cigarettesPerDay: null,
   packPrice: null,
-  cigsPerPack: 20,
-  currency: 'USD',
+  cigsPerPack: DEFAULT_CIGS_PER_PACK,
+  currency: DEFAULT_CURRENCY,
   gender: null,
   age: null,
   yearsSmoking: null,

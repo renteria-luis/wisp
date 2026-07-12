@@ -6,6 +6,7 @@ import { NumberField } from '@/components/ui/NumberField';
 import { OnboardingStep } from '@/components/ui/OnboardingStep';
 import { OptionChip } from '@/components/ui/OptionChip';
 import { useOnboarding } from '@/store/useOnboarding';
+import { DEFAULT_CIGS_PER_PACK } from '@/types/domain';
 
 const CURRENCIES = ['CAD', 'PEN', 'USD'];
 
@@ -48,7 +49,7 @@ export default function Consumption() {
       <NumberField
         label={t('onboarding.consumption.cigsPerPack')}
         value={cigsPerPack}
-        onChange={(v) => patch({ cigsPerPack: v ?? 20 })}
+        onChange={(v) => patch({ cigsPerPack: v ?? DEFAULT_CIGS_PER_PACK })}
         placeholder="20"
       />
       <View>

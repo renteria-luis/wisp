@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useNavOnce } from '@/hooks/useNavOnce';
+
 import { Button } from './Button';
 import { KeyboardAvoider } from './KeyboardAvoider';
 import { ProgressDots } from './ProgressDots';
@@ -35,6 +37,10 @@ export function OnboardingStep({
 }: Props) {
   const router = useRouter();
   const { t } = useTranslation();
+  // Both feet go through the same door: one departure per visit, whichever way
+  // it is. An impatient double-tap used to stack the next screen twice — and a
+  // Next landing on top of a Back would have been worse still.
+  const leave = useNavOnce();
 
   return (
     <SafeAreaView
@@ -68,14 +74,14 @@ export function OnboardingStep({
             <Button
               label={t('common.back')}
               variant="secondary"
-              onPress={() => router.back()}
+              onPress={() => leave(() => router.back())}
             />
           </View>
         ) : null}
         <View className="flex-1">
           <Button
             label={nextLabel ?? t('common.next')}
-            onPress={onNext}
+            onPress={() => leave(onNext)}
             disabled={nextDisabled}
           />
         </View>

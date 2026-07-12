@@ -27,7 +27,7 @@ import { applyTheme, type ThemePref } from '@/theme/appearance';
 import { inputText } from '@/theme/inputText';
 import { colors } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/useThemeColors';
-import type { Gender } from '@/types/domain';
+import { DEFAULT_CIGS_PER_PACK, type Gender } from '@/types/domain';
 import { exportAppData, importAppData, wipeAppData } from '@/utils/appData';
 import { tap } from '@/utils/feedback';
 
@@ -277,7 +277,7 @@ export default function Settings() {
           <NumberField
             label={t('settings.cigsPerPack')}
             value={s.pricing.cigsPerPack || null}
-            onChange={(v) => s.setPricing({ cigsPerPack: v ?? 20 })}
+            onChange={(v) => s.setPricing({ cigsPerPack: v ?? DEFAULT_CIGS_PER_PACK })}
           />
           <View>
             <Text className="mb-2 text-sm font-medium text-ink-soft dark:text-neutral-300">

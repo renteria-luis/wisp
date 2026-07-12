@@ -73,9 +73,17 @@ export interface Pricing {
   /** After-tax price of a pack. */
   packPrice: number;
   cigsPerPack: number;
-  /** ISO 4217 currency code, e.g. "USD". */
+  /** ISO 4217 currency code, e.g. "CAD". */
   currency: string;
 }
+
+/** What a pack holds and costs where this is being used, until told otherwise.
+ *  Kept in one place: the number seeds the onboarding draft AND backs the two
+ *  fields that fall back to it when cleared, and those had every chance to
+ *  drift apart. Price is deliberately absent — see the consumption step, which
+ *  refuses to move on without a real one. */
+export const DEFAULT_CIGS_PER_PACK = 25;
+export const DEFAULT_CURRENCY = 'CAD';
 
 /** Companion mood bands derived from the vitality score (§6.4). */
 export type VitalityState = 'exhausted' | 'tired' | 'okay' | 'radiant';

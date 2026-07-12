@@ -4,11 +4,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { SupportedLanguage } from '@/i18n';
 import { personal } from '@/personal/personal.config';
-import type {
-  Pricing,
-  Profile,
-  QuietHours,
-  TriggerCategory,
+import {
+  DEFAULT_CIGS_PER_PACK,
+  DEFAULT_CURRENCY,
+  type Pricing,
+  type Profile,
+  type QuietHours,
+  type TriggerCategory,
 } from '@/types/domain';
 
 /** Span shown by the Progress trend chart. */
@@ -78,7 +80,11 @@ interface SettingsState {
 
 const initialState = {
   profile: {} as Profile,
-  pricing: { packPrice: 0, cigsPerPack: 20, currency: 'USD' } satisfies Pricing,
+  pricing: {
+    packPrice: 0,
+    cigsPerPack: DEFAULT_CIGS_PER_PACK,
+    currency: DEFAULT_CURRENCY,
+  } satisfies Pricing,
   cigarettesPerDay: 0,
   userName: '',
   companionName: personal.companionDefaultName,

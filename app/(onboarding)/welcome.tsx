@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { useNavOnce } from '@/hooks/useNavOnce';
 import { useCelebration } from '@/store/useCelebration';
 import { useOnboarding } from '@/store/useOnboarding';
 import { useSettings } from '@/store/useSettings';
@@ -17,6 +18,7 @@ import { colors } from '@/theme/tokens';
 export default function Welcome() {
   const router = useRouter();
   const { t } = useTranslation();
+  const leave = useNavOnce();
   const name = useOnboarding((s) => s.name);
   const patch = useOnboarding((s) => s.patch);
   const setSecret = useSettings((s) => s.setSecretCompanionUnlocked);
@@ -84,7 +86,7 @@ export default function Welcome() {
       <View className="px-6 pb-4">
         <Button
           label={t('onboarding.getStarted')}
-          onPress={() => router.push('/consumption')}
+          onPress={() => leave(() => router.push('/consumption'))}
           disabled={name.trim() === ''}
         />
       </View>
