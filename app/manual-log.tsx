@@ -13,11 +13,13 @@ import {
   addCigarette,
   countCigarettesOnDate,
 } from '@/data/repositories/cigaretteLog';
+import { backfillPenaltyHours } from '@/engine/health';
+import { allowanceForDay } from '@/engine/planEngine';
 import { useLogs } from '@/store/useLogs';
 import { usePlan } from '@/store/usePlan';
 import { useRecovery } from '@/store/useRecovery';
 import { useVitalityStore } from '@/store/useVitalityStore';
-import { nowISO } from '@/utils/date';
+import { daysBetween, nowISO } from '@/utils/date';
 import { logDev } from '@/utils/logger';
 
 function dayKey(d: Date): string {
@@ -89,8 +91,24 @@ export default function ManualLog() {
     if (toAdd <= 0 || saving) return;
     setSaving(true);
     try {
+      const day = dayKey(date);
       for (let i = 0; i < toAdd; i++) {
         await addCigarette({ timestamp: nowISO(date) });
+      }
+      // A cigarette recorded late is still a cigarette. Knock recovery back by
+      // what these would have cost on the day they were actually smoked —
+      // priced by their place in that day, against THAT day's allowance, which
+      // on a tapering plan is not today's. The cost is deliberately not shown
+      // before you tap: an app that warns you what honesty will cost is an app
+      // that teaches you to lie to it.
+      if (plan) {
+        const allowance = allowanceForDay(
+          plan,
+          Math.max(0, daysBetween(plan.startDate, day)),
+        );
+        useRecovery
+          .getState()
+          .penalize(backfillPenaltyHours(existing, toAdd, allowance));
       }
       await refreshToday().catch(() => {});
       await useVitalityStore.getState().recompute(plan);
@@ -107,7 +125,11 @@ export default function ManualLog() {
         <Text className="text-xl font-bold text-ink dark:text-neutral-50">
           {t('manualLog.title')}
         </Text>
-        <Pressable onPress={() => router.back()} hitSlop={8} className="px-2 py-1">
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={8}
+          className="px-2 py-1"
+        >
           <Text className="text-base font-medium text-primary-600">
             {t('common.close')}
           </Text>

@@ -192,13 +192,54 @@ export function cigarettePenaltyHours(
   // Cold turkey: there is no allowance, so every cigarette is a real slip and
   // each one in the same day stings a little more than the last.
   if (limit <= 0) {
-    return COLD_TURKEY_HOURS * (1 + OVER_QUOTA_GROWTH * Math.max(0, indexToday));
+    return (
+      COLD_TURKEY_HOURS * (1 + OVER_QUOTA_GROWTH * Math.max(0, indexToday))
+    );
   }
   const unit = WITHIN_QUOTA_HOURS / limit;
   if (indexToday < limit) return unit;
   // Over quota: at least OVER_QUOTA_MULT× an in-quota cigarette, escalating.
   const over = indexToday - limit; // 0 for the first cigarette past the limit
   return unit * (OVER_QUOTA_MULT + OVER_QUOTA_GROWTH * over);
+}
+
+/**
+ * Recovery hours lost by backfilling `count` cigarettes onto a day that already
+ * had `alreadyOnDay` of them, against **that day's** allowance.
+ *
+ * It costs exactly what it would have cost had each one been logged as it was
+ * smoked — no more, no less. Three things follow from that, and each is the
+ * point:
+ *
+ * - **Each cigarette is priced by its place in that day.** The 4th of the day
+ *   costs what the 4th costs; adding to a day that already has three is dearer
+ *   than adding to an empty one, and crossing the day's line escalates from
+ *   there. Filling a gap cannot be cheaper than living it honestly.
+ * - **It is that day's allowance, not today's.** On a tapering plan the quota
+ *   falls week by week, so three cigarettes on day 2 may sit inside the line
+ *   while the same three on day 40 are well past it. Judging an old day by
+ *   today's stricter quota would punish someone for the plan having moved on.
+ * - **There is no surcharge for adding several at once.** Recording three at a
+ *   time means three happened that day — not three in one go. The only thing
+ *   this screen is missing is the exact minute, and the app has no business
+ *   inventing a binge out of an honest gap in the log.
+ *
+ * Nor is anything discounted for age: recovery climbs linearly with real time,
+ * so subtracting the hit today lands on precisely the value it would have had
+ * if the hit had landed back then. Logging late is honest, and it is free.
+ */
+export function backfillPenaltyHours(
+  alreadyOnDay: number,
+  count: number,
+  allowance: number,
+): number {
+  const from = Math.max(0, Math.trunc(alreadyOnDay));
+  const n = Math.max(0, Math.trunc(count));
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    total += cigarettePenaltyHours(from + i, allowance);
+  }
+  return total;
 }
 
 /** Live recovery hours = stored base + time since the last update (floored 0). */
