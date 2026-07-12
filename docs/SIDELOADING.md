@@ -1,161 +1,171 @@
 # Putting Wisp on an iPhone for free (sideloading)
 
-This is the **open plan** for installing Wisp on a real iPhone (Tiffani's iPhone 13)
-**without paying the $99/year Apple Developer fee**, using **SideStore** + a
-free Apple ID. Everything here is install/ops tooling — **there is nothing to
-implement inside the Wisp app**; SideStore re-signs the build on the device.
+How to install Wisp on a real iPhone **without paying the $99/year Apple
+Developer fee**, using **SideStore** and a free Apple Account.
 
-There are two paths. We're doing the **free** one for now; the **paid** one is
-documented at the bottom and stays open for later.
+This is install/ops tooling — **there is nothing to implement inside the app**.
+SideStore re-signs the build on the device itself.
 
 ```
 [ GitHub Actions: build unsigned .ipa ]  ->  [ Linux + iLoader: install SideStore ]  ->  [ SideStore: install Wisp, auto-refresh ]
-        (this repo, free, no Mac)                  (one-time, ~30–45 min)                    (wireless, every <7 days)
+        (this repo, free, no Mac)                   (one-time, ~30–45 min)                    (wireless, every <7 days)
 ```
 
----
-
-## TL;DR
-
-1. **Build the IPA** — GitHub → **Actions** → **"iOS unsigned IPA (sideload)"** →
-   **Run workflow**. Download the `wisp-unsigned-ipa` artifact, unzip → `Wisp-unsigned.ipa`.
-2. **One-time setup** — on Luis's Linux PC install `usbmuxd` + **iLoader**, plug in
-   the iPhone, generate a pairing file, sign in with a **free Apple ID**, install
-   **SideStore**, then install/connect **LocalDevVPN** on the phone.
-3. **Install Wisp** — open `Wisp-unsigned.ipa` in SideStore. It signs + installs it,
-   and **auto-refreshes** the 7-day certificate wirelessly from then on.
-
-Free Apple ID limits: **3 apps max** (SideStore counts as 1 → Wisp is the 2nd),
-**10 app-IDs / 7 days**, **7-day** certificate (SideStore renews it for you).
+> Sideloading tooling moves fast. These steps were checked against the
+> [SideStore docs](https://docs.sidestore.io/) in July 2026 — re-verify before a
+> fresh setup.
 
 ---
 
 ## Step A — Build the unsigned `.ipa` (GitHub Actions, free, no Mac)
 
-The workflow lives at [`.github/workflows/ios-unsigned-ipa.yml`](../.github/workflows/ios-unsigned-ipa.yml).
-It runs on a GitHub-hosted **macOS** runner, so **no Mac is needed** locally.
+The workflow is [`.github/workflows/ios-unsigned-ipa.yml`](../.github/workflows/ios-unsigned-ipa.yml).
+It runs on a GitHub-hosted **macOS** runner, so no Mac is needed locally.
 
-**What it does, step by step:**
-1. Checks out the repo and selects the latest stable **Xcode** (RN 0.81 needs Xcode 16+).
-2. `npm ci` to install JS deps (Node 22, same as CI).
-3. `npx expo prebuild --platform ios --no-install` — generates the native `ios/`
-   project (Wisp is a *managed* Expo app; `/ios` is gitignored).
-4. `pod install` (CocoaPods).
-5. `xcodebuild ... build` in **Release** with **signing disabled**
-   (`CODE_SIGNING_ALLOWED=NO`, etc.) → produces a bare `Wisp.app`. We use plain
-   `build` (not `archive`) precisely because archive/export would demand signing.
-6. Packages the `.app` into `Payload/` and zips it → `Wisp-unsigned.ipa`
-   (an `.ipa` is just that zip).
-7. Uploads it as the **`wisp-unsigned-ipa`** artifact (kept 30 days).
+1. GitHub → **Actions** → **"iOS unsigned IPA (sideload)"** → **Run workflow**.
+   (It is `workflow_dispatch` — manual only, never on push.)
+2. Wait ~15–30 min, open the finished run → **Artifacts** → download
+   `wisp-unsigned-ipa` → unzip → **`Wisp-unsigned.ipa`**.
 
-**To run it:**
-- Push this repo to GitHub (private is fine).
-- GitHub → **Actions** tab → pick **"iOS unsigned IPA (sideload)"** →
-  **Run workflow** (it's `workflow_dispatch`, manual only, so it never runs on push).
-- Wait ~15–30 min. Open the finished run → **Artifacts** → download
-  `wisp-unsigned-ipa` → unzip → you get **`Wisp-unsigned.ipa`**.
+What it does: selects a stable Xcode → `npm ci` → `expo prebuild -p ios`
+(the app is managed; `ios/` is gitignored) → `pod install` → `xcodebuild build`
+in Release with **signing disabled** (`CODE_SIGNING_ALLOWED=NO`) → zips the
+resulting `.app` into `Payload/` (an `.ipa` is just that zip).
 
-> The IPA is **unsigned on purpose** — SideStore signs it with the free Apple ID
-> when you install it. Don't try to install it directly via Finder/Apple Configurator.
+> The IPA is **unsigned on purpose** — SideStore signs it on the device. Don't
+> try to install it directly with Finder or Apple Configurator.
 
-**Free CI minutes note:** macOS runners cost 10× minutes. Public repos get free
-minutes; private repos get a monthly free allowance (~2,000 min ÷ 10 ≈ ~200 macOS
-min). One build (~20 min) is well within that. Run it only when you change the app.
+**CI minutes:** macOS runners bill at 10×. One build (~20 min) fits comfortably
+in the free monthly allowance. Run it only when the app actually changes.
 
 ---
 
-## Step B — One-time SideStore setup (Linux, ~30–45 min)
+## Step B — One-time SideStore setup
 
-The modern desktop tool is **iLoader** (it replaced the old AltServer/Jitterbug
-dance) and it has a **Linux** build, works with a **free Apple ID**, and both
-generates the pairing file and installs SideStore.
+Done from a computer once; after this the phone refreshes itself over Wi-Fi.
+**iLoader** is the current desktop tool (it replaced the old AltServer dance),
+it has a Linux build, and it both generates the pairing file and installs
+SideStore.
 
-**On Luis's Linux PC:**
-1. Install `usbmuxd`: `sudo apt install usbmuxd` (Pop!_OS/Ubuntu/Debian; often
-   already present).
-2. Download **iLoader** for Linux (DEB or AppImage) from <https://iloader.site/>
-   (or its GitHub releases).
-3. Plug Tiffani's iPhone 13 in via **USB**; on the phone tap **Trust** + passcode.
-4. In iLoader: select the device → **Generate** the **pairing file** → sign in
-   with a **free Apple ID** (a dedicated throwaway Apple ID is recommended so it
-   isn't tied to her main account) → **Install SideStore (Stable)**.
-   - *Pairing-file alternative:* the official `iDevicePair-*.AppImage` from the
-     iDevice Pair GitHub can generate just the pairing file if iLoader's path fails.
+**On the computer (Linux/Windows/macOS):**
+
+1. Install `usbmuxd` — `sudo apt install usbmuxd` on Debian/Ubuntu/Pop!\_OS
+   (often already present).
+2. Download **iLoader** (DEB / AppImage) from <https://iloader.site/>.
+3. Plug the iPhone in over **USB**; on the phone tap **Trust** and enter the
+   passcode.
+4. Open iLoader → **sign in with an Apple Account**. With two-factor on, it asks
+   for the **6-digit code** shown on your own trusted device — there is no
+   app-specific password step.
+5. Select the device → generate the **pairing file** → **Install SideStore
+   (Stable)**.
+
+> **Whose Apple Account?** It does **not** have to be the one signed into that
+> iPhone — the SideStore docs say so explicitly, and using your own on someone
+> else's phone is a supported, ordinary setup. See
+> [Which account to use](#which-apple-account-to-use) below before you decide.
 
 **On the iPhone:**
-5. Open **SideStore**; import the pairing file if asked; confirm the Apple ID.
-6. Install the VPN helper **LocalDevVPN** (a.k.a. StosVPN) and **connect** it
-   (approve the VPN profile in iOS Settings). This is what enables **untethered**
-   wireless refresh — no computer needed afterwards.
-7. iOS **Settings → General → VPN & Device Management** → **trust** the developer
-   (the free Apple ID).
+
+6. **Settings → Privacy & Security → Developer Mode → on.** The phone restarts
+   and asks you to confirm. **Required on iOS 16 and later**, and the toggle
+   only appears once a development tool has talked to the device — i.e. after
+   step 5, not before.
+7. Install **LocalDevVPN** (from the App Store) and **connect** it; approve the
+   VPN profile when iOS asks. This is what lets SideStore refresh itself
+   **wirelessly**, with no computer, from now on.
+8. **Settings → General → VPN & Device Management** → find the developer entry
+   under the Apple Account name → **Trust**.
+9. Open **SideStore**, import the pairing file if prompted, and confirm the
+   Apple Account.
 
 ---
 
-## Step C — Install Wisp + how refresh works
+## Step C — Install Wisp, and how refresh works
 
-1. Get `Wisp-unsigned.ipa` onto the phone (AirDrop from a Mac isn't an option on
-   Linux — use a **USB transfer**, a cloud link, or email it to her and open in Files).
-2. In **SideStore** → **+** / **My Apps** → pick the `.ipa` → it **signs and
-   installs** Wisp with the free Apple ID. Wisp now opens like any normal app.
-3. **Refresh:** SideStore re-signs the 7-day certificate **in the background over
-   the VPN**, so it keeps working without a computer. If a refresh ever lapses
-   (phone off > 7 days, VPN disconnected, etc.), Wisp just **stops launching** until
-   refreshed — **your data is safe** (everything is stored on-device) and she only
-   needs to open SideStore on Wi-Fi and tap **Refresh** (still no computer).
+1. Get `Wisp-unsigned.ipa` onto the phone — USB transfer, a cloud link, or
+   email it and open it from Files. (AirDrop isn't an option from Linux.)
+2. In **SideStore** → **+** / **My Apps** → pick the `.ipa`. It signs and
+   installs it. Wisp now opens like any normal app.
+3. **Refresh:** the free certificate lasts **7 days**, and SideStore renews it in
+   the background over the VPN — no computer, ever again. If a refresh does lapse
+   (phone off for a week, VPN disconnected), Wisp simply stops launching until
+   it is refreshed. **No data is lost** — everything is stored on the device —
+   and opening SideStore on Wi-Fi and tapping **Refresh** fixes it.
 
-**Travel:** Tiffani travels rarely (~once every couple of months). Best practice:
-open SideStore and **Refresh right before a trip**. Even if it lapses mid-trip,
-nothing is lost — reopen SideStore on any Wi-Fi to refresh.
+**Travelling:** open SideStore and hit **Refresh** right before a trip. Even if
+it lapses mid-trip, nothing is lost; any Wi-Fi will do.
+
+**Free-account limits:** **3 sideloaded apps per device** (SideStore is one of
+them, so Wisp is the second), **10 app-IDs per 7 days** per account, and the
+**7-day** certificate above.
+
+---
+
+## Which Apple Account to use
+
+Any free Apple Account works, including your own. What matters is where the
+credentials end up.
+
+The sign-in in **step 4 happens on your computer**, not on the phone. But
+SideStore also holds the account **on the device**, because that is what it uses
+to re-sign every 7 days. So if you set up someone else's phone with your
+account, your credential lives on their phone.
+
+That is usually fine, and worth knowing precisely:
+
+- Signing into SideStore is **not** signing the phone into your iCloud. No
+  photos, messages, contacts or purchases. It can only mint development signing
+  certificates.
+- **Two-factor still protects you.** The stored credential cannot be used to log
+  in anywhere new without a code on your trusted device.
+- **Try an app-specific password** in SideStore's own sign-in (generate one at
+  [appleid.apple.com](https://appleid.apple.com) → Sign-In and Security).
+  SideStore is an AltStore fork and AltStore accepts them; the docs don't confirm
+  it, so fall back to the real password if it is rejected. The win is that it is
+  **independently revocable** and your real password never leaves your machine.
+- **To cut access at any time:** revoke that app-specific password (or change
+  your Apple Account password). SideStore can no longer re-sign; the app's data
+  on the phone is untouched.
+
+A dedicated throwaway account is the tidiest option, but Apple wants a phone
+number for a new one, and reusing yours to dodge that is more friction than the
+tidiness is worth.
 
 ---
 
 ## Troubleshooting
 
-- **The build failed — find out *which* step.** In the failed run, open the job
-  and look for the **red step** (its name tells you the stage: prebuild / pods /
-  build / package). The workflow runs every shell step with `set -x`, and on
-  failure it uploads an **`xcodebuild-log`** artifact with the full compiler
-  output. Grab that (or expand the red step) and read the last ~30 lines — that's
-  the real error. (`exit code 66` from `xcodebuild` usually means it couldn't
-  find the scheme/workspace; the build step prints `xcodebuild -list` to show the
-  real names.)
-- **Workflow fails at `xcodebuild`** — usually an Xcode/SDK mismatch. The workflow
-  already pins `latest-stable`; if Apple ships a breaking Xcode, pin a known-good
-  version in `setup-xcode` (e.g. `xcode-version: '16.2'`).
-- **`pod install` errors** — re-run; if it persists, change it to
-  `pod install --repo-update` (refreshes the CocoaPods index).
+- **The build failed — find out _which_ step.** Open the failed run and look for
+  the red step; its name is the stage (prebuild / pods / build / package). Every
+  shell step runs with `set -x`, and on failure the workflow uploads an
+  **`xcodebuild-log`** artifact with the full compiler output. Read its last ~30
+  lines — that is the real error. (`exit code 66` from `xcodebuild` usually means
+  it couldn't find the scheme or workspace; the build step prints `xcodebuild
+-list` so you can see the real names.)
+- **`xcodebuild` fails on an Xcode/SDK mismatch** — the workflow pins
+  `latest-stable`; if Apple ships a breaking Xcode, pin a known-good version in
+  `setup-xcode` (e.g. `xcode-version: '16.2'`).
 - **`pod install` can't resolve a pod** — re-run; if it persists, change the step
-  to `pod install --repo-update` (slower but refreshes the CocoaPods index).
-- **Prebuild complains about a missing icon/asset** — harmless warnings are fine;
-  a hard failure means an asset path in `app.config.ts` is wrong.
-- **SideStore "Maximum number of apps" / can't install** — free Apple IDs allow
-  **3 apps total**. Remove an unused sideloaded app, or the **10 app-IDs per 7
-  days** quota was hit (wait out the week).
-- **App won't open after a while** — the cert expired; open SideStore → Refresh.
-- **iLoader can't see the device on Linux** — make sure `usbmuxd` is running and
-  the phone shows **Trust** when plugged in; try a different USB cable/port.
+  to `pod install --repo-update` (slower, refreshes the CocoaPods index).
+- **iLoader can't see the device on Linux** — check `usbmuxd` is running, that the
+  phone showed the **Trust** prompt, and try another cable or port.
+- **Developer Mode isn't in Settings** — it only appears after a development tool
+  has connected. Do step 5 first.
+- **SideStore says "maximum number of apps"** — free accounts allow 3 per device.
+  Remove an unused sideloaded app. If that isn't it, you hit the 10-app-IDs-per-7-
+  days quota; wait out the week.
+- **The app stopped opening** — the certificate expired. Open SideStore → Refresh.
 
 ---
 
-## The paid path (OPEN — not doing this now)
+## The paid path (open, not taken yet)
 
-When/if Luis pays the **$99/year Apple Developer** fee, this all gets much simpler
-and SideStore is no longer needed:
+Paying the **$99/year Apple Developer** fee removes all of the above — no
+SideStore, no VPN, no weekly refresh, no IPA juggling:
 
-- `eas build -p ios --profile preview` (internal distribution) **or** TestFlight.
-- **TestFlight** is the cleanest: she installs from the TestFlight app, the build
-  lasts **90 days** per upload (and the cert is a full year), **no weekly refresh,
-  no VPN, no IPA juggling**. Up to 100 internal testers.
-- This is tracked as Phase 8 release prep. Left open intentionally.
+- `eas build -p ios --profile preview`, then **TestFlight**.
+- Builds last **90 days** per upload, the certificate a full year, and testers
+  install from the TestFlight app. Up to 100 internal testers.
 
----
-
-## Sources
-
-- SideStore docs (prerequisites / install / pairing file / FAQ): <https://docs.sidestore.io/>
-- iLoader: <https://iloader.site/>
-- Building unsigned `.ipa`: the standard `CODE_SIGNING_ALLOWED=NO` + `Payload/` zip approach.
-
-*(Sideloading tooling changes fast — re-verify the iLoader/SideStore/LocalDevVPN
-steps against their current docs before a fresh setup.)*
+Tracked as release prep. Left open on purpose.

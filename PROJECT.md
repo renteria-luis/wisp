@@ -28,12 +28,18 @@ A third, quieter differentiator: **warmth.** Almost every quit app is clinical a
 
 ## 2. Target user (real persona)
 
-Built first for one real user, then generalizable.
+Built first for one real user, then generalized. The persona is deliberately not
+named in this repo; what matters is the shape of her behaviour, which is what
+the defaults are tuned to.
 
-- **Primary user:** Tiffani — light smoker (~3–4 cigarettes/day). Likely routed to the **Gradual Reduction** track. Loves Finch (customizing her avatar and home, daily encouragement, hugs). **Plays muted** → no sound/voice in v1; use haptics for feedback instead.
-- **Her known triggers (seed the trigger system with these as defaults/examples):**
-  - Work breaks at Starbucks: **3 breaks/shift — two of 15 min, one of 30 min** (times configurable in onboarding).
-  - **Commute:** on the way to the bus stop / while waiting for the bus.
+- **Primary user:** a light smoker (~3–4 cigarettes/day) who wants to stop but
+  isn't ready to stop dead — so she is routed to the **Gradual Reduction** track.
+  She loves Finch (customizing an avatar, daily encouragement, hugs), and she
+  **keeps her phone muted**, which is where the no-sound / haptics-only rule
+  comes from (§17).
+- **Her triggers** — seed the trigger system with these as the worked example:
+  - **Work breaks:** 3 per shift — two of 15 min, one of 30 min (configurable).
+  - **Commute:** walking to the bus stop, and waiting for the bus.
   - **Alcohol / social:** smokes when drinking.
 - The app must still generalize: any smoker, any consumption level, either track.
 
@@ -53,7 +59,7 @@ Built first for one real user, then generalizable.
 10. **Health timeline:** personalizable by gender, age, smoking frequency, years smoking, start date.
 11. **Progress views:** trend-based metrics, animated charts, streak + under-target win days.
 12. **i18n:** English (default) + Spanish.
-13. **Personal touches:** "Made with ♥ for Tiffani" dedication + 2–3 hidden easter eggs (driven by `personal.config.ts`).
+13. **Personal touches:** a dedication line + 2–3 hidden easter eggs, all driven by `personal.config.ts` — the one file that carries anything personal.
 14. **Monetization scaffold** (inactive in v1): a single `isPremium` flag; full app is free for us (see §13).
 
 **Explicitly out of scope for v1** (tracked in §22): sound/voice, community/social, remote push, any backend, real In-App Purchase wiring, ML.
@@ -67,7 +73,7 @@ Built first for one real user, then generalizable.
 1. **Welcome** — name + short framing.
 2. **Consumption** — cigarettes/day, pack price (after-tax), cigarettes per pack, currency.
 3. **Profile** — gender, age, years smoking, started-smoking date (for the health timeline).
-4. **Triggers** — pick trigger categories (work breaks, commute, alcohol/social, after meals, stress, boredom…) and, for time-bound ones, configure windows (e.g., Tiffani's 15/15/30 breaks, commute time).
+4. **Triggers** — pick trigger categories (work breaks, commute, alcohol/social, after meals, stress, boredom…) and, for time-bound ones, configure windows (e.g. two 15-minute breaks and one 30-minute break in a shift, or the commute).
 5. **Readiness** — 2–3 questions (confidence, preference for quitting outright vs cutting down). Combined with consumption + dependence to choose the track. Let the user override the suggested track.
 6. **Plan preview** — shows assigned track, the plan/schedule, target date, and the companion greeting the user by name.
 
@@ -232,7 +238,7 @@ The defining mechanic: **the longer the smoke-free stretch, the faster coins acc
 ## 9. Triggers & notifications (all LOCAL)
 
 - Only **local** notifications are used in v1 (scheduled on-device). No remote push, no server. This is the only kind this app needs and it works in Expo Go on iOS.
-- **Trigger windows → schedules** (`triggers.ts` + `src/notifications/scheduler.ts`): a gentle notification a few minutes before each configured window (Tiffani's 15/15/30 breaks, commute time, etc.), deep-linking to the craving toolkit + a companion interaction offering a 2-minute alternative instead of the cigarette. The 30-min break can offer a slightly longer ritual; the 15-min ones a quick breathing exercise.
+- **Trigger windows → schedules** (`triggers.ts` + `src/notifications/scheduler.ts`): a gentle notification a few minutes before each configured window (the shift breaks, the commute, etc.), deep-linking to the craving toolkit + a companion interaction offering a 2-minute alternative instead of the cigarette. The 30-min break can offer a slightly longer ritual; the 15-min ones a quick breathing exercise.
 - **Situational "I'm out / drinking" mode:** a manual toggle that, for a few hours, raises support density (more frequent check-ins, one-tap craving access). Alcohol/social is a high-risk situational trigger.
 - **Daily rituals:** morning greeting + optional evening reflection, gentle, never nagging.
 - **Quiet hours:** user-configurable; suppress notifications overnight.
@@ -250,28 +256,29 @@ The defining mechanic: **the longer the smoke-free stretch, the faster coins acc
 
 ## 11. Personal touches (`src/personal/personal.config.ts`)
 
-A **single file** the user edits for all personalization. Shape:
+**One file holds everything personal**, so a public build is a single file swap
+and nothing personal leaks into the rest of the codebase. Shape:
 
 ```ts
 export const personal = {
   appName: 'Wisp',
   companionDefaultName: 'Wisp',
-  dedicateeName: 'Tiffani',
-  authorName: '<your name>', // EDIT
-  dedicationLine: 'Made with ♥ for Tiffani',
-  specialDate: 'MM-DD', // OPTIONAL anniversary — EDIT or leave null
-  specialNumber: null as number | null, // OPTIONAL inside number for an easter egg — EDIT
+  dedicateeName: '<name>',
+  authorName: '<name>',
+  dedicationLine: 'Made with ♥ for <name>',
+  specialDate: 'MM-DD', // OPTIONAL anniversary — or null
+  specialNumber: null as number | null, // OPTIONAL, for an easter egg
   easterEggs: {
-    companionLongPress:
-      "Tiffani — I'm proud of you. Every hard day is worth it. — <your name>", // EDIT
-    savingsOrStreakNote:
-      "Look how far you've come. I knew you could. — <your name>", // EDIT
-    hiddenSpaceNote: 'L ♥ T', // EDIT
-    specialDateGreeting:
-      "Happy day, Tiffani. Today, like every day, I'm in your corner.", // OPTIONAL
+    companionLongPress: '<a private message>',
+    savingsOrStreakNote: '<a private message>',
+    hiddenSpaceNote: '<initials>',
+    specialDateGreeting: '<a private message>', // OPTIONAL
   },
 };
 ```
+
+The values above are placeholders on purpose — the real ones live in the working
+copy and are none of this document's business.
 
 ### Dedication
 
@@ -467,20 +474,26 @@ Provide a small dev-seed utility (behind `__DEV__`) to populate sample logs for 
 
 ### 19.1 Free dev path (no Mac, no Apple account) — use this first
 
-- Develop on Pop!\_OS. Run `npx expo start`.
-- **Preview options on Linux:** (1) **Expo web** in the browser for fast layout iteration; (2) **a real iPhone via the Expo Go app** (install Expo Go free, scan the QR) — this is the primary preview and works on **both** the iPhone 16 Pro Max and the iPhone 13 simultaneously. **Note: there is no iOS Simulator on Linux** (Simulator is macOS-only); the real device + web preview cover it.
-- Local notifications, SQLite, charts, companion, haptics, i18n all work in Expo Go. This path is **$0** and good for the whole build + personal daily use.
+- Develop on Linux. Run `npx expo start`.
+- **Preview options on Linux:** (1) **a real iPhone via Expo Go** (free, scan the QR) — this is the primary preview and works on several phones at once; (2) **Expo web** in the browser for fast layout iteration only. **There is no iOS Simulator on Linux** (it is macOS-only), so the real device carries the load.
+- Local notifications, SQLite, charts, companion, haptics and i18n all work in Expo Go. This path is **$0** and good for the whole build plus daily personal use.
+- **Web is a layout preview, not a target.** SQLite on the web needs `SharedArrayBuffer`, so it only works where COOP/COEP headers are served (`expo start` does; a static host generally does not), and haptics, local notifications and the gesture-driven sheets are meaningless in a browser. Don't ship a hosted web demo — it would misrepresent the app.
+
+### 19.1b Free installable path (no Mac, no Apple account) — sideloading
+
+- A **GitHub Actions** macOS runner builds an **unsigned `.ipa`**; **SideStore** signs it on the device with a free Apple Account and re-signs it wirelessly every 7 days.
+- Full procedure: **[`docs/SIDELOADING.md`](./docs/SIDELOADING.md)**. Nothing to implement in the app.
 
 ### 19.2 Real-app path ($99/year, when ready) — TestFlight + App Store
 
 - Enroll in the Apple Developer Program ($99/year) when you want the app as a standalone installable app and/or to publish.
 - **EAS Build** compiles iOS in the cloud (no Mac). **EAS Submit** uploads to TestFlight/App Store.
-- **TestFlight:** invite both Apple IDs; installs as a real app on both phones; builds last 90 days (re-upload via EAS is one command); free for testers; this is also the App Store staging ground.
-- Configure `eas.json` (dev/preview/production profiles) and `app.config.ts` (bundle id, name from `personal.config.ts`, icons, splash). Min iOS target: **iOS 16** (TestFlight requirement; covers iPhone 13 and 16 Pro Max easily).
+- **TestFlight:** invite the testers' Apple Accounts; installs as a real app; builds last 90 days (re-upload via EAS is one command); free for testers; also the App Store staging ground.
+- Configure `eas.json` (dev/preview/production profiles) and `app.config.ts` (bundle id, name from `personal.config.ts`, icons, splash). Min iOS target: **iOS 16**.
 
 ### 19.3 Compatibility
 
-- Responsive layouts + safe-area handling so it looks right on iPhone 13 through 16 Pro Max (and any size in between). No device-specific assumptions.
+- Responsive layouts + safe-area handling, no device-specific assumptions: it must look right from a small iPhone to a Pro Max.
 
 ---
 
@@ -496,7 +509,16 @@ Work **one phase at a time.** Each phase must end with: app boots and runs in Ex
 - **Phase 5 — Craving toolkit & triggers/notifications.** Breathing guide, craving timer, distraction; trigger windows → local notification scheduling; situational mode; daily rituals; quiet hours. _DoD:_ panic button works; scheduled notifications fire; situational mode raises support.
 - **Phase 6 — Charts & health timeline.** Custom animated SVG charts (cigarette trend, savings over time, allowance vs actual) + personalized health timeline. _DoD:_ Progress screen shows animated charts + timeline.
 - **Phase 7 — i18n completion, personal touches & polish.** Full en/es strings, About + dedication, the 2–3 easter eggs via `personal.config.ts`, settings (language, profile edit, notifications, export/reset), accessibility, empty/edge states, visual polish, dark mode. _DoD:_ language switch works; dedication + easter eggs present; app feels finished.
-- **Phase 8 — Release prep (only when ready, $99).** `eas.json` profiles, app icon + splash, EAS dev build, TestFlight submit, optional StoreKit `isPremium` wiring. _DoD:_ installable build on TestFlight on both phones.
+- **Phase 8 — Release prep (only when ready, $99).** `eas.json` profiles, app icon + splash, EAS dev build, TestFlight submit, optional StoreKit `isPremium` wiring. _DoD:_ installable build on TestFlight.
+
+**Phases 0–7 are done.** A substantial body of work landed after them, outside
+the original plan — see `PROGRESS.md` for the current state. In short: a running
+recovery model with 30 cited milestones, a wishlist economy you spend real
+savings on, a day-grouped cigarette history with backfill, a distraction library
+that learns what worked, an in-app splash, themes (light/dark/vivid), a
+haptics-only feedback layer with a switch, and a **16-step guided tour that runs
+on a throwaway sandbox world** so a first-time user can practise on live UI
+without touching their real data. Only Phase 8 remains.
 
 ---
 
@@ -526,8 +548,8 @@ Work **one phase at a time.** Each phase must end with: app boots and runs in Ex
 
 ## 22. Out of scope now / future ideas
 
-- **Sound & voice** (she plays muted now) — optional later, off by default.
-- **ML trigger insights (v2, on-device).** Once enough craving data exists, surface descriptive patterns ("cravings cluster around 5pm / bus stops / drinking"). Honestly, this is mostly descriptive statistics, not heavy ML; a small on-device "craving-risk" model is a possible portfolio flex but thin with one user's data. Rules win for v1.
+- **Sound — rejected, not deferred.** A craving lands at work, at dinner, on the street, and an app that chirps when you tap "I smoked" is one you cannot open in front of people, which is exactly when it is needed. Touch says the same thing privately, so haptics are the only feedback channel (`src/utils/feedback.ts`, with a switch). Two further nails: iOS mutes ambient audio on the silent switch, so most of it would go unheard anyway; and any playback has to claim an audio session, which risks ducking her music during the very craving the app is meant to help with. There is deliberately **no failure or warning haptic** either — the app does not buzz at you for smoking.
+- **ML trigger insights.** Considered and declined at this data scale (~1,100 rows and about five usable features per user). A per-user hour-of-day histogram _is_ the optimal model for that signal, and it is explainable, offline, and ~80 lines; a learned model would be a worse version of it with a story attached. NLP over the notes is redundant — the mood check-in already gives that signal cleanly. Public datasets are population-level surveys, and that knowledge is already encoded in the cited recovery milestones. Revisit only if the data ever gets deep enough to earn it.
 - **LLM coach chat (opt-in, needs a tiny key-holding proxy).** Could power dynamic encouragement/Q&A; gated behind premium for a public release. Not v1 (would break on-device/no-backend).
 - **Community/social** (peer support) — needs a backend; later.
 - **Richer companion animation** via Skia/Lottie in a dev build.

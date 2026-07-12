@@ -1,61 +1,70 @@
 # PROGRESS
 
-## Current phase: 7 — i18n, personal touches & polish (status: done)
+## Current phase: post-Phase-7 — feature-complete v1 (status: done, pending release)
 
-Wisp now feels like a finished v1: a full Settings screen, on-device data
-export/erase, a daily mood check-in, the personal dedication + easter eggs, a
-"what you could buy instead" savings goal, and app-wide dark mode. `lint`,
-`typecheck`, and **71 tests** pass; iOS and web bundles export cleanly
-(SDK 54 / Expo Go). Only **Phase 8 (release prep)** remains.
+Phases **0–7 are done**, and a large body of work landed after them (below).
+`lint`, `typecheck` and **104 tests** pass; the iOS and web bundles export
+cleanly on **Expo SDK 54 / Expo Go**. The app is functionally finished: what is
+left is release, not features.
 
 > **Phases done:** 0 (scaffold), 1 (data layer), 2 (onboarding & plan engine),
 > 3 (adherence & savings), 4 (companion & economy), 5 (craving & notifications),
-> 6 (charts & health timeline), 7 (polish). Plus post-roadmap work: an SDK-54
-> retarget, a UX batch (claimable pending coins, cosmetic preview, God Mode),
-> cigarette source/manner logging (shared/gifted), and unlockable companion
-> characters. All merged to `main`; commits carry no the agent attribution.
+> 6 (charts & health timeline), 7 (i18n, personal touches, polish).
+> All merged to `main`.
 
-## Done (Phase 7)
+## Done since Phase 7 (outside the original roadmap)
 
-- **Settings** (`app/settings.tsx`, reached via the gear in Space): edit your
-  name + companion name, profile (gender/age/years), pricing/currency,
-  notification toggle + quiet-hours steppers (reschedules on change), and a
-  language override (auto/en/es) applied on launch.
-- **Data ownership** (`src/utils/appData.ts`, §12): one-tap **export** of every
-  store + SQLite table to a shared JSON file, and a confirmed **erase all**.
-  Native modules (`expo-file-system`/`expo-sharing`) are lazy-imported.
-- **Daily mood check-in** (`app/checkin.tsx`): a warm 5-mood ritual that writes
-  to `check_in` and awards coins once per day.
-- **Personal touches** (`personal.config.ts`, §11): the About screen (dedication,
-  version, privacy, credits) plus all four easter eggs — companion long-press
-  heart burst, one-time savings note, hidden Space star, optional special-date
-  greeting.
-- **Savings goals** (§6.8): a "what you could buy instead" next-goal bar in the
-  Progress savings card.
-- **Dark mode** (§17): `dark:` variants across the shared components and every
-  screen/chart; follows the system appearance.
-- EN/ES strings for all of the above (locale-parity test passes).
+- **Recovery model + health milestones.** A running recovery score and **30
+  cited milestones** from 20 minutes to 15 years, personalised by profile.
+- **Wishlist economy.** Add things you actually want, then buy them with coins
+  earned from real savings; purchased items become "treats" you can look back on.
+- **Cigarette history.** Day-grouped log with a per-day filter, a week/month/all
+  trend range, and **manual backfill** for a day you forgot — with the whole
+  progress view live-refreshing after a backfill.
+- **Distraction library** that records which distractions actually helped you,
+  and surfaces those first.
+- **Guided tour.** A **16-step tour that runs on a throwaway sandbox world** —
+  the user really taps Log, really sees the cigarette land in the chart, really
+  resists a craving, all on live UI without touching one byte of real data. Each
+  step declares the one route it lives on; the controller reconciles the real
+  route against it and steers back if anything drifts, and the overlay refuses
+  to spotlight anything off its own screen.
+- **Celebrations**, an in-app splash on cold start, an ebooks/reading screen, and
+  a **God Mode** debug panel (`__DEV__` only).
+- **Themes:** light, dark and a vivid palette, following the system by default.
+- **Feedback layer** (`src/utils/feedback.ts`): every haptic routed through one
+  module, with a Settings switch. No sound anywhere — see PROJECT.md §22 for why.
+- **Companion sprite system** with several unlockable characters and accessories.
 
 ## Next steps
 
-- **Phase 8 — Release prep (optional, needs a $99 Apple Developer account).**
-  1. `eas.json` profiles (dev/preview/production) + `app.config.ts` bundle id,
-     name, icon, splash, min iOS 16.
-  2. EAS dev build → **TestFlight** submit (both iPhones).
-  3. Optional StoreKit wiring for the existing `isPremium` flag (forced open).
-  - DoD: an installable TestFlight build on both phones.
+- **Phase 8 — Release prep.** Two paths, both open:
+  1. **Free / sideload** — `docs/SIDELOADING.md` (GitHub Actions builds an
+     unsigned IPA; SideStore signs it on-device with a free Apple Account). The
+     workflow already exists and works.
+  2. **Paid ($99/yr)** — `eas.json` profiles → EAS build → **TestFlight**. No
+     weekly refresh, no VPN. This is the cleaner long-term path.
+- Add the four screenshots the README embeds (`docs/screenshots/`).
+- Companion art: finish the AI-generated originals (see the note below).
 
 ## Notes / deviations from PROJECT.md
 
-- **Companion characters are placeholder SVG silhouettes.** The user wants to
-  replace them with detailed, Secret-style **AI-generated original** art later
-  (e.g. Niji Journey / Recraft-to-SVG), swapped per vitality band. Tracked as a
-  visual follow-up, not a blocker.
-- **Dark mode follows the system** (no in-app Light/Dark override toggle yet).
-- **Trigger windows use sensible per-category defaults**; a precise per-window
-  editor (e.g. Tiffani's 15/15/30 breaks) is still future polish.
-- _(Carried)_ Notifications are local-only (Expo Go iOS); inventory lives in
-  Zustand, not the SQLite `inventory` table; only `economy_ledger` uses SQLite;
-  retargeted to **Expo SDK 54**; typed routes on but `tsc`/CI run with
-  `.expo/types` absent; SVG/Reanimated charts; Spanish feminine for the
-  dedicatee; route files default-export, shared modules named.
+- **Companion art is a work in progress.** The sprite system is built and
+  driven by vitality; the original characters still need a final art pass
+  (borderless regeneration plus a ground shadow). Not a blocker.
+- **Trigger windows use per-category defaults**; a precise per-window editor
+  (e.g. two 15-minute breaks and one 30-minute break in a shift) is still
+  future polish.
+- **Theme is a real setting now** (system / light / dark / vivid), not just
+  "follows the system" as originally specced.
+- _(Carried)_ Notifications are local-only; inventory lives in Zustand, not the
+  SQLite `inventory` table (only `economy_ledger` uses SQLite); typed routes are
+  on but `tsc`/CI run with `.expo/types` absent; charts are hand-built with
+  SVG + Reanimated; route files default-export, shared modules are named.
+
+## Image assets — read before making the repo public
+
+`assets/` contains third-party character artwork used for a **private, personal
+build**. It is excluded from the MIT licence (see `LICENSE`), but a licence note
+is not a licence to redistribute: if this repo goes public as a portfolio piece,
+either remove that artwork from the public history or keep the repo private.
