@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Wisp",
+    "appName": "{{appName}}",
     "loading": "Cargando…",
     "close": "Cerrar",
     "back": "Atrás",
@@ -33,7 +33,7 @@
     "quietEnd": "Hasta",
     "feedback": "Respuesta táctil",
     "enableHaptics": "Vibración",
-    "hapticsNote": "Wisp nunca suena — solo un toque suave, para que puedas abrirla donde sea.",
+    "hapticsNote": "{{appName}} nunca suena — solo un toque suave, para que puedas abrirla donde sea.",
     "language": "Idioma",
     "lang": {
       "auto": "Automático",
@@ -59,13 +59,13 @@
     "importBody": "Esto reemplaza tu plan, registros y ajustes actuales por los del archivo que elijas.",
     "importConfirm": "Elegir archivo",
     "importDone": "Datos importados.",
-    "importInvalid": "Ese archivo no es una exportación de Wisp.",
+    "importInvalid": "Ese archivo no es una exportación de {{appName}}.",
     "importError": "No se pudo importar. Intenta de nuevo.",
     "reset": "Borrar todos los datos",
     "resetTitle": "¿Borrar todo?",
     "resetBody": "Esto elimina permanentemente tu plan, registros, monedas y ajustes. No se puede deshacer.",
     "resetConfirm": "Borrar",
-    "about": "Acerca de Wisp"
+    "about": "Acerca de {{appName}}"
   },
   "tabs": {
     "home": "Inicio",
@@ -90,7 +90,7 @@
     "pickCompanion": "Elige tu compañero"
   },
   "onboarding": {
-    "welcomeTitle": "Bienvenida a Wisp",
+    "welcomeTitle": "Bienvenida a {{appName}}",
     "welcomeBody": "Una compañía amable para ayudarte a fumar menos, a tu propio ritmo.",
     "getStarted": "Empezar",
     "nameLabel": "¿Cómo te llamo?",
@@ -668,7 +668,7 @@
     "character": "Personaje"
   },
   "character": {
-    "char_wisp": "Wisp",
+    "char_wisp": "{{appName}}",
     "char_cat": "Gatito",
     "char_bunny": "Conejito",
     "char_bird": "Pajarito",
@@ -752,7 +752,7 @@
     "triggerBody": "Suele ser un momento de cigarro. ¿Probamos 2 minutos juntas en su lugar?",
     "situationalTitle": "Aquí estoy",
     "situationalBody": "¿Momento difícil? Toca para respirar o un temporizador de antojo.",
-    "nudgeTitle": "Wisp 💛",
+    "nudgeTitle": "{{appName}} 💛",
     "nudgeBody1": "Solo paso a saludar — ¿cómo vas? 💛",
     "nudgeBody2": "Una respiración y un momento para ti. Tú puedes.",
     "nudgeBody3": "Aquí estoy si aparece un antojo — tócame cuando quieras.",

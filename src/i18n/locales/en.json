@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Wisp",
+    "appName": "{{appName}}",
     "loading": "Loading…",
     "close": "Close",
     "back": "Back",
@@ -33,7 +33,7 @@
     "quietEnd": "Until",
     "feedback": "Feedback",
     "enableHaptics": "Vibration",
-    "hapticsNote": "Wisp never makes a sound — a gentle tap is all it uses, so you can open it anywhere.",
+    "hapticsNote": "{{appName}} never makes a sound — a gentle tap is all it uses, so you can open it anywhere.",
     "language": "Language",
     "lang": {
       "auto": "Automatic",
@@ -59,13 +59,13 @@
     "importBody": "This replaces your current plan, logs and settings with the ones in the file you pick.",
     "importConfirm": "Choose file",
     "importDone": "Data imported.",
-    "importInvalid": "That file isn't a Wisp export.",
+    "importInvalid": "That file isn't a {{appName}} export.",
     "importError": "Couldn't import. Please try again.",
     "reset": "Erase all data",
     "resetTitle": "Erase everything?",
     "resetBody": "This permanently deletes your plan, logs, coins and settings. It can't be undone.",
     "resetConfirm": "Erase",
-    "about": "About Wisp"
+    "about": "About {{appName}}"
   },
   "tabs": {
     "home": "Home",
@@ -90,7 +90,7 @@
     "pickCompanion": "Choose your companion"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to Wisp",
+    "welcomeTitle": "Welcome to {{appName}}",
     "welcomeBody": "A gentle companion to help you smoke less — at your own pace.",
     "getStarted": "Get started",
     "nameLabel": "What should I call you?",
@@ -668,7 +668,7 @@
     "character": "Character"
   },
   "character": {
-    "char_wisp": "Wisp",
+    "char_wisp": "{{appName}}",
     "char_cat": "Kitty",
     "char_bunny": "Bunny",
     "char_bird": "Birdie",
@@ -752,7 +752,7 @@
     "triggerBody": "This is a usual moment for a cigarette. Want to try 2 minutes with me instead?",
     "situationalTitle": "I'm right here",
     "situationalBody": "Tricky moment? Tap for a quick breath or a craving timer.",
-    "nudgeTitle": "Wisp 💛",
+    "nudgeTitle": "{{appName}} 💛",
     "nudgeBody1": "Just popping in — how are you doing? 💛",
     "nudgeBody2": "A breath and a moment for you. You've got this.",
     "nudgeBody3": "Here if a craving shows up — tap me anytime.",

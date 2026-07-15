@@ -10,9 +10,14 @@
  * whoever happens to be holding the phone. The only name in it is the author's,
  * which is a credit rather than a confidence.
  */
+import brand from './brand.json';
+
 export const personal = {
-  appName: 'Wisp',
-  companionDefaultName: 'Wisp',
+  /** The app's name, everywhere the UI shows it. Reads brand.json — the same
+   *  file app.config.ts uses for the native name — so the two can never drift.
+   *  A build for someone else swaps that one JSON and the whole brand follows. */
+  appName: brand.name,
+  companionDefaultName: brand.name,
   /** Falls back into the companion's greeting if the user never gave a name. */
   dedicateeName: 'friend',
   authorName: 'Luis Renteria',

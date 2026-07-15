@@ -8,6 +8,7 @@
  * never touch them.
  */
 import { getDb } from '@/data/db';
+import { personal } from '@/personal/personal.config';
 import { useCompanion } from '@/store/useCompanion';
 import { useEconomy } from '@/store/useEconomy';
 import { useLogs } from '@/store/useLogs';
@@ -50,6 +51,9 @@ export function collectAppState(): Record<string, unknown> {
   const economy = useEconomy.getState();
   const recovery = useRecovery.getState();
   return {
+    // A fixed format marker, not the display name — it stays 'Wisp' across every
+    // build so an export from one can be imported into another. Not user-facing;
+    // do not tie it to personal.appName.
     app: 'Wisp',
     schema: 2,
     exportedAt: new Date().toISOString(),
@@ -97,12 +101,13 @@ export async function exportAppData(): Promise<ExportOutcome> {
     const json = JSON.stringify(payload, null, 2);
     const FS = await import('expo-file-system/legacy');
     const Sharing = await import('expo-sharing');
-    const uri = `${FS.cacheDirectory ?? ''}wisp-export-${todayISO()}.json`;
+    const slug = personal.appName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const uri = `${FS.cacheDirectory ?? ''}${slug}-export-${todayISO()}.json`;
     await FS.writeAsStringAsync(uri, json);
     if (!(await Sharing.isAvailableAsync())) return 'unavailable';
     await Sharing.shareAsync(uri, {
       mimeType: 'application/json',
-      dialogTitle: 'Wisp',
+      dialogTitle: personal.appName,
       UTI: 'public.json',
     });
     return 'shared';
@@ -184,7 +189,8 @@ async function restoreAppState(data: Record<string, unknown>): Promise<void> {
   if (logs) {
     const db = await getDb();
     for (const table of TABLES) {
-      if (Array.isArray(logs[table])) await restoreTable(db, table, logs[table]);
+      if (Array.isArray(logs[table]))
+        await restoreTable(db, table, logs[table]);
     }
   }
   await useLogs

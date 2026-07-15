@@ -7,6 +7,7 @@ import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { personal } from '@/personal/personal.config';
 import { setDateLocale } from '@/utils/date';
 
 import en from './locales/en.json';
@@ -36,7 +37,13 @@ if (!i18n.isInitialized) {
     resources,
     lng: initial,
     fallbackLng: defaultLanguage,
-    interpolation: { escapeValue: false },
+    interpolation: {
+      escapeValue: false,
+      // `{{appName}}` resolves in every string without threading the name
+      // through each `t()` call — so the whole UI is branded from one place,
+      // and a build for someone else changes only brand.json.
+      defaultVariables: { appName: personal.appName },
+    },
     returnNull: false,
   });
 }

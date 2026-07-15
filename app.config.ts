@@ -1,19 +1,22 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
+import brand from './src/personal/brand.json';
+
 const BUNDLE_ID = 'com.luisrenteria.wisp';
 
 /**
  * Dynamic Expo config.
  *
- * NOTE: the native display name is intentionally inlined here rather than
- * imported from `src/personal/personal.config.ts`. Expo's config loader
- * transpiles only this file, so it cannot resolve relative `.ts` imports at
- * config-eval time. Keep this `name` in sync with `personal.appName`
- * (the runtime/UI source of truth). See PROGRESS.md.
+ * The display name (under the home-screen icon, on the splash) comes from
+ * `src/personal/brand.json` — a plain JSON so Expo's config loader can resolve
+ * it here (it cannot resolve `.ts` imports at config-eval time, which is why the
+ * name does not come straight from personal.config). That one JSON is the single
+ * brand switch: `personal.appName` reads it too, so the native name and every UI
+ * string always agree, and a build for someone else swaps just that file.
  */
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'Wisp',
+  name: brand.name,
   slug: 'wisp',
   version: '1.0.0',
   orientation: 'portrait',
